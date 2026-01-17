@@ -7,7 +7,7 @@ const Biography: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div className="relative animate-in fade-in slide-in-from-left-8 duration-700">
           <img 
-            src="https://picsum.photos/seed/albasax-bio/800/1000" 
+            src="/IMG_2495.webp" 
             alt="Albasax Portrait" 
             className="w-full h-auto grayscale hover:grayscale-0 transition-all duration-1000 shadow-2xl"
           />
@@ -16,11 +16,11 @@ const Biography: React.FC = () => {
 
         <div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-700">
           <header>
-            <span className="text-yellow-600 tracking-[0.4em] uppercase text-sm font-bold">The Artist</span>
-            <h2 className="text-5xl md:text-7xl font-serif mt-2">Albasax</h2>
+            <span className="text-yellow-600 tracking-[0.2em] md:tracking-[0.4em] uppercase text-xs md:text-sm font-bold">The Artist</span>
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-serif mt-2">Albasax</h2>
           </header>
 
-          <div className="space-y-6 text-gray-300 leading-relaxed text-lg font-light">
+          <div className="space-y-6 text-gray-300 leading-relaxed text-base md:text-lg font-light">
             <p>
               Born in the heart of the jazz revival, Albasax has spent the last decade reinventing the boundaries of woodwind instruments. With a unique style that fuses neoclassical arrangements with electronic ambient layers, they have captivated audiences from intimate basement clubs in London to grand concert halls in Tokyo.
             </p>
@@ -36,11 +36,7 @@ const Biography: React.FC = () => {
           </div>
 
           <div className="pt-4">
-            <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Signature_of_John_Coltrane.png" 
-              alt="Signature" 
-              className="h-16 invert brightness-200"
-            />
+             {/* Signature removed */}
           </div>
         </div>
       </div>

@@ -13,9 +13,9 @@ const Tour: React.FC = () => {
   };
 
   return (
-    <div className="pt-32 pb-20 px-4 max-w-7xl mx-auto">
-      <header className="mb-16 text-center">
-        <h2 className="text-5xl font-serif mb-4">Tour Dates</h2>
+    <div className="pt-24 md:pt-32 pb-16 md:pb-20 px-4 max-w-7xl mx-auto">
+      <header className="mb-10 md:mb-16 text-center">
+        <h2 className="text-4xl md:text-5xl font-serif mb-4">Tour Dates</h2>
         <div className="h-1 w-20 bg-yellow-600 mx-auto" />
       </header>
 

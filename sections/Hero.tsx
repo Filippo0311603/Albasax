@@ -16,12 +16,12 @@ const Hero: React.FC = () => {
 
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-        <h1 className="text-6xl md:text-8xl font-serif text-white leading-tight">
-          Midnight Echoes <br />
-          <span className="text-2xl md:text-3xl font-light tracking-[0.5em] uppercase text-gray-300">New Album Out Now</span>
+        <h1 className="text-5xl sm:text-6xl md:text-8xl font-serif text-white leading-tight">
+          Albasax <br />
+          <span className="block mt-4 text-xs sm:text-xl md:text-3xl font-light tracking-[0.2em] sm:tracking-[0.5em] uppercase text-gray-300">New Album Out Now</span>
         </h1>
         
-        <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto font-light leading-relaxed">
+        <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto font-light leading-relaxed">
           Embark on a sonic journey where classical soul meets modern atmosphere. 
           Albasax's most ambitious project to date is available globally.
         </p>

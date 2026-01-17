@@ -9,7 +9,9 @@ import Tour from './sections/Tour';
 import Music from './sections/Music';
 import Shop from './sections/Shop';
 import Press from './sections/Press';
+import ArticleView from './sections/ArticleView';
 import Media from './sections/Media';
+
 import Auth from './sections/Auth';
 import Cart from './sections/Cart';
 import { User } from './types';
@@ -53,7 +55,8 @@ const App: React.FC = () => {
           <Route path="/shop" element={<Shop />} />
           <Route path="/media" element={<Media />} />
           <Route path="/press" element={<Press />} />
-          <Route path="/auth" element={<Auth onLogin={setUser} />} />
+          <Route path="/press/:id" element={<ArticleView />} />
+          <Route path="/auth" element={<Auth user={user} onLogin={setUser} onLogout={() => setUser(null)} />} />
         </Routes>
       </main>
 

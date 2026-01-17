@@ -4,18 +4,18 @@ import { Package, Bell } from 'lucide-react';
 
 const Shop: React.FC = () => {
   return (
-    <div className="pt-32 pb-20 px-4 h-[80vh] flex items-center justify-center">
-      <div className="max-w-xl w-full text-center space-y-12 animate-in zoom-in duration-700">
+    <div className="pt-24 md:pt-32 pb-16 md:pb-20 px-4 min-h-screen flex items-center justify-center">
+      <div className="max-w-xl w-full text-center space-y-8 md:space-y-12 animate-in zoom-in duration-700">
         <div className="flex justify-center">
-           <div className="p-8 bg-yellow-600/10 rounded-full border border-yellow-600/30">
-             <Package size={64} className="text-yellow-600 animate-pulse" />
+           <div className="p-6 md:p-8 bg-yellow-600/10 rounded-full border border-yellow-600/30">
+             <Package size={48} className="text-yellow-600 animate-pulse md:w-16 md:h-16" />
            </div>
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-5xl font-serif">Official Shop</h2>
-          <p className="text-2xl text-yellow-600 font-light tracking-widest uppercase italic">Coming Soon</p>
-          <p className="text-gray-400 max-w-sm mx-auto">
+          <h2 className="text-4xl md:text-5xl font-serif">Official Shop</h2>
+          <p className="text-xl md:text-2xl text-yellow-600 font-light tracking-widest uppercase italic">Coming Soon</p>
+          <p className="text-sm md:text-base text-gray-400 max-w-sm mx-auto">
             Our exclusive collection of vinyl, apparel, and limited edition prints is currently in production. 
           </p>
         </div>

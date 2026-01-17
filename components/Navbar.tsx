@@ -15,6 +15,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
   const location = useLocation();
 
   const navLinks = [
+    { name: 'Home', path: '/' },
     { name: 'Music', path: '/music' },
     { name: 'Tour', path: '/tour' },
     { name: 'Bio', path: '/bio' },

@@ -2,6 +2,7 @@
 import React from 'react';
 import { PRESS_ARTICLES } from '../constants';
 import { Quote, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Press: React.FC = () => {
   return (
@@ -30,13 +31,13 @@ const Press: React.FC = () => {
                 {article.excerpt}
               </p>
               
-              <a 
-                href={article.url}
+              <Link 
+                to={`/press/${article.id}`}
                 className="inline-flex items-center text-sm font-bold tracking-widest uppercase text-white hover:text-yellow-600 transition-colors group/link"
               >
                 Read Full Article 
                 <ArrowRight size={16} className="ml-2 transform group-hover/link:translate-x-2 transition-transform" />
-              </a>
+              </Link>
             </div>
             
             <div className="mt-16 h-[1px] w-full bg-gradient-to-r from-transparent via-gray-800 to-transparent" />
