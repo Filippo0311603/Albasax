@@ -8,7 +8,13 @@ export default {
     "./*.{js,ts,jsx,tsx}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        serif: ['Park Lane', 'serif'],
+        sans: ['Park Lane', 'serif'],
+        navbar: ['Park Lane', 'serif'],
+      },
+    },
   },
   plugins: [],
 }

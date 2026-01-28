@@ -7,7 +7,7 @@ const Biography: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div className="relative animate-in fade-in slide-in-from-left-8 duration-700">
           <img 
-            src="/IMG_2495.webp" 
+            src="/IMG_2492.webp" 
             alt="Albasax Portrait" 
             className="w-full h-auto grayscale hover:grayscale-0 transition-all duration-1000 shadow-2xl"
           />
@@ -22,16 +22,16 @@ const Biography: React.FC = () => {
 
           <div className="space-y-6 text-gray-300 leading-relaxed text-base md:text-lg font-light">
             <p>
-              Born in the heart of the jazz revival, Albasax has spent the last decade reinventing the boundaries of woodwind instruments. With a unique style that fuses neoclassical arrangements with electronic ambient layers, they have captivated audiences from intimate basement clubs in London to grand concert halls in Tokyo.
+              ALBASAX is an international Pop Artist, Performer, Singer and Saxophonist, blending what he loves to define as his “Cinematic Glamour Pop” with live instruments and dramatic performance into a single artistic universe. Graduated from the prestigious Santa Cecilia Conservatory of Rome, he combines a solid musical foundation with contemporary pop, electronic soundscapes and theatrical storytelling.
             </p>
             <p>
-              Their musical journey began at the age of six, picking up a vintage tenor saxophone that would eventually become an extension of their own voice. After graduating from the prestigious Royal Academy of Music, Albasax chose to bypass the traditional paths, instead finding a new language in the intersection of organic sound and digital manipulation.
+              His artistic world is inspired by Hollywood cinema, theatrical aesthetics and pop spectacle, shaping a distinctive identity where elegance, glamour, vulnerability and power coexist.
             </p>
             <p>
-              "Music isn't just what you hear; it's the space between the notes," Albasax famously told Rolling Stone. This philosophy is evident in their critically acclaimed debut album 'Midnight Echoes', which topped the independent charts for six consecutive weeks.
+              Driven by the belief that music is not only meant to be heard, but also seen, felt and lived, ALBASAX transforms each performance into a cinematic experience — where music becomes a film and the stage becomes a scene.
             </p>
             <p>
-              Beyond the stage, Albasax is a dedicated educator and advocate for music therapy, believing that the vibration of sound has the power to heal as much as it has to entertain.
+              He is currently working on his international debut album, written in English and Spanish, conceived as a cinematic journey designed for a global audience, where sound, image and performance merge into one immersive vision.
             </p>
           </div>
 

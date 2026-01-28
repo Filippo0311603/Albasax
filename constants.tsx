@@ -67,7 +67,7 @@ export const MEDIA_GALLERY: MediaItem[] = [
   { id: '1', type: 'image', url: '/IMG_2492.webp', title: 'Live Performance' },
   { id: '2', type: 'image', url: '/IMG_2493.webp', title: 'Concert Moment' },
   { id: '3', type: 'image', url: '/IMG_2494.webp', title: 'On Stage' },
-  { id: '4', type: 'image', url: '/IMG_2495.webp', title: 'Backstage' },
+  { id: '4', type: 'image', url: '/Ballo.JPG', title: 'Backstage' },
   { id: '5', type: 'image', url: '/IMG_2496.webp', title: 'Live Session' },
   { id: '6', type: 'image', url: '/IMG_2497.webp', title: 'Artist Portrait' },
 ];
