@@ -18,7 +18,7 @@ const Cart: React.FC<CartProps> = ({ onClose, items }) => {
       <div className="absolute top-0 right-0 h-full w-full max-w-md bg-[#0a0a0a] border-l border-gray-800 shadow-2xl flex flex-col animate-in slide-in-from-right duration-500">
         <header className="p-8 border-b border-gray-900 flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <ShoppingBag size={24} className="text-yellow-600" />
+            <ShoppingBag size={24} className="text-gold" />
             <h2 className="text-2xl font-serif">Your Cart</h2>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
@@ -35,7 +35,7 @@ const Cart: React.FC<CartProps> = ({ onClose, items }) => {
               <p className="text-xl font-serif text-gray-500">Your cart is empty</p>
               <button 
                 onClick={onClose}
-                className="px-8 py-3 border border-gray-800 hover:border-yellow-600 tracking-widest uppercase text-xs font-bold transition-all"
+                className="px-8 py-3 border border-gray-800 hover:border-gold tracking-widest uppercase text-xs font-bold transition-all"
               >
                 Continue Browsing
               </button>

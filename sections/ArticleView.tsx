@@ -18,7 +18,7 @@ const ArticleView: React.FC = () => {
         <h2 className="text-4xl font-serif text-white mb-4">Article Not Found</h2>
         <button 
           onClick={() => navigate('/press')}
-          className="text-yellow-600 hover:text-white transition-colors uppercase tracking-widest text-sm font-bold"
+          className="text-gold hover:text-white transition-colors uppercase tracking-widest text-sm font-bold"
         >
           Return to Press
         </button>
@@ -32,7 +32,7 @@ const ArticleView: React.FC = () => {
       {/* Navigation */}
       <button 
         onClick={() => navigate('/press')}
-        className="group flex items-center text-gray-500 hover:text-yellow-600 transition-colors mb-12 uppercase tracking-widest text-xs font-bold"
+        className="group flex items-center text-gray-500 hover:text-gold transition-colors mb-12 uppercase tracking-widest text-xs font-bold"
       >
         <ArrowLeft size={16} className="mr-2 transform group-hover:-translate-x-1 transition-transform" />
         Back to Press
@@ -40,7 +40,7 @@ const ArticleView: React.FC = () => {
 
       {/* Header */}
       <header className="mb-12 border-b border-gray-900 pb-12">
-        <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-yellow-600 mb-6">
+        <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-gold mb-6">
           <span>{article.outlet}</span>
           <span className="w-1 h-1 bg-gray-700 rounded-full" />
           <span className="flex items-center text-gray-500">
@@ -54,7 +54,7 @@ const ArticleView: React.FC = () => {
         </h1>
 
         <div className="flex items-center justify-between">
-            <p className="text-xl text-gray-400 italic font-light border-l-4 border-yellow-600 pl-6 max-w-2xl">
+            <p className="text-xl text-gray-400 italic font-light border-l-4 border-gold pl-6 max-w-2xl">
             {article.excerpt}
             </p>
             <button className="hidden md:flex items-center space-x-2 text-gray-600 hover:text-white transition-colors">
@@ -64,7 +64,7 @@ const ArticleView: React.FC = () => {
       </header>
 
       {/* Content */}
-      <div className="prose prose-invert prose-lg max-w-none prose-headings:font-serif prose-headings:text-white prose-a:text-yellow-600 hover:prose-a:text-yellow-500 prose-blockquote:border-l-yellow-600 prose-blockquote:text-gray-300">
+      <div className="prose prose-invert prose-lg max-w-none prose-headings:font-serif prose-headings:text-white prose-a:text-gold hover:prose-a:text-gold-400 prose-blockquote:border-l-gold prose-blockquote:text-gray-300">
         {/* Helper per gestire testo normale con "a capo" invece di HTML */}
         {(article.content || '').split('\n').map((paragraph, index) => (
             paragraph.trim() !== '' ? (
@@ -83,7 +83,7 @@ const ArticleView: React.FC = () => {
                 href={article.url} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-block text-yellow-600 text-xs uppercase tracking-widest border-b border-yellow-600/30 hover:border-yellow-600 pb-1 transition-all"
+                className="inline-block text-gold text-xs uppercase tracking-widest border-b border-gold/30 hover:border-gold pb-1 transition-all"
             >
                 View Original Source
             </a>

@@ -11,7 +11,7 @@ const Media: React.FC = () => {
     <div className="pt-32 pb-20 px-4 max-w-7xl mx-auto">
       <header className="mb-16 text-center">
         <h2 className="text-5xl font-serif mb-4">Gallery & Videos</h2>
-        <div className="h-1 w-20 bg-yellow-600 mx-auto" />
+        <div className="h-1 w-20 bg-gold mx-auto" />
       </header>
 
       <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
@@ -56,7 +56,7 @@ const Media: React.FC = () => {
       {selectedItem && (
         <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 animate-in fade-in duration-300">
           <button 
-            className="absolute top-8 right-8 text-white hover:text-yellow-600 transition-colors"
+            className="absolute top-8 right-8 text-white hover:text-gold transition-colors"
             onClick={() => setSelectedItem(null)}
           >
             <X size={48} />

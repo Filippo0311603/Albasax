@@ -43,7 +43,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, message, type = '
             onClick={onClose}
             className={`w-full py-3 font-bold uppercase tracking-widest text-xs transition-all ${
               type === 'success' 
-                ? 'bg-yellow-600 hover:bg-yellow-700 text-white' 
+                ? 'bg-gold hover:bg-gold-600 text-white' 
                 : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
             }`}
           >

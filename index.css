@@ -1,1 +1,90 @@
 @import "tailwindcss";
+
+@theme {
+  --color-gold-50: #faf6e8;
+  --color-gold-100: #f3ecd0;
+  --color-gold-200: #e7d9a1;
+  --color-gold-300: #dbc672;
+  --color-gold-400: #cfb343;
+  --color-gold-500: #c5a643;
+  --color-gold: #c5a643;
+  --color-gold-600: #9e8536;
+  --color-gold-700: #776428;
+  --color-gold-800: #4f431b;
+  --color-gold-900: #28210d;
+  
+  --font-serif: 'Park Lane', serif;
+  --font-sans: 'ClassyVogue', sans-serif;
+  --font-navbar: 'Market Deco', sans-serif;
+  --font-body: 'ClassyVogue', sans-serif;
+}
+
+@font-face {
+  font-family: 'Core Deco A1';
+  src: url('/fonts/Core Deco A1.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Park Lane';
+  src: url('/fonts/Park Lane NF.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'MPIDeco';
+  src: url('/fonts/MPIDeco.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Dalmais';
+  src: url('/fonts/Dalmais.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Market Deco';
+  src: url('/fonts/Market_Deco.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'ClassyVogue';
+  src: url('/fonts/ClassyVogue.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: 'ClassyVogue', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Park Lane', serif;
+}
+
+/* Animazione note musicali */
+@keyframes float-up {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(-20px) rotate(15deg) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) rotate(-10deg) scale(0.8);
+  }
+}
+
+.animate-float-up {
+  animation: float-up 1s ease-out forwards;
+}

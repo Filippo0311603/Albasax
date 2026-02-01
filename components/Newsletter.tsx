@@ -14,12 +14,12 @@ const Newsletter: React.FC = () => {
         <input 
           type="email" 
           placeholder="ENTER YOUR EMAIL"
-          className="w-full bg-transparent border-b border-gray-800 py-4 text-sm tracking-[0.2em] outline-none focus:border-yellow-600 transition-all placeholder:text-gray-700"
+          className="w-full bg-transparent border-b border-gray-800 py-4 text-sm tracking-[0.2em] outline-none focus:border-gold transition-all placeholder:text-gray-700"
           required
         />
         <button 
           type="submit"
-          className="absolute right-0 top-1/2 -translate-y-1/2 p-4 text-gray-500 hover:text-yellow-600 transition-colors"
+          className="absolute right-0 top-1/2 -translate-y-1/2 p-4 text-gray-500 hover:text-gold transition-colors"
         >
           <Send size={18} />
         </button>

@@ -28,7 +28,7 @@ const Hero: React.FC = () => {
         <div className="flex flex-col sm:flex-row items-end justify-end gap-4 pt-4">
           <Link 
             to="/music"
-            className="w-full sm:w-auto px-8 py-4 bg-yellow-600 hover:bg-yellow-700 text-white flex items-center justify-center space-x-2 transition-all group rounded-sm"
+            className="w-full sm:w-auto px-8 py-4 bg-gold hover:bg-gold-600 text-white flex items-center justify-center space-x-2 transition-all group rounded-sm"
           >
             <Play size={18} fill="currentColor" />
             <span className="uppercase tracking-widest text-sm font-bold">Listen Now</span>

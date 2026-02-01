@@ -163,8 +163,8 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
       />
       {user ? (
           <div className="max-w-md w-full glass p-8 md:p-12 shadow-2xl border-gray-800 text-center space-y-8 animate-in fade-in duration-500">
-            <div className="mx-auto w-24 h-24 bg-yellow-600/20 rounded-full flex items-center justify-center border-2 border-yellow-600">
-                <span className="text-4xl font-serif text-yellow-600">{user.name.charAt(0).toUpperCase()}</span>
+            <div className="mx-auto w-24 h-24 bg-gold/20 rounded-full flex items-center justify-center border-2 border-gold">
+                <span className="text-4xl font-serif text-gold">{user.name.charAt(0).toUpperCase()}</span>
             </div>
             
             {!isEditing ? (
@@ -177,7 +177,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
                     <div className="pt-8 space-y-4">
                         <button 
                             onClick={() => setIsEditing(true)}
-                            className="w-full py-4 border border-yellow-600 text-yellow-600 hover:bg-yellow-600 hover:text-white font-bold uppercase tracking-widest text-xs transition-all rounded-sm"
+                            className="w-full py-4 border border-gold text-gold hover:bg-gold hover:text-white font-bold uppercase tracking-widest text-xs transition-all rounded-sm"
                         >
                             Edit Profile
                         </button>
@@ -202,7 +202,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
                             type="text"
                             value={editData.name}
                             onChange={(e) => setEditData({...editData, name: e.target.value})}
-                            className="w-full bg-black/40 border border-gray-800 p-3 text-sm focus:border-yellow-600 outline-none text-white"
+                            className="w-full bg-black/40 border border-gray-800 p-3 text-sm focus:border-gold outline-none text-white"
                         />
                     </div>
                     
@@ -212,7 +212,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
                             type="email"
                             value={editData.email}
                             onChange={(e) => setEditData({...editData, email: e.target.value})}
-                            className="w-full bg-black/40 border border-gray-800 p-3 text-sm focus:border-yellow-600 outline-none text-white"
+                            className="w-full bg-black/40 border border-gray-800 p-3 text-sm focus:border-gold outline-none text-white"
                         />
                     </div>
 
@@ -222,7 +222,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
                             type="password"
                             value={editData.password}
                             onChange={(e) => setEditData({...editData, password: e.target.value})}
-                            className="w-full bg-black/40 border border-gray-800 p-3 text-sm focus:border-yellow-600 outline-none text-white"
+                            className="w-full bg-black/40 border border-gray-800 p-3 text-sm focus:border-gold outline-none text-white"
                             placeholder="Leave blank to keep current"
                         />
                     </div>
@@ -238,7 +238,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
                         <button 
                             type="submit"
                             disabled={loading}
-                            className="flex-1 py-3 bg-yellow-600 text-white hover:bg-yellow-700 font-bold uppercase tracking-widest text-xs rounded-sm disabled:opacity-50"
+                            className="flex-1 py-3 bg-gold text-white hover:bg-gold-600 font-bold uppercase tracking-widest text-xs rounded-sm disabled:opacity-50"
                         >
                             {loading ? 'Saving...' : 'Save'}
                         </button>
@@ -267,7 +267,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full bg-black/40 border border-gray-800 p-4 text-sm focus:border-yellow-600 outline-none transition-all placeholder:text-gray-700"
+                className="w-full bg-black/40 border border-gray-800 p-4 text-sm focus:border-gold outline-none transition-all placeholder:text-gray-700"
                 placeholder="John Doe"
               />
             </div>
@@ -282,7 +282,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
               required
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
-              className="w-full bg-black/40 border border-gray-800 p-4 text-sm focus:border-yellow-600 outline-none transition-all placeholder:text-gray-700"
+              className="w-full bg-black/40 border border-gray-800 p-4 text-sm focus:border-gold outline-none transition-all placeholder:text-gray-700"
               placeholder="name@example.com"
             />
           </div>
@@ -296,7 +296,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
               required
               value={formData.password}
               onChange={(e) => setFormData({...formData, password: e.target.value})}
-              className="w-full bg-black/40 border border-gray-800 p-4 text-sm focus:border-yellow-600 outline-none transition-all placeholder:text-gray-700"
+              className="w-full bg-black/40 border border-gray-800 p-4 text-sm focus:border-gold outline-none transition-all placeholder:text-gray-700"
               placeholder="••••••••"
             />
           </div>
@@ -307,7 +307,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
                 type="checkbox" 
                 checked={formData.newsletter}
                 onChange={(e) => setFormData({...formData, newsletter: e.target.checked})}
-                className="form-checkbox bg-transparent border-gray-800 text-yellow-600 rounded-sm"
+                className="form-checkbox bg-transparent border-gray-800 text-gold rounded-sm"
               />
               <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors">
                 Receive newsletter for tour dates and new releases
@@ -318,7 +318,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
           <button 
             type="submit"
             disabled={loading}
-            className="w-full py-4 bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center group"
+            className="w-full py-4 bg-gold hover:bg-gold-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center group"
           >
             {loading ? <Loader className="animate-spin mr-2" /> : (isLogin ? 'Log In' : 'Sign Up')}
             <ArrowRight size={16} className="ml-2 transform group-hover:translate-x-1 transition-transform" />
@@ -330,7 +330,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
             {isLogin ? "Don't have an account?" : "Already have an account?"}
             <button 
               onClick={() => setIsLogin(!isLogin)}
-              className="ml-2 text-yellow-600 font-bold hover:underline"
+              className="ml-2 text-gold font-bold hover:underline"
             >
               {isLogin ? 'Sign up now' : 'Log in here'}
             </button>

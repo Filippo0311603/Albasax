@@ -38,7 +38,7 @@ const App: React.FC = () => {
   }, [location]);
 
   return (
-    <div className="min-h-screen flex flex-col selection:bg-yellow-500 selection:text-black">
+    <div className="min-h-screen flex flex-col selection:bg-gold-400 selection:text-black">
       <ScrollToTop />
       <Navbar 
         user={user} 

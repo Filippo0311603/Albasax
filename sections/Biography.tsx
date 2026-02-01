@@ -11,12 +11,12 @@ const Biography: React.FC = () => {
             alt="Albasax Portrait" 
             className="w-full h-auto grayscale hover:grayscale-0 transition-all duration-1000 shadow-2xl"
           />
-          <div className="absolute -bottom-8 -right-8 w-64 h-64 border-8 border-yellow-600 -z-10 hidden md:block" />
+          <div className="absolute -bottom-8 -right-8 w-64 h-64 border-8 border-gold -z-10 hidden md:block" />
         </div>
 
         <div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-700">
           <header>
-            <span className="text-yellow-600 tracking-[0.2em] md:tracking-[0.4em] uppercase text-xs md:text-sm font-bold">The Artist</span>
+            <span className="text-gold tracking-[0.2em] md:tracking-[0.4em] uppercase text-xs md:text-sm font-bold">The Artist</span>
             <h2 className="text-4xl sm:text-5xl md:text-7xl font-serif mt-2">Albasax</h2>
           </header>
 

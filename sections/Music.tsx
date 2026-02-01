@@ -8,7 +8,7 @@ const Music: React.FC = () => {
     <div className="pt-24 md:pt-32 pb-16 md:pb-20 px-4 max-w-7xl mx-auto">
       <header className="mb-10 md:mb-16 text-center">
         <h2 className="text-4xl md:text-5xl font-serif mb-4">Music</h2>
-        <div className="h-1 w-20 bg-yellow-600 mx-auto" />
+        <div className="h-1 w-20 bg-gold mx-auto" />
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
@@ -32,7 +32,7 @@ const Music: React.FC = () => {
               </div>
             </div>
             <div className="space-y-1">
-              <span className="text-yellow-600 text-xs tracking-widest uppercase">{release.type} • {release.year}</span>
+              <span className="text-gold text-xs tracking-widest uppercase">{release.type} • {release.year}</span>
               <h3 className="text-2xl font-serif text-white">{release.title}</h3>
             </div>
           </div>

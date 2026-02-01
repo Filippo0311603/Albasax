@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ShoppingBag, User, Menu, X } from 'lucide-react';
 import { User as UserType } from '../types';
+import MusicNoteEffect from './MusicNoteEffect';
 
 interface NavbarProps {
   user: UserType | null;
@@ -31,24 +32,31 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0 flex items-center space-x-2">
-            <span className="text-3xl font-serif tracking-widest uppercase font-bold text-white">
-              Alba<span className="text-yellow-600">sax</span>
+          <Link to="/" className="flex-shrink-0 flex items-center gap-2">
+            <img 
+              src="/logo_alb.webp" 
+              alt="Albasax Logo" 
+              className="h-8 w-auto"
+              loading="eager"
+            />
+            <span className="text-xl font-serif tracking-widest uppercase font-bold text-white leading-none translate-y-[3px]">
+              Albasax
             </span>
           </Link>
 
           {/* Desktop Links */}
           <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.path}
-                className={`text-sm tracking-widest uppercase transition-colors duration-200 ${
-                  isActive(link.path) ? 'text-yellow-600' : 'text-gray-300 hover:text-white'
-                }`}
-              >
-                {link.name}
-              </Link>
+              <MusicNoteEffect key={link.name}>
+                <Link
+                  to={link.path}
+                  className={`text-sm tracking-widest uppercase transition-colors duration-200 font-navbar ${
+                    isActive(link.path) ? 'text-gold' : 'text-gray-300 hover:text-gold'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              </MusicNoteEffect>
             ))}
           </div>
 
@@ -60,7 +68,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
             >
               <ShoppingBag size={22} />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-yellow-600 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-gold text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
@@ -91,8 +99,8 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
                 key={link.name}
                 to={link.path}
                 onClick={() => setIsMenuOpen(false)}
-                className={`block px-3 py-4 text-base font-medium tracking-widest uppercase ${
-                  isActive(link.path) ? 'text-yellow-600' : 'text-gray-300'
+                className={`block px-3 py-4 text-base font-medium tracking-widest uppercase font-navbar ${
+                  isActive(link.path) ? 'text-gold' : 'text-gray-300 hover:text-gold'
                 }`}
               >
                 {link.name}

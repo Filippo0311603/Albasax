@@ -26,8 +26,8 @@ export interface PressArticle {
   outlet: string;
   date: string;
   excerpt: string;
-  content: string; // New field for full article text
-  url?: string;
+  imageUrl: string;
+  url: string;
 }
 
 export interface MediaItem {
