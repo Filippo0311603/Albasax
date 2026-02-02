@@ -46,22 +46,19 @@ const Hero: React.FC = () => {
       {/* Scroll Indicator */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
         <svg width="32" height="60" viewBox="0 0 32 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-          {/* Bocchino */}
-          <rect x="13" y="2" width="6" height="4" rx="1" />
-          {/* Corpo superiore */}
-          <path d="M 14 6 Q 12 8 12 12 Q 12 16 14 18" />
-          <path d="M 18 6 Q 20 8 20 12 Q 20 16 18 18" />
-          {/* Tubo centrale */}
-          <path d="M 14 18 Q 10 22 10 28 Q 10 34 12 40" />
-          <path d="M 18 18 Q 22 22 22 28 Q 22 34 20 40" />
-          {/* Campana/Bell */}
-          <path d="M 12 40 Q 8 44 8 50 Q 8 55 14 58" />
-          <path d="M 20 40 Q 24 44 24 50 Q 24 55 18 58" />
-          {/* Chiavi/Keys */}
-          <circle cx="12" cy="20" r="1.5" fill="currentColor" />
-          <circle cx="20" cy="20" r="1.5" fill="currentColor" />
-          <circle cx="12" cy="28" r="1.5" fill="currentColor" />
-          <circle cx="20" cy="28" r="1.5" fill="currentColor" />
+          {/* Griglia microfono */}
+          <circle cx="16" cy="12" r="8" />
+          <circle cx="16" cy="12" r="6" />
+          <circle cx="16" cy="12" r="4" />
+          {/* Linee griglia */}
+          <line x1="8" y1="12" x2="24" y2="12" />
+          <line x1="16" y1="4" x2="16" y2="20" />
+          {/* Stelo */}
+          <path d="M 14 20 Q 12 28 12 36 Q 12 42 14 48" strokeWidth="2" />
+          <path d="M 18 20 Q 20 28 20 36 Q 20 42 18 48" strokeWidth="2" />
+          {/* Base */}
+          <ellipse cx="16" cy="52" rx="6" ry="3" strokeWidth="1.2" />
+          <path d="M 10 52 L 10 56 Q 10 58 16 58 Q 22 58 22 56 L 22 52" />
         </svg>
       </div>
     </section>
