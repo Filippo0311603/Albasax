@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import PageTransition from './components/PageTransition';
 import Hero from './sections/Hero';
 import Biography from './sections/Biography';
 import Tour from './sections/Tour';
@@ -47,20 +48,22 @@ const App: React.FC = () => {
         onCartClick={() => setIsCartOpen(true)} 
       />
       
-      <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Hero />} />
-          <Route path="/bio" element={<Biography />} />
-          <Route path="/tour" element={<Tour />} />
-          <Route path="/music" element={<Music />} />
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/media" element={<Media />} />
-          <Route path="/dancers" element={<Dancers />} />
-          <Route path="/press" element={<Press />} />
-          <Route path="/press/:id" element={<ArticleView />} />
-          <Route path="/auth" element={<Auth user={user} onLogin={setUser} onLogout={() => setUser(null)} />} />
-        </Routes>
-      </main>
+      <PageTransition>
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Hero />} />
+            <Route path="/bio" element={<Biography />} />
+            <Route path="/tour" element={<Tour />} />
+            <Route path="/music" element={<Music />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/media" element={<Media />} />
+            <Route path="/dancers" element={<Dancers />} />
+            <Route path="/press" element={<Press />} />
+            <Route path="/press/:id" element={<ArticleView />} />
+            <Route path="/auth" element={<Auth user={user} onLogin={setUser} onLogout={() => setUser(null)} />} />
+          </Routes>
+        </main>
+      </PageTransition>
 
       <Footer />
       
