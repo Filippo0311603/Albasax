@@ -96,16 +96,17 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
         <div className="md:hidden glass border-t border-gray-800 animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="px-2 pt-2 pb-3 space-y-1">
             {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.path}
-                onClick={() => setIsMenuOpen(false)}
-                className={`block px-3 py-4 text-base font-medium tracking-widest uppercase font-navbar ${
-                  isActive(link.path) ? 'text-gold' : 'text-gray-300 hover:text-gold'
-                }`}
-              >
-                {link.name}
-              </Link>
+              <MusicNoteEffect key={link.name} className="block">
+                <Link
+                  to={link.path}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`block px-3 py-4 text-base font-medium tracking-widest uppercase font-navbar ${
+                    isActive(link.path) ? 'text-gold' : 'text-gray-300 hover:text-gold'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              </MusicNoteEffect>
             ))}
           </div>
         </div>
