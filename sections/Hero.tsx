@@ -45,11 +45,17 @@ const Hero: React.FC = () => {
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-        <img 
-          src="/logo_alb.webp" 
-          alt="Albasax Logo" 
-          className="h-12 w-auto opacity-80 hover:opacity-100 transition-opacity"
-        />
+        <svg width="28" height="60" viewBox="0 0 28 60" fill="white" xmlns="http://www.w3.org/2000/svg">
+          {/* Capsula microfono ovale */}
+          <ellipse cx="14" cy="10" rx="8" ry="10" fill="white" />
+          {/* Stelo */}
+          <rect x="12" y="20" width="4" height="26" fill="white" />
+          {/* Supporto stelo */}
+          <circle cx="14" cy="28" r="3" fill="white" opacity="0.7" />
+          {/* Base piede */}
+          <ellipse cx="14" cy="50" rx="6" ry="4" fill="white" />
+          <path d="M 8 50 Q 8 54 14 55 Q 20 54 20 50" fill="white" />
+        </svg>
       </div>
     </section>
   );
