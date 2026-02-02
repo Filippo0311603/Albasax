@@ -25,7 +25,7 @@ const Hero: React.FC = () => {
           GLAMOUR POP ARTIST<br />
         </p>
 
-        <div className="flex flex-col sm:flex-row items-end justify-end gap-4 pt-4 sm:pt-4 md:pt-8 mt-8 sm:mt-0">
+        <div className="flex flex-col sm:flex-row items-end justify-end gap-4 pt-4 sm:pt-4 md:pt-8 mt-16 sm:mt-0">
           <Link 
             to="/music"
             className="w-full sm:w-auto px-8 py-4 bg-gold hover:bg-gold-600 text-white flex items-center justify-center space-x-2 transition-all group rounded-sm"
