@@ -45,18 +45,23 @@ const Hero: React.FC = () => {
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-        <svg width="24" height="60" viewBox="0 0 24 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          {/* Sax body */}
-          <path d="M 12 8 Q 8 12 8 20 Q 8 30 10 40 Q 10 45 12 50" />
-          {/* Sax bell */}
-          <path d="M 10 40 Q 6 42 6 48 Q 6 54 12 56" />
-          {/* Sax keys */}
-          <circle cx="12" cy="16" r="2" fill="none" />
-          <circle cx="12" cy="24" r="2" fill="none" />
-          <circle cx="12" cy="32" r="2" fill="none" />
-          {/* Mouthpiece */}
-          <line x1="12" y1="8" x2="12" y2="2" />
-          <line x1="10" y1="4" x2="14" y2="4" />
+        <svg width="32" height="60" viewBox="0 0 32 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+          {/* Bocchino */}
+          <rect x="13" y="2" width="6" height="4" rx="1" />
+          {/* Corpo superiore */}
+          <path d="M 14 6 Q 12 8 12 12 Q 12 16 14 18" />
+          <path d="M 18 6 Q 20 8 20 12 Q 20 16 18 18" />
+          {/* Tubo centrale */}
+          <path d="M 14 18 Q 10 22 10 28 Q 10 34 12 40" />
+          <path d="M 18 18 Q 22 22 22 28 Q 22 34 20 40" />
+          {/* Campana/Bell */}
+          <path d="M 12 40 Q 8 44 8 50 Q 8 55 14 58" />
+          <path d="M 20 40 Q 24 44 24 50 Q 24 55 18 58" />
+          {/* Chiavi/Keys */}
+          <circle cx="12" cy="20" r="1.5" fill="currentColor" />
+          <circle cx="20" cy="20" r="1.5" fill="currentColor" />
+          <circle cx="12" cy="28" r="1.5" fill="currentColor" />
+          <circle cx="20" cy="28" r="1.5" fill="currentColor" />
         </svg>
       </div>
     </section>
