@@ -45,20 +45,20 @@ const Hero: React.FC = () => {
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-        <svg width="32" height="60" viewBox="0 0 32 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-          {/* Griglia microfono */}
-          <circle cx="16" cy="12" r="8" />
-          <circle cx="16" cy="12" r="6" />
-          <circle cx="16" cy="12" r="4" />
-          {/* Linee griglia */}
-          <line x1="8" y1="12" x2="24" y2="12" />
-          <line x1="16" y1="4" x2="16" y2="20" />
-          {/* Stelo */}
-          <path d="M 14 20 Q 12 28 12 36 Q 12 42 14 48" strokeWidth="2" />
-          <path d="M 18 20 Q 20 28 20 36 Q 20 42 18 48" strokeWidth="2" />
-          {/* Base */}
-          <ellipse cx="16" cy="52" rx="6" ry="3" strokeWidth="1.2" />
-          <path d="M 10 52 L 10 56 Q 10 58 16 58 Q 22 58 22 56 L 22 52" />
+        <svg width="28" height="60" viewBox="0 0 28 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+          {/* Capsula microfono ovale vintage */}
+          <ellipse cx="14" cy="10" rx="7" ry="9" />
+          {/* Dettagli rete capsula */}
+          <line x1="8" y1="6" x2="20" y2="6" />
+          <line x1="7" y1="10" x2="21" y2="10" />
+          <line x1="8" y1="14" x2="20" y2="14" />
+          {/* Stelo sottile elegante */}
+          <path d="M 13 19 L 12 45" strokeWidth="1.5" />
+          {/* Supporto stelo */}
+          <path d="M 11 28 Q 10 30 11 32 Q 12 30 13 32" strokeWidth="1" />
+          {/* Base piede vintage */}
+          <circle cx="14" cy="50" r="5" strokeWidth="1" />
+          <path d="M 9 50 L 9 54 Q 9 56 14 56 Q 19 56 19 54 L 19 50" strokeWidth="1.2" />
         </svg>
       </div>
     </section>
