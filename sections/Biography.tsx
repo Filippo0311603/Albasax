@@ -28,7 +28,7 @@ const Biography: React.FC = () => {
               His artistic world is inspired by Hollywood cinema, theatrical aesthetics and pop spectacle, shaping a distinctive identity where elegance, glamour, vulnerability and power coexist.
             </p>
             <p>
-              Driven by the belief that music is not only meant to be heard, but also seen, felt and lived, ALBASAX transforms each performance into a cinematic experience — where music becomes a film and the stage becomes a scene.
+              Driven by the belief that music is not only meant to be heard, but also seen, felt and lived, ALBASAX transforms each performance into a cinematic experience where music becomes a film and the stage becomes a scene.
             </p>
             <p>
               He is currently working on his international debut album, written in English and Spanish, conceived as a cinematic journey designed for a global audience, where sound, image and performance merge into one immersive vision.
