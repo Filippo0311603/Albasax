@@ -45,16 +45,23 @@ const Hero: React.FC = () => {
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-        <svg width="28" height="60" viewBox="0 0 28 60" fill="white" xmlns="http://www.w3.org/2000/svg">
-          {/* Capsula microfono ovale */}
-          <ellipse cx="14" cy="10" rx="8" ry="10" fill="white" />
-          {/* Stelo */}
-          <rect x="12" y="20" width="4" height="26" fill="white" />
-          {/* Supporto stelo */}
-          <circle cx="14" cy="28" r="3" fill="white" opacity="0.7" />
-          {/* Base piede */}
-          <ellipse cx="14" cy="50" rx="6" ry="4" fill="white" />
-          <path d="M 8 50 Q 8 54 14 55 Q 20 54 20 50" fill="white" />
+        <svg width="24" height="60" viewBox="0 0 24 60" fill="white" xmlns="http://www.w3.org/2000/svg">
+          {/* Bocchino */}
+          <rect x="10" y="2" width="4" height="5" fill="white" />
+          {/* Corpo superiore */}
+          <path d="M 10 7 Q 8 10 8 14 Q 8 18 12 20" fill="white" />
+          <path d="M 14 7 Q 16 10 16 14 Q 16 18 12 20" fill="white" />
+          {/* Tubo principale */}
+          <path d="M 11 20 Q 8 25 8 32 Q 8 38 10 44" fill="white" />
+          <path d="M 13 20 Q 16 25 16 32 Q 16 38 14 44" fill="white" />
+          {/* Campana */}
+          <path d="M 10 44 Q 6 48 6 52 Q 6 56 12 58" fill="white" />
+          <path d="M 14 44 Q 18 48 18 52 Q 18 56 12 58" fill="white" />
+          {/* Chiavi */}
+          <circle cx="10" cy="22" r="1.5" fill="white" />
+          <circle cx="14" cy="22" r="1.5" fill="white" />
+          <circle cx="10" cy="30" r="1.5" fill="white" />
+          <circle cx="14" cy="30" r="1.5" fill="white" />
         </svg>
       </div>
     </section>
