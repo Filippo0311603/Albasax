@@ -17,13 +17,12 @@ const MusicNoteEffect: React.FC<MusicNoteEffectProps> = ({ children, className =
 
   const musicSymbols = ['♪', '♫', '♩', '♬', '🎵', '🎶'];
 
-  const createNote = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+  const createNote = useCallback((x: number, rect: DOMRect) => {
+    const relativeX = x - rect.left;
     
     const newNote: Note = {
       id: noteId,
-      x: x,
+      x: relativeX,
       symbol: musicSymbols[Math.floor(Math.random() * musicSymbols.length)],
     };
 
@@ -39,15 +38,35 @@ const MusicNoteEffect: React.FC<MusicNoteEffectProps> = ({ children, className =
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     // Crea una nota ogni tanto (non ad ogni movimento)
     if (Math.random() > 0.85) {
-      createNote(e);
+      const rect = e.currentTarget.getBoundingClientRect();
+      createNote(e.clientX, rect);
     }
+  }, [createNote]);
+
+  const handleMouseEnter = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    createNote(e.clientX, rect);
+  }, [createNote]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (Math.random() > 0.85) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      createNote(e.touches[0].clientX, rect);
+    }
+  }, [createNote]);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    createNote(e.touches[0].clientX, rect);
   }, [createNote]);
 
   return (
     <div 
       className={`relative inline-block ${className}`}
       onMouseMove={handleMouseMove}
-      onMouseEnter={createNote}
+      onMouseEnter={handleMouseEnter}
+      onTouchMove={handleTouchMove}
+      onTouchStart={handleTouchStart}
     >
       {children}
       {notes.map(note => (
