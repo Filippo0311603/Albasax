@@ -45,7 +45,19 @@ const Hero: React.FC = () => {
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-        <div className="w-[1px] h-16 bg-gradient-to-b from-transparent to-white" />
+        <svg width="24" height="60" viewBox="0 0 24 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          {/* Sax body */}
+          <path d="M 12 8 Q 8 12 8 20 Q 8 30 10 40 Q 10 45 12 50" />
+          {/* Sax bell */}
+          <path d="M 10 40 Q 6 42 6 48 Q 6 54 12 56" />
+          {/* Sax keys */}
+          <circle cx="12" cy="16" r="2" fill="none" />
+          <circle cx="12" cy="24" r="2" fill="none" />
+          <circle cx="12" cy="32" r="2" fill="none" />
+          {/* Mouthpiece */}
+          <line x1="12" y1="8" x2="12" y2="2" />
+          <line x1="10" y1="4" x2="14" y2="4" />
+        </svg>
       </div>
     </section>
   );
