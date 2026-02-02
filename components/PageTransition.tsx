@@ -5,36 +5,29 @@ interface PageTransitionProps {
   children: React.ReactNode;
 }
 
-type TransitionEffect = 'dissolve' | 'zoom' | 'wipe' | 'push' | 'iris';
-
 const PageTransition: React.FC<PageTransitionProps> = ({ children }) => {
   const location = useLocation();
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [effect, setEffect] = useState<TransitionEffect>('dissolve');
+  const [transitionCount, setTransitionCount] = useState(0);
+  const [fromDirection, setFromDirection] = useState<'left' | 'right'>('right');
 
   useEffect(() => {
-    // Seleziona un effetto casuale
-    const effects: TransitionEffect[] = ['dissolve', 'zoom', 'wipe', 'push', 'iris'];
-    setEffect(effects[Math.floor(Math.random() * effects.length)]);
+    // Alterna direzione: destra, sinistra, destra, sinistra...
+    const direction = transitionCount % 2 === 0 ? 'right' : 'left';
+    setFromDirection(direction);
     
     setIsTransitioning(true);
     const timer = setTimeout(() => {
       setIsTransitioning(false);
     }, 600);
 
+    setTransitionCount(prev => prev + 1);
+
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
   return (
     <>
-      {/* Overlay di transizione */}
-      <div
-        className={`fixed inset-0 z-40 pointer-events-none transition-all duration-500`}
-        style={{
-          background: getTransitionStyle(effect, isTransitioning),
-        }}
-      />
-
       {/* Contenuto con animazione di fade */}
       <div
         className={`transition-opacity duration-500 ${
@@ -44,66 +37,23 @@ const PageTransition: React.FC<PageTransitionProps> = ({ children }) => {
         {children}
       </div>
 
-      {/* Effetto wipe dall'alto */}
-      {effect === 'wipe' && (
-        <div
-          className="fixed inset-0 z-40 pointer-events-none bg-black"
-          style={{
-            clipPath: isTransitioning
-              ? 'polygon(0 0, 100% 0, 100% 0, 0 0)'
-              : 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-            transition: 'clip-path 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-          }}
-        />
-      )}
-
-      {/* Effetto push da sinistra */}
-      {effect === 'push' && (
-        <div
-          className="fixed inset-0 z-40 pointer-events-none bg-gradient-to-r from-gold via-gold to-transparent"
-          style={{
-            transform: isTransitioning ? 'translateX(-100%)' : 'translateX(100%)',
-            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-          }}
-        />
-      )}
-
-      {/* Effetto iris (cerchio che si espande) */}
-      {effect === 'iris' && (
-        <div
-          className="fixed inset-0 z-40 pointer-events-none"
-          style={{
-            background: 'radial-gradient(circle at center, transparent 0%, black 100%)',
-            opacity: isTransitioning ? 1 : 0,
-            transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-          }}
-        />
-      )}
+      {/* Effetto push dorato da destra o sinistra */}
+      <div
+        className="fixed inset-0 z-40 pointer-events-none bg-gradient-to-r from-gold via-gold to-transparent"
+        style={{
+          transform: isTransitioning 
+            ? fromDirection === 'right' 
+              ? 'translateX(-100%)' 
+              : 'translateX(100%)'
+            : fromDirection === 'right'
+            ? 'translateX(100%)'
+            : 'translateX(-100%)',
+          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
+      />
 
       {/* Stili CSS per le animazioni */}
       <style>{`
-        @keyframes zoomOut {
-          from {
-            transform: scale(1);
-            opacity: 1;
-          }
-          to {
-            transform: scale(1.1);
-            opacity: 0;
-          }
-        }
-
-        @keyframes zoomIn {
-          from {
-            transform: scale(0.9);
-            opacity: 0;
-          }
-          to {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-
         @keyframes floatUp {
           from {
             transform: translateY(0);
@@ -118,22 +68,5 @@ const PageTransition: React.FC<PageTransitionProps> = ({ children }) => {
     </>
   );
 };
-
-function getTransitionStyle(
-  effect: TransitionEffect,
-  isTransitioning: boolean
-): string {
-  if (effect === 'dissolve') {
-    return isTransitioning
-      ? 'rgba(0, 0, 0, 0.5)'
-      : 'rgba(0, 0, 0, 0)';
-  }
-  if (effect === 'zoom') {
-    return isTransitioning
-      ? 'rgba(0, 0, 0, 0.7)'
-      : 'rgba(0, 0, 0, 0)';
-  }
-  return 'transparent';
-}
 
 export default PageTransition;
