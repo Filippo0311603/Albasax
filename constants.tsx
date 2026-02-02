@@ -1,5 +1,5 @@
 
-import { TourDate, MusicRelease, PressArticle, MediaItem } from './types';
+import { TourDate, MusicRelease, PressArticle, MediaItem, Dancer } from './types';
 
 export const TOUR_DATES: TourDate[] = [
   { id: '1', date: '2024-08-15', venue: 'Jazz Blue Club', location: 'London, UK', status: 'Available', ticketUrl: '#' },
@@ -51,9 +51,18 @@ export const PRESS_ARTICLES: PressArticle[] = [
 
 export const MEDIA_GALLERY: MediaItem[] = [
   { id: '1', type: 'image', url: '/IMG_2492.webp', title: 'Live Performance' },
-  { id: '2', type: 'image', url: '/IMG_2493.webp', title: 'Concert Moment' },
-  { id: '3', type: 'image', url: '/IMG_2494.webp', title: 'On Stage' },
-  { id: '4', type: 'image', url: '/Ballo.JPG', title: 'Backstage' },
-  { id: '5', type: 'image', url: '/IMG_2496.webp', title: 'Live Session' },
-  { id: '6', type: 'image', url: '/IMG_2497.webp', title: 'Artist Portrait' },
+  { id: '2', type: 'image', url: '/foto1.webp', title: 'Concert Moment' },
+  { id: '3', type: 'image', url: '/foto2.webp', title: 'On Stage' },
+  { id: '4', type: 'image', url: '/Ballo.webp', title: 'Backstage' },
+  { id: '5', type: 'image', url: '/foto3.webp', title: 'Live Session' },
+  { id: '6', type: 'image', url: '/foto4.webp', title: 'Artist Portrait' },
+];
+
+export const DANCERS: Dancer[] = [
+  { id: '1', firstName: 'Arianna', lastName: 'Del Mastro', photoUrl: '/dancers/arianna-del-mastro.webp' },
+  { id: '2', firstName: 'Morgana', lastName: 'Tomassi', photoUrl: '/dancers/morgana-tomassi.webp' },
+  { id: '3', firstName: 'Nicole', lastName: 'Vinci', photoUrl: '/dancers/nicole-vinci.webp' },
+  { id: '4', firstName: 'Alessia', lastName: 'Comito', photoUrl: '/dancers/alessia-comito.webp' },
+  { id: '5', firstName: 'Irene', lastName: 'Mosquera', photoUrl: '/dancers/irene-mosquera.webp' },
+  { id: '6', firstName: 'Sarah', lastName: 'Cosac', photoUrl: '/dancers/sarah-cosac.webp' },
 ];

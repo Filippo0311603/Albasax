@@ -38,7 +38,7 @@ const Footer: React.FC = () => {
               </h2>
             </div>
             <p className="text-gray-400 max-w-md leading-relaxed">
-              Official website for Albasax. Reimagining the landscape of modern jazz and electronic fusion. Stay connected for exclusive content and tour updates.
+              Official website of Albasax. Pop artist and performer, he turns every song into Glamour Cinematic Scenes. Join the community of “The Dramatics”. Stay connected for exclusive content and tour updates.
             </p>
             <div className="flex space-x-6">
               <a href="https://www.instagram.com/albasax_official/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gold transition-colors">

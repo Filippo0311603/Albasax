@@ -20,6 +20,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
     { name: 'Music', path: '/music' },
     { name: 'Tour', path: '/tour' },
     { name: 'Bio', path: '/bio' },
+    { name: 'Dancers', path: '/dancers' },
     { name: 'Media', path: '/media' },
     { name: 'Shop', path: '/shop' },
     { name: 'Press', path: '/press' },

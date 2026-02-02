@@ -42,3 +42,10 @@ export interface User {
   email: string;
   name: string;
 }
+
+export interface Dancer {
+  id: string;
+  firstName: string;
+  lastName: string;
+  photoUrl: string;
+}

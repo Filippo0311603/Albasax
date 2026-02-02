@@ -1,0 +1,14 @@
+{
+  "projectId": "",
+  "orgId": "",
+  "buildCommand": "npm run build",
+  "devCommand": "vite",
+  "installCommand": "npm install",
+  "framework": "vite",
+  "outputDirectory": "./dist",
+  "env": [
+    "VITE_SUPABASE_URL",
+    "VITE_SUPABASE_KEY",
+    "VITE_API_URL"
+  ]
+}
