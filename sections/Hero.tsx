@@ -47,7 +47,7 @@ const Hero: React.FC = () => {
         
         <CinematicText 
           as="span"
-          className="block text-xs sm:text-xl md:text-3xl font-light tracking-[0.2em] sm:tracking-[0.5em] uppercase text-gray-300"
+          className="block text-xs sm:text-xl md:text-3xl font-serif font-light tracking-[0.2em] sm:tracking-[0.5em] uppercase text-gray-300"
           letterDelay={50}
         >
           I Live In A Dramatic Film
