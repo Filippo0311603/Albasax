@@ -39,19 +39,28 @@ const Hero: React.FC = () => {
       <div className="relative z-10 text-right px-6 sm:px-16 md:px-24 max-w-5xl space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 w-full flex flex-col justify-center h-full pt-20 sm:pt-0">
         <CinematicText 
           as="h1"
-          className="text-5xl sm:text-6xl md:text-8xl font-serif text-white leading-tight"
+          className="text-5xl sm:text-6xl md:text-8xl font-serif text-white leading-tight ml-auto"
           letterDelay={60}
         >
           Albasax
         </CinematicText>
         
-        <CinematicText 
-          as="span"
-          className="block text-xs sm:text-xl md:text-3xl font-serif font-light tracking-[0.2em] sm:tracking-[0.5em] uppercase text-gray-300"
-          letterDelay={50}
-        >
-          I Live In A Dramatic Film
-        </CinematicText>
+        <div className="space-y-2">
+          <CinematicText 
+            as="span"
+            className="block text-xs sm:text-xl md:text-3xl font-serif font-light tracking-[0.2em] sm:tracking-[0.5em] uppercase text-gray-300"
+            letterDelay={50}
+          >
+            I Live In A
+          </CinematicText>
+          <CinematicText 
+            as="span"
+            className="block text-xs sm:text-xl md:text-3xl font-serif font-light tracking-[0.2em] sm:tracking-[0.5em] uppercase text-gray-300"
+            letterDelay={50}
+          >
+            Dramatic Film
+          </CinematicText>
+        </div>
         
         <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl font-light leading-relaxed ml-auto">
           GLAMOUR POP ARTIST<br />
