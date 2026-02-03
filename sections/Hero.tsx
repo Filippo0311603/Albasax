@@ -10,15 +10,26 @@ const Hero: React.FC = () => {
       <div 
         className="absolute inset-0 z-5 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.4) 100%)',
-          boxShadow: 'inset 0 0 80px rgba(0, 0, 0, 0.5)',
+          background: 'radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%)',
+          boxShadow: 'inset 0 0 100px rgba(0, 0, 0, 0.6)',
+        }}
+      />
+
+      {/* Spotlight morbido sul volto (ellisse diffusa) */}
+      <div 
+        className="absolute inset-0 z-4 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 600px 700px at 40% 35%, rgba(217, 119, 6, 0.15) 0%, rgba(217, 119, 6, 0.05) 40%, transparent 100%)',
         }}
       />
 
       {/* Background Image with Overlay */}
       <div 
         className="absolute inset-0 z-0 bg-cover bg-top"
-        style={{ backgroundImage: `url('/IMG_2590.webp')` }}
+        style={{ 
+          backgroundImage: `url('/IMG_2590.webp')`,
+          animation: 'breathe 6s ease-in-out infinite',
+        }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
       </div>
@@ -60,6 +71,17 @@ const Hero: React.FC = () => {
           className="h-12 w-auto filter brightness-0 invert"
         />
       </div>
+
+      <style>{`
+        @keyframes breathe {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.015);
+          }
+        }
+      `}</style>
     </section>
   );
 };
