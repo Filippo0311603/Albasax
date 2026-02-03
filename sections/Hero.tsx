@@ -53,17 +53,17 @@ const Hero: React.FC = () => {
           GLAMOUR POP ARTIST<br />
         </p>
 
-        <div className="flex flex-col sm:flex-row items-end justify-end gap-4 pt-4 sm:pt-4 md:pt-8 mt-16 sm:mt-0">
+        <div className="flex flex-col sm:flex-row items-end justify-end gap-3 sm:gap-4 pt-4 sm:pt-4 md:pt-8 mt-16 sm:mt-0">
           <Link 
             to="/music"
-            className="w-full sm:w-auto px-8 py-4 bg-gold-animated text-white flex items-center justify-center space-x-2 transition-all group rounded-sm shadow-lg hover:shadow-xl"
+            className="w-full sm:w-auto px-6 py-3 sm:px-8 sm:py-4 bg-gold-animated text-white flex items-center justify-center space-x-2 transition-all group rounded-sm shadow-lg hover:shadow-xl"
           >
             <Play size={18} fill="currentColor" />
             <span className="uppercase tracking-widest text-sm font-bold">Listen Now</span>
           </Link>
           <Link 
             to="/tour"
-            className="w-full sm:w-auto px-8 py-4 border border-white hover:bg-white hover:text-black text-white flex items-center justify-center space-x-2 transition-all rounded-sm"
+            className="w-full sm:w-auto px-6 py-3 sm:px-8 sm:py-4 border border-white hover:bg-white hover:text-black text-white flex items-center justify-center space-x-2 transition-all rounded-sm"
           >
             <Calendar size={18} />
             <span className="uppercase tracking-widest text-sm font-bold">View Tour Dates</span>
