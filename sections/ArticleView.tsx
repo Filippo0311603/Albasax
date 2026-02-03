@@ -66,7 +66,7 @@ const ArticleView: React.FC = () => {
       {/* Content */}
       <div className="prose prose-invert prose-lg max-w-none prose-headings:font-serif prose-headings:text-white prose-a:text-gold hover:prose-a:text-gold-400 prose-blockquote:border-l-gold prose-blockquote:text-gray-300">
         {/* Helper per gestire testo normale con "a capo" invece di HTML */}
-        {(article.content || '').split('\n').map((paragraph, index) => (
+        {(article.excerpt || '').split('\n').map((paragraph, index) => (
             paragraph.trim() !== '' ? (
                 <p key={index} className="mb-6 leading-relaxed text-gray-300 text-justify">
                     {paragraph.trim()}
