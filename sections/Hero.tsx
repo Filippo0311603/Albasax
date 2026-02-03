@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Play, Calendar } from 'lucide-react';
+import CinematicText from '../components/CinematicText';
 
 const Hero: React.FC = () => {
   return (
@@ -36,10 +37,21 @@ const Hero: React.FC = () => {
 
       {/* Content */}
       <div className="relative z-10 text-right px-6 sm:px-16 md:px-24 max-w-5xl space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 w-full flex flex-col justify-center h-full pt-20 sm:pt-0">
-        <h1 className="text-5xl sm:text-6xl md:text-8xl font-serif text-white leading-tight">
-          Albasax <br />
-          <span className="block mt-4 text-xs sm:text-xl md:text-3xl font-light tracking-[0.2em] sm:tracking-[0.5em] uppercase text-gray-300">I Live In A <br /> Dramatic Film</span>
-        </h1>
+        <CinematicText 
+          as="h1"
+          className="text-5xl sm:text-6xl md:text-8xl font-serif text-white leading-tight"
+          letterDelay={60}
+        >
+          Albasax
+        </CinematicText>
+        
+        <CinematicText 
+          as="span"
+          className="block text-xs sm:text-xl md:text-3xl font-light tracking-[0.2em] sm:tracking-[0.5em] uppercase text-gray-300"
+          letterDelay={50}
+        >
+          I Live In A Dramatic Film
+        </CinematicText>
         
         <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl font-light leading-relaxed ml-auto">
           GLAMOUR POP ARTIST<br />
