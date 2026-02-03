@@ -52,6 +52,17 @@ const PageTransition: React.FC<PageTransitionProps> = ({ children }) => {
         }}
       />
 
+      {/* Vignettatura potenziata durante transizioni */}
+      <div
+        className="fixed inset-0 z-40 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.4) 100%)',
+          boxShadow: 'inset 0 0 80px rgba(0, 0, 0, 0.5)',
+          opacity: isTransitioning ? 0.6 : 0,
+          transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
+      />
+
       {/* Stili CSS per le animazioni */}
       <style>{`
         @keyframes floatUp {

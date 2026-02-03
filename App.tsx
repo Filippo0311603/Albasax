@@ -4,6 +4,7 @@ import { HashRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import PageTransition from './components/PageTransition';
+import AtmosphereOverlay from './components/AtmosphereOverlay';
 import Hero from './sections/Hero';
 import Biography from './sections/Biography';
 import Tour from './sections/Tour';
@@ -41,6 +42,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col selection:bg-gold-400 selection:text-black">
+      <AtmosphereOverlay />
       <ScrollToTop />
       <Navbar 
         user={user} 

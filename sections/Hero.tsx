@@ -6,6 +6,15 @@ import { Play, Calendar } from 'lucide-react';
 const Hero: React.FC = () => {
   return (
     <section className="relative h-screen w-full flex items-center justify-end overflow-hidden">
+      {/* Vignettatura Hero più evidente */}
+      <div 
+        className="absolute inset-0 z-5 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.4) 100%)',
+          boxShadow: 'inset 0 0 80px rgba(0, 0, 0, 0.5)',
+        }}
+      />
+
       {/* Background Image with Overlay */}
       <div 
         className="absolute inset-0 z-0 bg-cover bg-top"
