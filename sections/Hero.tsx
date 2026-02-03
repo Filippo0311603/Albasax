@@ -45,17 +45,17 @@ const Hero: React.FC = () => {
           Albasax
         </CinematicText>
         
-        <div className="space-y-2">
+        <div className="space-y-0">
           <CinematicText 
             as="span"
-            className="block text-xs sm:text-xl md:text-3xl font-serif font-light tracking-[0.2em] sm:tracking-[0.5em] uppercase text-gray-300"
+            className="block text-xs sm:text-xl md:text-3xl font-serif font-light tracking-[0.2em] sm:tracking-[0.5em] uppercase text-gray-300 whitespace-nowrap"
             letterDelay={50}
           >
             I Live In A
           </CinematicText>
           <CinematicText 
             as="span"
-            className="block text-xs sm:text-xl md:text-3xl font-serif font-light tracking-[0.2em] sm:tracking-[0.5em] uppercase text-gray-300"
+            className="block text-xs sm:text-xl md:text-3xl font-serif font-light tracking-[0.2em] sm:tracking-[0.5em] uppercase text-gray-300 whitespace-nowrap"
             letterDelay={50}
           >
             Dramatic Film
