@@ -108,10 +108,10 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
                     const rect = e.currentTarget.getBoundingClientRect();
                     const newExplosions: NoteExplosion[] = [];
                     
-                    // Crea solo 3-4 note, non caotico
-                    for (let i = 0; i < 3; i++) {
-                      const angle = Math.PI / 4 + (i * Math.PI / 6); // Curva, non lineare
-                      const distance = 60 + i * 20;
+                    // Crea 5 note con movimento curvo
+                    for (let i = 0; i < 5; i++) {
+                      const angle = Math.PI / 3 + (i * Math.PI / 12); // Curva più ampia
+                      const distance = 40 + i * 25; // Distanza variabile
                       const x = rect.left + rect.width / 2 + Math.cos(angle) * distance;
                       const y = rect.top + rect.height / 2 - Math.sin(angle) * distance;
                       
@@ -124,13 +124,13 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
                     }
                     
                     setExplosions(prev => [...prev, ...newExplosions]);
-                    setExplosionId(prev => prev + 3);
+                    setExplosionId(prev => prev + 5);
 
                     // Rimuovi le note dopo l'animazione
                     newExplosions.forEach((note) => {
                       setTimeout(() => {
                         setExplosions(prev => prev.filter(n => n.id !== note.id));
-                      }, 600);
+                      }, 1200);
                     });
                   }}
                   style={{
@@ -215,18 +215,19 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
       )}
 
       {/* Desktop note effects - rendered outside menu */}
-      {explosions.map(note => (
+      {explosions.map((note, idx) => (
         <span
           key={`desktop-${note.id}`}
-          className="fixed pointer-events-none animate-float-up opacity-0"
+          className="fixed pointer-events-none opacity-0"
           style={{
             left: `${note.x}px`,
             top: `${note.y}px`,
-            fontSize: '16px',
-            animation: `float-up 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
+            fontSize: '18px',
+            animation: `float-up 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards`,
             color: '#c5a643',
-            textShadow: '0 0 10px rgba(197, 166, 67, 0.8)',
+            textShadow: '0 0 12px rgba(197, 166, 67, 0.8)',
             fontWeight: 'bold',
+            animationDelay: `${idx * 0.1}s`, // Delay sequenziale tra le note
           }}
         >
           {note.symbol}
