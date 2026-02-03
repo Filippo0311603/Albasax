@@ -88,3 +88,74 @@ h1, h2, h3, h4, h5, h6 {
 .animate-float-up {
   animation: float-up 1s ease-out forwards;
 }
+
+/* Oro realistico animato */
+@keyframes shimmer-gold {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes subtle-light {
+  0%, 100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.bg-gold-animated {
+  background: linear-gradient(
+    90deg,
+    #a67c3d 0%,
+    #c5a643 20%,
+    #dbc672 40%,
+    #e7d9a1 50%,
+    #dbc672 60%,
+    #c5a643 80%,
+    #a67c3d 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-gold 8s linear infinite;
+  position: relative;
+}
+
+.bg-gold-animated::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-gold 8s linear infinite;
+  pointer-events: none;
+}
+
+.text-gold-animated {
+  background: linear-gradient(
+    90deg,
+    #a67c3d 0%,
+    #c5a643 20%,
+    #dbc672 40%,
+    #e7d9a1 50%,
+    #dbc672 60%,
+    #c5a643 80%,
+    #a67c3d 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer-gold 8s linear infinite;
+}
