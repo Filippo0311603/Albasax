@@ -99,16 +99,50 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
           {/* Desktop Links */}
           <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
-              <MusicNoteEffect key={link.name}>
+              <div key={link.name} className="relative group">
                 <Link
                   to={link.path}
-                  className={`text-sm tracking-widest uppercase transition-colors duration-200 font-navbar ${
-                    isActive(link.path) ? 'text-gold' : 'text-gray-300 hover:text-gold'
-                  }`}
+                  className="nav-link-underline text-sm tracking-widest uppercase transition-colors duration-200 font-navbar relative"
+                  onMouseEnter={(e) => {
+                    // Crea note musicali eleganti su hover desktop
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const newExplosions: NoteExplosion[] = [];
+                    
+                    // Crea solo 3-4 note, non caotico
+                    for (let i = 0; i < 3; i++) {
+                      const angle = Math.PI / 4 + (i * Math.PI / 6); // Curva, non lineare
+                      const distance = 60 + i * 20;
+                      const x = rect.left + rect.width / 2 + Math.cos(angle) * distance;
+                      const y = rect.top + rect.height / 2 - Math.sin(angle) * distance;
+                      
+                      newExplosions.push({
+                        id: explosionId + i,
+                        x,
+                        y,
+                        symbol: musicSymbols[Math.floor(Math.random() * musicSymbols.length)],
+                      });
+                    }
+                    
+                    setExplosions(prev => [...prev, ...newExplosions]);
+                    setExplosionId(prev => prev + 3);
+
+                    // Rimuovi le note dopo l'animazione
+                    newExplosions.forEach((note) => {
+                      setTimeout(() => {
+                        setExplosions(prev => prev.filter(n => n.id !== note.id));
+                      }, 600);
+                    });
+                  }}
+                  style={{
+                    color: isActive(link.path) ? '#c5a643' : 'rgb(209, 213, 219)',
+                  }}
+                  onMouseLeave={() => {
+                    // Rimuovi le note se l'hover viene lasciato
+                  }}
                 >
                   {link.name}
                 </Link>
-              </MusicNoteEffect>
+              </div>
             ))}
           </div>
 
@@ -171,6 +205,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
                 top: `${note.y}px`,
                 fontSize: '18px',
                 animation: `float-up 0.8s ease-out forwards`,
+                textShadow: '0 0 8px rgba(197, 166, 67, 0.6)',
               }}
             >
               {note.symbol}
@@ -178,6 +213,25 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
           ))}
         </div>
       )}
+
+      {/* Desktop note effects - rendered outside menu */}
+      {explosions.map(note => (
+        <span
+          key={`desktop-${note.id}`}
+          className="fixed pointer-events-none animate-float-up opacity-0"
+          style={{
+            left: `${note.x}px`,
+            top: `${note.y}px`,
+            fontSize: '16px',
+            animation: `float-up 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
+            color: '#c5a643',
+            textShadow: '0 0 10px rgba(197, 166, 67, 0.8)',
+            fontWeight: 'bold',
+          }}
+        >
+          {note.symbol}
+        </span>
+      ))}
     </nav>
   );
 };
