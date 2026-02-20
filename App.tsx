@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { HashRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import PageTransition from './components/PageTransition';
@@ -14,10 +14,10 @@ import Press from './sections/Press';
 import ArticleView from './sections/ArticleView';
 import Media from './sections/Media';
 import Dancers from './sections/Dancers';
-
 import Auth from './sections/Auth';
 import Cart from './sections/Cart';
 import { User } from './types';
+import { supabase } from './supabaseClient';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -31,6 +31,41 @@ const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // ── Supabase session persistence ───────────────────────────────────────
+  useEffect(() => {
+    // Ripristina la sessione al caricamento della pagina
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        const meta = session.user.user_metadata;
+        const fullName = [meta?.first_name, meta?.last_name].filter(Boolean).join(' ') || session.user.email!;
+        setUser({
+          email: session.user.email!,
+          name: fullName,
+          firstName: meta?.first_name,
+          lastName: meta?.last_name,
+        });
+      }
+    });
+
+    // Ascolta tutti i cambiamenti di autenticazione (login, logout, refresh token)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const meta = session.user.user_metadata;
+        const fullName = [meta?.first_name, meta?.last_name].filter(Boolean).join(' ') || session.user.email!;
+        setUser({
+          email: session.user.email!,
+          name: fullName,
+          firstName: meta?.first_name,
+          lastName: meta?.last_name,
+        });
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Simple SEO Title updates
   const location = useLocation();

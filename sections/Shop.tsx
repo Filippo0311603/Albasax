@@ -1,8 +1,36 @@
 
-import React from 'react';
-import { Package, Bell } from 'lucide-react';
+import React, { useState } from 'react';
+import { Package, Bell, Check, Loader } from 'lucide-react';
+import { supabase } from '../supabaseClient';
+
+type Status = 'idle' | 'loading' | 'success' | 'error';
 
 const Shop: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<Status>('idle');
+  const [message, setMessage] = useState('');
+
+  const handleNotify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('loading');
+    try {
+      const { error } = await supabase
+        .from('newsletter_subscribers')
+        .upsert(
+          { email: email.toLowerCase().trim(), source: 'shop_notify', active: true },
+          { onConflict: 'email' }
+        );
+      if (error) throw error;
+
+      setStatus('success');
+      setMessage("You'll be the first to know when the shop goes live.");
+      setEmail('');
+    } catch (err: any) {
+      setStatus('error');
+      setMessage(err.message || 'Something went wrong. Try again.');
+    }
+  };
+
   return (
     <div className="pt-24 md:pt-32 pb-16 md:pb-20 px-4 min-h-screen flex items-center justify-center">
       <div className="max-w-xl w-full text-center space-y-8 md:space-y-12 animate-in zoom-in duration-700">
@@ -21,23 +49,42 @@ const Shop: React.FC = () => {
         </div>
 
         <div className="glass p-8 space-y-4">
-          <p className="text-sm tracking-widest uppercase font-bold text-gray-300">Notify me on launch</p>
-          <form className="flex flex-col sm:flex-row gap-3">
-            <input 
-              type="email" 
-              placeholder="Your email address"
-              className="flex-grow bg-black/50 border border-gray-800 p-4 text-sm focus:border-gold outline-none transition-all"
-              required
-            />
-            <button 
-              type="submit"
-              className="px-8 py-4 bg-white text-black font-bold uppercase tracking-widest text-xs hover:bg-gold hover:text-white transition-all flex items-center justify-center"
-            >
-              <Bell size={16} className="mr-2" />
-              Subscribe
-            </button>
-          </form>
-          <p className="text-[10px] text-gray-500 italic">By subscribing, you agree to receive promotional updates from Albasax.</p>
+          {status === 'success' ? (
+            <div className="flex flex-col items-center gap-3 py-4 text-green-400">
+              <Check size={28} />
+              <p className="text-sm">{message}</p>
+            </div>
+          ) : (
+            <>
+              <p className="text-sm tracking-widest uppercase font-bold text-gray-300">Notify me on launch</p>
+              <form onSubmit={handleNotify} className="flex flex-col sm:flex-row gap-3">
+                <input 
+                  type="email" 
+                  placeholder="Your email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={status === 'loading'}
+                  className="flex-grow bg-black/50 border border-gray-800 p-4 text-sm focus:border-gold outline-none transition-all disabled:opacity-50"
+                  required
+                />
+                <button 
+                  type="submit"
+                  disabled={status === 'loading'}
+                  className="px-8 py-4 bg-white text-black font-bold uppercase tracking-widest text-xs hover:bg-gold hover:text-white transition-all flex items-center justify-center disabled:opacity-50"
+                >
+                  {status === 'loading'
+                    ? <Loader size={16} className="animate-spin mr-2" />
+                    : <Bell size={16} className="mr-2" />
+                  }
+                  Subscribe
+                </button>
+              </form>
+              {status === 'error' && (
+                <p className="text-red-500 text-xs">{message}</p>
+              )}
+              <p className="text-[10px] text-gray-500 italic">By subscribing, you agree to receive promotional updates from Albasax.</p>
+            </>
+          )}
         </div>
       </div>
     </div>

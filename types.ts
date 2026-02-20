@@ -40,7 +40,67 @@ export interface MediaItem {
 
 export interface User {
   email: string;
+  name: string;         // first_name + last_name
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  birthDate?: string;
+  country?: string;
+  emailVerified?: boolean;
+}
+
+// ─── Shop ────────────────────────────────────────────────────────────────────
+
+export interface Product {
+  id: string;
   name: string;
+  description: string;
+  price: number;
+  image_url: string;
+  category: 'vinyl' | 'apparel' | 'limited';
+  stock: number;
+  stripe_price_id?: string;
+}
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}
+
+export interface Order {
+  id: string;
+  user_email: string;
+  status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
+  total_amount: number;
+  stripe_session_id?: string;
+  shipping_address?: {
+    name: string;
+    line1: string;
+    line2?: string;
+    city: string;
+    postal_code: string;
+    country: string;
+  };
+  created_at: string;
+  order_items?: OrderItem[];
+}
+
+export interface OrderItem {
+  id: string;
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+}
+
+// ─── Newsletter ───────────────────────────────────────────────────────────────
+
+export interface NewsletterSubscriber {
+  id: string;
+  email: string;
+  name?: string;
+  source: 'newsletter' | 'registration' | 'shop_notify';
+  active: boolean;
+  subscribed_at: string;
 }
 
 export interface Dancer {

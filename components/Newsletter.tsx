@@ -1,8 +1,36 @@
 
-import React from 'react';
-import { Send } from 'lucide-react';
+import React, { useState } from 'react';
+import { Send, Check, Loader } from 'lucide-react';
+import { supabase } from '../supabaseClient';
+
+type Status = 'idle' | 'loading' | 'success' | 'error';
 
 const Newsletter: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<Status>('idle');
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('loading');
+    try {
+      const { error } = await supabase
+        .from('newsletter_subscribers')
+        .upsert(
+          { email: email.toLowerCase().trim(), source: 'newsletter', active: true },
+          { onConflict: 'email' }
+        );
+      if (error) throw error;
+
+      setStatus('success');
+      setMessage("You're in! Welcome to the inner circle.");
+      setEmail('');
+    } catch (err: any) {
+      setStatus('error');
+      setMessage(err.message || 'Something went wrong. Try again.');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -10,20 +38,34 @@ const Newsletter: React.FC = () => {
         <p className="text-gray-500 text-sm">Be the first to know about new album drops and secret pop-up shows.</p>
       </div>
 
-      <form className="relative group">
-        <input 
-          type="email" 
-          placeholder="ENTER YOUR EMAIL"
-          className="w-full bg-transparent border-b border-gray-800 py-4 text-sm tracking-[0.2em] outline-none focus:border-gold transition-all placeholder:text-gray-700"
-          required
-        />
-        <button 
-          type="submit"
-          className="absolute right-0 top-1/2 -translate-y-1/2 p-4 text-gray-500 hover:text-gold transition-colors"
-        >
-          <Send size={18} />
-        </button>
-      </form>
+      {status === 'success' ? (
+        <div className="flex items-center gap-3 py-4 text-green-400">
+          <Check size={18} />
+          <span className="text-sm">{message}</span>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="relative group">
+          <input
+            type="email"
+            placeholder="ENTER YOUR EMAIL"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            disabled={status === 'loading'}
+            className="w-full bg-transparent border-b border-gray-800 py-4 text-sm tracking-[0.2em] outline-none focus:border-gold transition-all placeholder:text-gray-700 disabled:opacity-50"
+          />
+          <button
+            type="submit"
+            disabled={status === 'loading'}
+            className="absolute right-0 top-1/2 -translate-y-1/2 p-4 text-gray-500 hover:text-gold transition-colors disabled:opacity-50"
+          >
+            {status === 'loading' ? <Loader size={18} className="animate-spin" /> : <Send size={18} />}
+          </button>
+          {status === 'error' && (
+            <p className="text-red-500 text-xs mt-2">{message}</p>
+          )}
+        </form>
+      )}
     </div>
   );
 };
