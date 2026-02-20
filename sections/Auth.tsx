@@ -62,21 +62,39 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
 
   // ── Email confirmation via token_hash ─────────────────────────────────────
   React.useEffect(() => {
-    const token_hash = searchParams.get('token_hash');
-    const type       = searchParams.get('type');
-    if (!token_hash || type !== 'signup') return;
+    // Support both `token` and `token_hash`, and handle HashRouter URLs
+    let token = searchParams.get('token') || searchParams.get('token_hash');
+    let typeParam = searchParams.get('type');
+
+    if (!token) {
+      const hash = window.location.hash || '';
+      const qIdx = hash.indexOf('?');
+      if (qIdx !== -1) {
+        const qs = new URLSearchParams(hash.slice(qIdx + 1));
+        token = token || qs.get('token') || qs.get('token_hash');
+        typeParam = typeParam || qs.get('type');
+      }
+    }
+
+    if (!token || typeParam !== 'signup') return;
+
     setVerifyState('verifying');
-    supabase.auth.verifyOtp({ token_hash, type: 'signup' })
-      .then(({ error }) => {
+    (supabase.auth as any).verifyOtp({ token, type: 'signup' })
+      .then(({ error }: any) => {
         if (error) {
           setVerifyState('error');
         } else {
           setVerifyState('success');
-          // Clean URL params without page reload
-          navigate('/auth', { replace: true });
+          // Remove query/hash params without navigating away so the success UI remains visible
+          try {
+            const cleanHash = '#/auth';
+            window.history.replaceState(null, '', window.location.pathname + cleanHash);
+          } catch (e) {
+            // ignore
+          }
         }
       });
-  }, []);
+  }, [searchParams]);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState<{title: string; message: string; type: 'success' | 'error'}>({
