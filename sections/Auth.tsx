@@ -423,7 +423,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
               <div className="space-y-2">
                 <label className={labelCls}><Lock size={12} className="mr-2" />Password</label>
                 <div className="relative">
-                  <input type={showPw ? 'text' : 'password'} required placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                  <input type={showPw ? 'text' : 'password'} required placeholder="Enter your password"
                     value={formData.password} onChange={e => fd('password', e.target.value)}
                     className={inputCls + ' pr-12'} />
                   <button type="button" onClick={() => setShowPw(v => !v)}
@@ -481,7 +481,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
                   <div className="relative">
                     <select required value={formData.country} onChange={e => fd('country', e.target.value)}
                       className={inputCls + ' appearance-none pr-8 cursor-pointer'}>
-                      <option value="">Selectâ€¦</option>
+                      <option value="">Select your country</option>
                       {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                     <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
