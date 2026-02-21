@@ -363,6 +363,12 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
           </div>
           <div className="space-y-3">
             <button
+              onClick={() => { setEmailSent(false); setIsLogin(true); }}
+              className="w-full py-4 bg-gold text-black font-bold uppercase tracking-widest text-xs hover:bg-gold/90 transition-all flex items-center justify-center gap-2"
+            >
+              <ArrowRight size={14} /> Ho già verificato → Accedi
+            </button>
+            <button
               onClick={handleResend}
               disabled={resendCooldown > 0 || loading}
               className="w-full py-4 border border-gray-700 text-gray-300 hover:border-gold hover:text-gold font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
@@ -371,16 +377,16 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
               {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend email'}
             </button>
             <button
-              onClick={() => { setEmailSent(false); setIsLogin(true); }}
+              onClick={() => { setEmailSent(false); setIsLogin(false); }}
               className="w-full py-3 text-gray-500 hover:text-gray-300 text-xs transition-colors"
             >
-              â† Back to login
+              ← Torna alla registrazione
             </button>
           </div>
           <div className="flex items-start gap-2 text-left bg-yellow-900/10 border border-yellow-800/30 p-4 rounded">
             <AlertCircle size={16} className="text-yellow-600 mt-0.5 shrink-0" />
             <p className="text-yellow-700 text-xs leading-relaxed">
-              Don't see it? Check your spam folder. The sender is <em>no-reply@albasax.com</em>.
+              Non la vedi? Controlla la cartella spam.
             </p>
           </div>
         </div>
