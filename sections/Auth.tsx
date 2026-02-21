@@ -24,11 +24,11 @@ function checkPassword(pw: string): PasswordCheck[] {
 // â”€â”€â”€ Age validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function isOldEnough(birthDate: string, minAge = 16): boolean {
   if (!birthDate) return false;
-  return age > minAge || (age === minAge && (m > 0 || (m === 0 && today.getDate() >= dob.getDate())));
+  const today = new Date();
   const dob   = new Date(birthDate);
   const age   = today.getFullYear() - dob.getFullYear();
   const m     = today.getMonth() - dob.getMonth();
-  return age > minAge || (age === minAge && m >= 0);
+  return age > minAge || (age === minAge && (m > 0 || (m === 0 && today.getDate() >= dob.getDate())));
 }
 
 // â”€â”€â”€ Country list â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
