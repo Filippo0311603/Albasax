@@ -68,12 +68,23 @@ const App: React.FC = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Simple SEO Title updates
+  // SEO Title updates — with HashRouter the real path is in location.hash
   const location = useLocation();
   useEffect(() => {
-    const path = location.pathname.replace('/', '');
-    const title = path ? `${path.charAt(0).toUpperCase() + path.slice(1)} | Albasax` : 'Albasax | Official Website';
-    document.title = title;
+    const path = location.hash.replace('#/', '').replace('#', '').split('?')[0];
+    const pageNames: Record<string, string> = {
+      '':         'Albasax | Official Website',
+      'bio':      'Biography | Albasax',
+      'tour':     'Tour | Albasax',
+      'music':    'Music | Albasax',
+      'shop':     'Shop | Albasax',
+      'media':    'Media | Albasax',
+      'dancers':  'Dancers | Albasax',
+      'press':    'Press | Albasax',
+      'auth':     'Account | Albasax',
+      'verified': 'Email Verified | Albasax',
+    };
+    document.title = pageNames[path] ?? `${path.charAt(0).toUpperCase() + path.slice(1)} | Albasax`;
   }, [location]);
 
   return (

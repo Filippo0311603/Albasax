@@ -17,14 +17,14 @@ function checkPassword(pw: string): PasswordCheck[] {
     { label: 'At least 8 characters',           pass: pw.length >= 8 },
     { label: 'One uppercase letter (A-Z)',        pass: /[A-Z]/.test(pw) },
     { label: 'One number (0-9)',                  pass: /[0-9]/.test(pw) },
-    { label: 'One special character (!@#$â€¦)',     pass: /[^A-Za-z0-9]/.test(pw) },
+    { label: 'One special character (!@#$%)',     pass: /[^A-Za-z0-9]/.test(pw) },
   ];
 }
 
 // â”€â”€â”€ Age validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function isOldEnough(birthDate: string, minAge = 16): boolean {
   if (!birthDate) return false;
-  const today = new Date();
+  return age > minAge || (age === minAge && (m > 0 || (m === 0 && today.getDate() >= dob.getDate())));
   const dob   = new Date(birthDate);
   const age   = today.getFullYear() - dob.getFullYear();
   const m     = today.getMonth() - dob.getMonth();
@@ -160,8 +160,8 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
       setErrorMSG('You must accept the Terms of Service and Privacy Policy.');
       return;
     }
-    if (!formData.phone.trim()) {
-      setErrorMSG('A valid phone number is required.');
+    if (!formData.phone.trim() || formData.phone.replace(/[^0-9]/g, '').length < 7) {
+      setErrorMSG('Please enter a valid phone number (at least 7 digits).');
       return;
     }
 
@@ -198,8 +198,8 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
       }
 
       // â† data.session is null when email confirmation is required
-      setSentEmail(formData.email);
-      setEmailSent(true);
+      setSentEmail(formData.email);      // Clear sensitive data from memory
+      setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));      setEmailSent(true);
       setResendCooldown(60);
 
     } catch (error: any) {

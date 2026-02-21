@@ -23,7 +23,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 // Middleware
 // NOTA: il webhook Stripe richiede il body RAW (prima di express.json)
 app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
-app.use(cors({ origin: process.env.CLIENT_URL || '*' }));
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowed = process.env.CLIENT_URL;
+    if (!allowed) return callback(new Error('CLIENT_URL not configured'));
+    // Allow same-origin requests (no origin header) and the configured client URL
+    if (!origin || origin === allowed) return callback(null, true);
+    return callback(new Error(`CORS: origin ${origin} not allowed`));
+  },
+  credentials: true,
+}));
 app.use(express.json());
 
 // Health check
@@ -37,8 +46,17 @@ app.get('/api/health', (_req, res) => {
 app.post('/api/stripe/create-checkout', async (req, res) => {
   try {
     const { items, customerEmail } = req.body;
-    if (!items || items.length === 0) {
+    if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: 'Cart is empty' });
+    }
+    // Validate each item has required fields and sane quantity
+    for (const item of items) {
+      if (!item.stripe_price_id || typeof item.stripe_price_id !== 'string') {
+        return res.status(400).json({ error: 'Invalid item: missing price ID' });
+      }
+      if (!Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 99) {
+        return res.status(400).json({ error: 'Invalid item quantity' });
+      }
     }
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -57,7 +75,7 @@ app.post('/api/stripe/create-checkout', async (req, res) => {
     res.json({ url: session.url });
   } catch (err) {
     console.error('[Stripe Checkout]', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Payment service temporarily unavailable. Please try again.' });
   }
 });
 
@@ -78,19 +96,21 @@ app.post('/api/stripe/webhook', async (req, res) => {
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object;
-      await supabase
+      const { error: dbErr } = await supabase
         .from('orders')
         .update({ status: 'paid', updated_at: new Date().toISOString() })
         .eq('stripe_session_id', session.id);
-      console.log(`[Webhook] Order paid: ${session.id}`);
+      if (dbErr) console.error('[Webhook] Failed to update order:', dbErr.message);
+      else console.log(`[Webhook] Order paid: ${session.id}`);
       break;
     }
     case 'checkout.session.expired': {
       const session = event.data.object;
-      await supabase
+      const { error: dbErr2 } = await supabase
         .from('orders')
         .update({ status: 'cancelled', updated_at: new Date().toISOString() })
         .eq('stripe_session_id', session.id);
+      if (dbErr2) console.error('[Webhook] Failed to cancel order:', dbErr2.message);
       break;
     }
     default:
