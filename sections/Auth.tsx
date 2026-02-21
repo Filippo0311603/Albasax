@@ -6,7 +6,7 @@ import {
   CheckCircle, AlertCircle, ChevronDown
 } from 'lucide-react';
 import { User } from '../types';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { supabase } from '../supabaseClient';
 
@@ -56,45 +56,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
   const [emailSent, setEmailSent]   = useState(false);
   const [sentEmail, setSentEmail]   = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
-  const [verifyState, setVerifyState] = useState<'idle'|'verifying'|'success'|'error'>('idle');
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-
-  // ── Email confirmation via token_hash ─────────────────────────────────────
-  React.useEffect(() => {
-    // Support both `token` and `token_hash`, and handle HashRouter URLs
-    let token = searchParams.get('token') || searchParams.get('token_hash');
-    let typeParam = searchParams.get('type');
-
-    if (!token) {
-      const hash = window.location.hash || '';
-      const qIdx = hash.indexOf('?');
-      if (qIdx !== -1) {
-        const qs = new URLSearchParams(hash.slice(qIdx + 1));
-        token = token || qs.get('token') || qs.get('token_hash');
-        typeParam = typeParam || qs.get('type');
-      }
-    }
-
-    if (!token || typeParam !== 'signup') return;
-
-    setVerifyState('verifying');
-    (supabase.auth as any).verifyOtp({ token, type: 'signup' })
-      .then(({ error }: any) => {
-        if (error) {
-          setVerifyState('error');
-        } else {
-          setVerifyState('success');
-          // Remove query/hash params without navigating away so the success UI remains visible
-          try {
-            const cleanHash = '#/auth';
-            window.history.replaceState(null, '', window.location.pathname + cleanHash);
-          } catch (e) {
-            // ignore
-          }
-        }
-      });
-  }, [searchParams]);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState<{title: string; message: string; type: 'success' | 'error'}>({
@@ -217,7 +179,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
             country:    formData.country,
           },
           // The confirmation email redirect points to your site
-          emailRedirectTo: `${window.location.origin}/#/auth`,
+          emailRedirectTo: `${window.location.origin}/#/verified`,
         },
       });
       if (error) throw new Error(error.message);
@@ -255,7 +217,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
       const { error } = await supabase.auth.resend({
         type:  'signup',
         email: sentEmail,
-        options: { emailRedirectTo: `${window.location.origin}/#/auth` },
+        options: { emailRedirectTo: `${window.location.origin}/#/verified` },
       });
       if (error) throw error;
       setResendCooldown(60);
@@ -679,7 +641,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
             </p>
           </footer>
         </div>
-      ))}
+      )}
     </div>
   );
 };

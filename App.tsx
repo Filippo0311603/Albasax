@@ -15,6 +15,7 @@ import ArticleView from './sections/ArticleView';
 import Media from './sections/Media';
 import Dancers from './sections/Dancers';
 import Auth from './sections/Auth';
+import Verified from './sections/Verified';
 import Cart from './sections/Cart';
 import { User } from './types';
 import { supabase } from './supabaseClient';
@@ -98,6 +99,7 @@ const App: React.FC = () => {
             <Route path="/press" element={<Press />} />
             <Route path="/press/:id" element={<ArticleView />} />
             <Route path="/auth" element={<Auth user={user} onLogin={setUser} onLogout={() => setUser(null)} />} />
+            <Route path="/verified" element={<Verified />} />
           </Routes>
         </main>
       </PageTransition>
