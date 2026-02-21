@@ -3,5 +3,8 @@
   "devCommand": "vite",
   "installCommand": "npm install",
   "framework": "vite",
-  "outputDirectory": "./dist"
+  "outputDirectory": "./dist",
+  "rewrites": [
+    { "source": "/((?!assets|fonts|dancers|press|favicon|robots|sitemap|og-image|logo).*)", "destination": "/index.html" }
+  ]
 }

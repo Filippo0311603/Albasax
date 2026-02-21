@@ -20,7 +20,8 @@ const Verified: React.FC = () => {
         setStatus('success');
         // Pulisce i token dall'URL senza ricaricare la pagina
         try {
-          window.history.replaceState(null, '', window.location.pathname + '#/verified');
+          // Rimuove i token Supabase dall'URL preservando il path /verified
+          window.history.replaceState(null, '', '/verified');
         } catch (_) {}
       }
     });

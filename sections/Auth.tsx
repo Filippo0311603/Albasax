@@ -179,7 +179,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
             country:    formData.country,
           },
           // The confirmation email redirect points to your site
-          emailRedirectTo: `${window.location.origin}/#/verified`,
+          emailRedirectTo: `${window.location.origin}/verified`,
         },
       });
       if (error) throw new Error(error.message);
@@ -217,7 +217,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
       const { error } = await supabase.auth.resend({
         type:  'signup',
         email: sentEmail,
-        options: { emailRedirectTo: `${window.location.origin}/#/verified` },
+        options: { emailRedirectTo: `${window.location.origin}/verified` },
       });
       if (error) throw error;
       setResendCooldown(60);

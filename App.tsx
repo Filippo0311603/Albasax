@@ -1,24 +1,25 @@
 
-import React, { useState, useEffect } from 'react';
-import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import PageTransition from './components/PageTransition';
 import AtmosphereOverlay from './components/AtmosphereOverlay';
-import Hero from './sections/Hero';
-import Biography from './sections/Biography';
-import Tour from './sections/Tour';
-import Music from './sections/Music';
-import Shop from './sections/Shop';
-import Press from './sections/Press';
-import ArticleView from './sections/ArticleView';
-import Media from './sections/Media';
-import Dancers from './sections/Dancers';
-import Auth from './sections/Auth';
-import Verified from './sections/Verified';
-import Cart from './sections/Cart';
 import { User } from './types';
 import { supabase } from './supabaseClient';
+
+const Hero        = lazy(() => import('./sections/Hero'));
+const Biography   = lazy(() => import('./sections/Biography'));
+const Tour        = lazy(() => import('./sections/Tour'));
+const Music       = lazy(() => import('./sections/Music'));
+const Shop        = lazy(() => import('./sections/Shop'));
+const Press       = lazy(() => import('./sections/Press'));
+const ArticleView = lazy(() => import('./sections/ArticleView'));
+const Media       = lazy(() => import('./sections/Media'));
+const Dancers     = lazy(() => import('./sections/Dancers'));
+const Auth        = lazy(() => import('./sections/Auth'));
+const Verified    = lazy(() => import('./sections/Verified'));
+const Cart        = lazy(() => import('./sections/Cart'));
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -68,10 +69,10 @@ const App: React.FC = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // SEO Title updates — with HashRouter the real path is in location.hash
+  // SEO Title updates — pathname reflects real URL with BrowserRouter
   const location = useLocation();
   useEffect(() => {
-    const path = location.hash.replace('#/', '').replace('#', '').split('?')[0];
+    const path = location.pathname.replace(/^\//, '').split('/')[0];
     const pageNames: Record<string, string> = {
       '':         'Albasax | Official Website',
       'bio':      'Biography | Albasax',
@@ -99,19 +100,21 @@ const App: React.FC = () => {
       
       <PageTransition>
         <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Hero />} />
-            <Route path="/bio" element={<Biography />} />
-            <Route path="/tour" element={<Tour />} />
-            <Route path="/music" element={<Music />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/media" element={<Media />} />
-            <Route path="/dancers" element={<Dancers />} />
-            <Route path="/press" element={<Press />} />
-            <Route path="/press/:id" element={<ArticleView />} />
-            <Route path="/auth" element={<Auth user={user} onLogin={setUser} onLogout={() => setUser(null)} />} />
-            <Route path="/verified" element={<Verified />} />
-          </Routes>
+          <Suspense fallback={<div className="min-h-screen bg-black" />}>
+            <Routes>
+              <Route path="/" element={<Hero />} />
+              <Route path="/bio" element={<Biography />} />
+              <Route path="/tour" element={<Tour />} />
+              <Route path="/music" element={<Music />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/media" element={<Media />} />
+              <Route path="/dancers" element={<Dancers />} />
+              <Route path="/press" element={<Press />} />
+              <Route path="/press/:id" element={<ArticleView />} />
+              <Route path="/auth" element={<Auth user={user} onLogin={setUser} onLogout={() => setUser(null)} />} />
+              <Route path="/verified" element={<Verified />} />
+            </Routes>
+          </Suspense>
         </main>
       </PageTransition>
 
@@ -125,8 +128,8 @@ const App: React.FC = () => {
 
 export default function Root() {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <App />
-    </HashRouter>
+    </BrowserRouter>
   );
 }
