@@ -6,7 +6,7 @@ import {
   CheckCircle, AlertCircle, ChevronDown
 } from 'lucide-react';
 import { User } from '../types';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { supabase } from '../supabaseClient';
 
@@ -17,14 +17,14 @@ function checkPassword(pw: string): PasswordCheck[] {
     { label: 'At least 8 characters',           pass: pw.length >= 8 },
     { label: 'One uppercase letter (A-Z)',        pass: /[A-Z]/.test(pw) },
     { label: 'One number (0-9)',                  pass: /[0-9]/.test(pw) },
-    { label: 'One special character (!@#$â€¦)',     pass: /[^A-Za-z0-9]/.test(pw) },
+    { label: 'One special character (!@#$%)',     pass: /[^A-Za-z0-9]/.test(pw) },
   ];
 }
 
 // â”€â”€â”€ Age validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function isOldEnough(birthDate: string, minAge = 16): boolean {
   if (!birthDate) return false;
-  const today = new Date();
+  return age > minAge || (age === minAge && (m > 0 || (m === 0 && today.getDate() >= dob.getDate())));
   const dob   = new Date(birthDate);
   const age   = today.getFullYear() - dob.getFullYear();
   const m     = today.getMonth() - dob.getMonth();
@@ -56,27 +56,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
   const [emailSent, setEmailSent]   = useState(false);
   const [sentEmail, setSentEmail]   = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
-  const [verifyState, setVerifyState] = useState<'idle'|'verifying'|'success'|'error'>('idle');
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-
-  // ── Email confirmation via token_hash ─────────────────────────────────────
-  React.useEffect(() => {
-    const token_hash = searchParams.get('token_hash');
-    const type       = searchParams.get('type');
-    if (!token_hash || type !== 'signup') return;
-    setVerifyState('verifying');
-    supabase.auth.verifyOtp({ token_hash, type: 'signup' })
-      .then(({ error }) => {
-        if (error) {
-          setVerifyState('error');
-        } else {
-          setVerifyState('success');
-          // Clean URL params without page reload
-          navigate('/auth', { replace: true });
-        }
-      });
-  }, []);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState<{title: string; message: string; type: 'success' | 'error'}>({
@@ -180,8 +160,8 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
       setErrorMSG('You must accept the Terms of Service and Privacy Policy.');
       return;
     }
-    if (!formData.phone.trim()) {
-      setErrorMSG('A valid phone number is required.');
+    if (!formData.phone.trim() || formData.phone.replace(/[^0-9]/g, '').length < 7) {
+      setErrorMSG('Please enter a valid phone number (at least 7 digits).');
       return;
     }
 
@@ -199,7 +179,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
             country:    formData.country,
           },
           // The confirmation email redirect points to your site
-          emailRedirectTo: `${window.location.origin}/#/auth`,
+          emailRedirectTo: `${window.location.origin}/#/verified`,
         },
       });
       if (error) throw new Error(error.message);
@@ -218,8 +198,8 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
       }
 
       // â† data.session is null when email confirmation is required
-      setSentEmail(formData.email);
-      setEmailSent(true);
+      setSentEmail(formData.email);      // Clear sensitive data from memory
+      setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));      setEmailSent(true);
       setResendCooldown(60);
 
     } catch (error: any) {
@@ -237,7 +217,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
       const { error } = await supabase.auth.resend({
         type:  'signup',
         email: sentEmail,
-        options: { emailRedirectTo: `${window.location.origin}/#/auth` },
+        options: { emailRedirectTo: `${window.location.origin}/#/verified` },
       });
       if (error) throw error;
       setResendCooldown(60);
@@ -296,59 +276,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
       />
 
       {/* â”€â”€ LOGGED IN: Profile view â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      {/* ── EMAIL VERIFICATION STATES ──────────────────────────────────────── */}
-      {verifyState === 'verifying' && (
-        <div className="max-w-md w-full glass p-10 shadow-2xl border-gray-800 text-center space-y-6 animate-in fade-in duration-500">
-          <div className="mx-auto w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center border border-gold/30">
-            <Loader size={36} className="text-gold animate-spin" />
-          </div>
-          <h2 className="text-2xl font-serif">Verifying your account…</h2>
-          <p className="text-gray-500 text-sm">Please wait a moment.</p>
-        </div>
-      )}
-
-      {verifyState === 'success' && (
-        <div className="max-w-md w-full glass p-10 shadow-2xl border-gray-800 text-center space-y-6 animate-in fade-in duration-500">
-          <div className="mx-auto w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center border border-gold/30">
-            <CheckCircle size={36} className="text-gold" />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-3xl font-serif">Account Verified!</h2>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              Your email has been confirmed. Welcome to the inner circle.
-            </p>
-          </div>
-          <button
-            onClick={() => { setVerifyState('idle'); setIsLogin(true); }}
-            className="w-full py-4 bg-gold text-black font-bold uppercase tracking-widest text-xs hover:bg-gold/90 transition-all flex items-center justify-center gap-2"
-          >
-            <ArrowRight size={14} /> Continue to Login
-          </button>
-        </div>
-      )}
-
-      {verifyState === 'error' && (
-        <div className="max-w-md w-full glass p-10 shadow-2xl border-gray-800 text-center space-y-6 animate-in fade-in duration-500">
-          <div className="mx-auto w-20 h-20 bg-red-900/20 rounded-full flex items-center justify-center border border-red-800/40">
-            <AlertCircle size={36} className="text-red-500" />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-3xl font-serif">Verification Failed</h2>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              The link may have expired or already been used.<br />
-              Try registering again or request a new link.
-            </p>
-          </div>
-          <button
-            onClick={() => { setVerifyState('idle'); setIsLogin(false); }}
-            className="w-full py-4 border border-gray-700 text-gray-300 hover:border-gold hover:text-gold font-bold uppercase tracking-widest text-xs transition-all"
-          >
-            ← Back to Register
-          </button>
-        </div>
-      )}
-
-      {verifyState === 'idle' && (user ? (
+      {user ? (
         <div className="max-w-md w-full glass p-8 md:p-12 shadow-2xl border-gray-800 text-center space-y-8 animate-in fade-in duration-500">
           <div className="mx-auto w-24 h-24 bg-gold/20 rounded-full flex items-center justify-center border-2 border-gold">
             <span className="text-4xl font-serif text-gold">
@@ -435,6 +363,12 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
           </div>
           <div className="space-y-3">
             <button
+              onClick={() => { setEmailSent(false); setIsLogin(true); }}
+              className="w-full py-4 bg-gold text-black font-bold uppercase tracking-widest text-xs hover:bg-gold/90 transition-all flex items-center justify-center gap-2"
+            >
+              <ArrowRight size={14} /> Ho già verificato → Accedi
+            </button>
+            <button
               onClick={handleResend}
               disabled={resendCooldown > 0 || loading}
               className="w-full py-4 border border-gray-700 text-gray-300 hover:border-gold hover:text-gold font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
@@ -443,16 +377,16 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
               {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend email'}
             </button>
             <button
-              onClick={() => { setEmailSent(false); setIsLogin(true); }}
+              onClick={() => { setEmailSent(false); setIsLogin(false); }}
               className="w-full py-3 text-gray-500 hover:text-gray-300 text-xs transition-colors"
             >
-              â† Back to login
+              ← Torna alla registrazione
             </button>
           </div>
           <div className="flex items-start gap-2 text-left bg-yellow-900/10 border border-yellow-800/30 p-4 rounded">
             <AlertCircle size={16} className="text-yellow-600 mt-0.5 shrink-0" />
             <p className="text-yellow-700 text-xs leading-relaxed">
-              Don't see it? Check your spam folder. The sender is <em>no-reply@albasax.com</em>.
+              Non la vedi? Controlla la cartella spam.
             </p>
           </div>
         </div>
@@ -489,7 +423,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
               <div className="space-y-2">
                 <label className={labelCls}><Lock size={12} className="mr-2" />Password</label>
                 <div className="relative">
-                  <input type={showPw ? 'text' : 'password'} required placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                  <input type={showPw ? 'text' : 'password'} required placeholder="Enter your password"
                     value={formData.password} onChange={e => fd('password', e.target.value)}
                     className={inputCls + ' pr-12'} />
                   <button type="button" onClick={() => setShowPw(v => !v)}
@@ -547,7 +481,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
                   <div className="relative">
                     <select required value={formData.country} onChange={e => fd('country', e.target.value)}
                       className={inputCls + ' appearance-none pr-8 cursor-pointer'}>
-                      <option value="">Selectâ€¦</option>
+                      <option value="">Select your country</option>
                       {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                     <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
@@ -661,7 +595,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
             </p>
           </footer>
         </div>
-      ))}
+      )}
     </div>
   );
 };

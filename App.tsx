@@ -15,6 +15,7 @@ import ArticleView from './sections/ArticleView';
 import Media from './sections/Media';
 import Dancers from './sections/Dancers';
 import Auth from './sections/Auth';
+import Verified from './sections/Verified';
 import Cart from './sections/Cart';
 import { User } from './types';
 import { supabase } from './supabaseClient';
@@ -67,12 +68,23 @@ const App: React.FC = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Simple SEO Title updates
+  // SEO Title updates — with HashRouter the real path is in location.hash
   const location = useLocation();
   useEffect(() => {
-    const path = location.pathname.replace('/', '');
-    const title = path ? `${path.charAt(0).toUpperCase() + path.slice(1)} | Albasax` : 'Albasax | Official Website';
-    document.title = title;
+    const path = location.hash.replace('#/', '').replace('#', '').split('?')[0];
+    const pageNames: Record<string, string> = {
+      '':         'Albasax | Official Website',
+      'bio':      'Biography | Albasax',
+      'tour':     'Tour | Albasax',
+      'music':    'Music | Albasax',
+      'shop':     'Shop | Albasax',
+      'media':    'Media | Albasax',
+      'dancers':  'Dancers | Albasax',
+      'press':    'Press | Albasax',
+      'auth':     'Account | Albasax',
+      'verified': 'Email Verified | Albasax',
+    };
+    document.title = pageNames[path] ?? `${path.charAt(0).toUpperCase() + path.slice(1)} | Albasax`;
   }, [location]);
 
   return (
@@ -98,6 +110,7 @@ const App: React.FC = () => {
             <Route path="/press" element={<Press />} />
             <Route path="/press/:id" element={<ArticleView />} />
             <Route path="/auth" element={<Auth user={user} onLogin={setUser} onLogout={() => setUser(null)} />} />
+            <Route path="/verified" element={<Verified />} />
           </Routes>
         </main>
       </PageTransition>

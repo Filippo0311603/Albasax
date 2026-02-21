@@ -131,12 +131,15 @@ ALTER TABLE products               ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders                 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE order_items            ENABLE ROW LEVEL SECURITY;
 
--- Newsletter: chiunque può iscriversi / leggere la propria riga
+-- Newsletter: chiunque può iscriversi
 CREATE POLICY "Anyone can subscribe"
     ON newsletter_subscribers FOR INSERT WITH CHECK (true);
 
-CREATE POLICY "Anyone can update own subscription"
-    ON newsletter_subscribers FOR UPDATE USING (true);
+-- Solo l'unsubscribe è permesso (active = false) — non si può cambiare l'email altrui
+CREATE POLICY "Subscribers can unsubscribe"
+    ON newsletter_subscribers FOR UPDATE
+    USING (true)
+    WITH CHECK (active = false);
 
 -- Products: chiunque può leggere i prodotti attivi
 CREATE POLICY "Anyone can read active products"
