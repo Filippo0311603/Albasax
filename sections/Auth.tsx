@@ -276,59 +276,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
       />
 
       {/* â”€â”€ LOGGED IN: Profile view â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      {/* ── EMAIL VERIFICATION STATES ──────────────────────────────────────── */}
-      {verifyState === 'verifying' && (
-        <div className="max-w-md w-full glass p-10 shadow-2xl border-gray-800 text-center space-y-6 animate-in fade-in duration-500">
-          <div className="mx-auto w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center border border-gold/30">
-            <Loader size={36} className="text-gold animate-spin" />
-          </div>
-          <h2 className="text-2xl font-serif">Verifying your account…</h2>
-          <p className="text-gray-500 text-sm">Please wait a moment.</p>
-        </div>
-      )}
-
-      {verifyState === 'success' && (
-        <div className="max-w-md w-full glass p-10 shadow-2xl border-gray-800 text-center space-y-6 animate-in fade-in duration-500">
-          <div className="mx-auto w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center border border-gold/30">
-            <CheckCircle size={36} className="text-gold" />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-3xl font-serif">Account Verified!</h2>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              Your email has been confirmed. Welcome to the inner circle.
-            </p>
-          </div>
-          <button
-            onClick={() => { setVerifyState('idle'); setIsLogin(true); }}
-            className="w-full py-4 bg-gold text-black font-bold uppercase tracking-widest text-xs hover:bg-gold/90 transition-all flex items-center justify-center gap-2"
-          >
-            <ArrowRight size={14} /> Continue to Login
-          </button>
-        </div>
-      )}
-
-      {verifyState === 'error' && (
-        <div className="max-w-md w-full glass p-10 shadow-2xl border-gray-800 text-center space-y-6 animate-in fade-in duration-500">
-          <div className="mx-auto w-20 h-20 bg-red-900/20 rounded-full flex items-center justify-center border border-red-800/40">
-            <AlertCircle size={36} className="text-red-500" />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-3xl font-serif">Verification Failed</h2>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              The link may have expired or already been used.<br />
-              Try registering again or request a new link.
-            </p>
-          </div>
-          <button
-            onClick={() => { setVerifyState('idle'); setIsLogin(false); }}
-            className="w-full py-4 border border-gray-700 text-gray-300 hover:border-gold hover:text-gold font-bold uppercase tracking-widest text-xs transition-all"
-          >
-            ← Back to Register
-          </button>
-        </div>
-      )}
-
-      {verifyState === 'idle' && (user ? (
+      {user ? (
         <div className="max-w-md w-full glass p-8 md:p-12 shadow-2xl border-gray-800 text-center space-y-8 animate-in fade-in duration-500">
           <div className="mx-auto w-24 h-24 bg-gold/20 rounded-full flex items-center justify-center border-2 border-gold">
             <span className="text-4xl font-serif text-gold">
