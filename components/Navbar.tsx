@@ -161,10 +161,10 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
             </button>
             <Link 
               to="/auth" 
-              className="p-2 text-gray-300 hover:text-white transition-colors"
+              className="flex items-center gap-2 p-2 text-gray-300 hover:text-white transition-colors"
             >
               <User size={22} />
-              {user && <span className="hidden lg:inline ml-2 text-xs">{user.name}</span>}
+              {user && <span className="hidden lg:inline text-xs">{user.name}</span>}
             </Link>
             <button 
               className="md:hidden p-2 text-gray-300"
