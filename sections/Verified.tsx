@@ -9,46 +9,46 @@ const Verified: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Legge token_hash sia da searchParams normali che dall'hash (HashRouter)
-    const url = new URL(window.location.href);
-    let token = url.searchParams.get('token') || url.searchParams.get('token_hash');
-    let typeParam = url.searchParams.get('type');
+    // Supabase verifica il token sul suo server e poi redirecta qui
+    // con i token di sessione nel fragment dell'URL.
+    // onAuthStateChange li rileva automaticamente e ci avvisa.
+    let timeout: ReturnType<typeof setTimeout>;
 
-    if (!token) {
-      const hash = window.location.hash || '';
-      const qIdx = hash.indexOf('?');
-      if (qIdx !== -1) {
-        const qs = new URLSearchParams(hash.slice(qIdx + 1));
-        token = qs.get('token') || qs.get('token_hash');
-        typeParam = typeParam || qs.get('type');
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
+        clearTimeout(timeout);
+        setStatus('success');
+        // Pulisce i token dall'URL senza ricaricare la pagina
+        try {
+          window.history.replaceState(null, '', window.location.pathname + '#/verified');
+        } catch (_) {}
       }
-    }
+    });
 
-    if (!token || typeParam !== 'signup') {
-      setStatus('error');
-      setErrorMsg('Link non valido o già utilizzato.');
-      return;
-    }
+    // Controlla se la sessione è già presente (caso in cui la pagina
+    // viene caricata dopo che i token sono già stati processati)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        clearTimeout(timeout);
+        setStatus('success');
+      }
+    });
 
-    // Pulisce l'URL dai parametri sensibili
-    try {
-      window.history.replaceState(null, '', window.location.pathname + '#/verified');
-    } catch (_) {}
-
-    // Verifica il token con Supabase
-    (supabase.auth as any).verifyOtp({ token, type: 'signup' })
-      .then(({ error }: any) => {
-        if (error) {
-          setStatus('error');
-          setErrorMsg(
-            error.message?.includes('expired')
-              ? 'Il link è scaduto. Registrati di nuovo o richiedi un nuovo link.'
-              : error.message || 'Verifica fallita.'
-          );
-        } else {
-          setStatus('success');
+    // Se dopo 5 secondi non è arrivata nessuna sessione → errore
+    timeout = setTimeout(() => {
+      setStatus(prev => {
+        if (prev === 'verifying') {
+          setErrorMsg('Il link è scaduto o non è valido. Registrati di nuovo o richiedi un nuovo link.');
+          return 'error';
         }
+        return prev;
       });
+    }, 5000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   return (
