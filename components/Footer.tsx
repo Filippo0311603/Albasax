@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Instagram, Youtube, Facebook, ArrowUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Newsletter from './Newsletter';
 
 // Icone custom per Spotify e Apple Music
@@ -70,9 +71,9 @@ const Footer: React.FC = () => {
           </p>
           
           <div className="flex space-x-8">
-            <a href="#" className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em]">Privacy Policy</a>
-            <a href="#" className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em]">Terms of Use</a>
-            <a href="#" className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em]">Cookie Settings</a>
+            <Link to="/legal/privacy" className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em]">Privacy Policy</Link>
+            <Link to="/legal/terms" className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em]">Terms of Use</Link>
+            <Link to="/legal/cookies" className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em]">Cookie Settings</Link>
           </div>
 
           <button 
