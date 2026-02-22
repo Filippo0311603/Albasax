@@ -6,6 +6,7 @@ import { supabase } from '../supabaseClient';
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
 const Newsletter: React.FC = () => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState('');
@@ -17,7 +18,7 @@ const Newsletter: React.FC = () => {
       const { error } = await supabase
         .from('newsletter_subscribers')
         .upsert(
-          { email: email.toLowerCase().trim(), source: 'newsletter', active: true },
+          { email: email.toLowerCase().trim(), name: name.trim() || null, source: 'newsletter', active: true },
           { onConflict: 'email' }
         );
       if (error) throw error;
@@ -44,7 +45,16 @@ const Newsletter: React.FC = () => {
           <span className="text-sm">{message}</span>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="relative group">
+      <form onSubmit={handleSubmit} className="space-y-0 relative group">
+          <input
+            type="text"
+            placeholder="YOUR NAME (OPTIONAL)"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={status === 'loading'}
+            className="w-full bg-transparent border-b border-gray-800 py-3 text-sm tracking-[0.2em] outline-none focus:border-gold transition-all placeholder:text-gray-700 disabled:opacity-50 mb-0"
+          />
+          <div className="relative">
           <input
             type="email"
             placeholder="ENTER YOUR EMAIL"
@@ -61,6 +71,7 @@ const Newsletter: React.FC = () => {
           >
             {status === 'loading' ? <Loader size={18} className="animate-spin" /> : <Send size={18} />}
           </button>
+          </div>
           {status === 'error' && (
             <p className="text-red-500 text-xs mt-2">{message}</p>
           )}

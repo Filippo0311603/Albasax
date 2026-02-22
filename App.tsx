@@ -20,6 +20,7 @@ const Dancers     = lazy(() => import('./sections/Dancers'));
 const Auth        = lazy(() => import('./sections/Auth'));
 const Verified    = lazy(() => import('./sections/Verified'));
 const Legal       = lazy(() => import('./sections/Legal'));
+const Unsubscribe = lazy(() => import('./sections/Unsubscribe'));
 const Cart        = lazy(() => import('./sections/Cart'));
 
 const ScrollToTop = () => {
@@ -85,7 +86,8 @@ const App: React.FC = () => {
       'press':    'Press | Albasax',
       'auth':     'Account | Albasax',
       'verified': 'Email Verified | Albasax',
-      'legal':    'Legal | Albasax',
+      'legal':       'Legal | Albasax',
+      'unsubscribe':  'Unsubscribe | Albasax',
     };
     document.title = pageNames[path] ?? `${path.charAt(0).toUpperCase() + path.slice(1)} | Albasax`;
   }, [location]);
@@ -116,6 +118,7 @@ const App: React.FC = () => {
               <Route path="/auth" element={<Auth user={user} onLogin={setUser} onLogout={() => setUser(null)} />} />
               <Route path="/verified" element={<Verified />} />
               <Route path="/legal/:type" element={<Legal />} />
+              <Route path="/unsubscribe" element={<Unsubscribe />} />
             </Routes>
           </Suspense>
         </main>
