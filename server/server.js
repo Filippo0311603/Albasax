@@ -247,20 +247,27 @@ app.post('/api/admin/send-newsletter', async (req, res) => {
       unsubscribeUrl,
     });
     try {
-      await resend.emails.send({
+      console.log(`[Newsletter] Sending to ${sub.email} from "${fromAddress}"...`);
+      const result = await resend.emails.send({
         from: fromAddress,
         to: sub.email,
         subject,
         html: emailHtml,
       });
-      sent++;
+      console.log(`[Newsletter] Result for ${sub.email}:`, JSON.stringify(result));
+      if (result.error) {
+        console.error(`[Newsletter] Resend error for ${sub.email}:`, JSON.stringify(result.error));
+        failed.push(sub.email);
+      } else {
+        sent++;
+      }
     } catch (err) {
-      console.error(`[Newsletter] Failed → ${sub.email}:`, err.message);
+      console.error(`[Newsletter] Exception → ${sub.email}:`, err.message, JSON.stringify(err));
       failed.push(sub.email);
     }
   }
 
-  console.log(`[Newsletter] Sent ${sent}/${subscribers.length}`);
+  console.log(`[Newsletter] Sent ${sent}/${subscribers.length}, failed: ${failed.length}`);
   res.json({ sent, total: subscribers.length, failed: failed.length });
 });
 
@@ -268,5 +275,7 @@ app.post('/api/admin/send-newsletter', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`\nAlbasax Server running on port ${PORT}`);
   console.log(`Supabase: ${process.env.SUPABASE_URL ? 'connected' : 'missing SUPABASE_URL'}`);
-  console.log(`Stripe:   ${process.env.STRIPE_SECRET_KEY ? 'configured' : 'missing STRIPE_SECRET_KEY'}\n`);
+  console.log(`Stripe:   ${process.env.STRIPE_SECRET_KEY ? 'configured' : 'missing STRIPE_SECRET_KEY'}`);
+  console.log(`Resend:   ${process.env.RESEND_API_KEY ? 'key loaded (' + process.env.RESEND_API_KEY.slice(0,8) + '...)' : 'MISSING RESEND_API_KEY'}`);
+  console.log(`From:     ${process.env.NEWSLETTER_FROM || 'MISSING NEWSLETTER_FROM'}\n`);
 });
