@@ -81,10 +81,11 @@ function buildEmailTemplate({ subject, html, previewText, name, unsubscribeUrl }
 app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
 app.use(cors({
   origin: (origin, callback) => {
-    const allowed = process.env.CLIENT_URL;
-    if (!allowed) return callback(new Error('CLIENT_URL not configured'));
-    // Allow same-origin requests (no origin header) and the configured client URL
-    if (!origin || origin === allowed) return callback(null, true);
+    const allowed = [
+      process.env.CLIENT_URL,
+      'https://albasax.vercel.app',
+    ].filter(Boolean);
+    if (!origin || allowed.includes(origin)) return callback(null, true);
     return callback(new Error(`CORS: origin ${origin} not allowed`));
   },
   credentials: true,
