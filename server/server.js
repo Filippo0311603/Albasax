@@ -43,34 +43,94 @@ function buildEmailTemplate({ subject, html, previewText, name, unsubscribeUrl }
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>${subject}</title>
-  <span style="display:none;font-size:1px;color:#0a0a0a;max-height:0;overflow:hidden;">${previewText || subject}&nbsp;&zwnj;</span>
+  <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
 </head>
-<body style="margin:0;padding:0;background:#0a0a0a;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 20px;">
-    <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#111111;border:1px solid #1f1f1f;">
-        <!-- Header -->
-        <tr>
-          <td align="center" style="padding:40px 40px 30px;border-bottom:1px solid #1f1f1f;">
-            <p style="margin:0;font-size:10px;letter-spacing:0.35em;text-transform:uppercase;color:#c5a643;font-weight:bold;">ALBASAX</p>
-          </td>
-        </tr>
-        <!-- Body -->
-        <tr>
-          <td style="padding:48px 48px 40px;color:#d1d5db;font-size:15px;line-height:1.8;">
-            <p style="margin:0 0 24px;color:#9ca3af;font-size:13px;">Ciao ${name},</p>
-            ${html}
-          </td>
-        </tr>
-        <!-- Footer -->
-        <tr>
-          <td align="center" style="padding:28px 40px;border-top:1px solid #1f1f1f;">
-            <p style="margin:0 0 8px;font-size:10px;color:#4b5563;letter-spacing:0.15em;text-transform:uppercase;">Albasax Music &mdash; Official Newsletter</p>
-            <p style="margin:0;font-size:10px;color:#374151;">Non vuoi pi&ugrave; ricevere questa newsletter? <a href="${unsubscribeUrl}" style="color:#c5a643;text-decoration:underline;">Disiscriviti</a></p>
-          </td>
-        </tr>
-      </table>
-    </td></tr>
+<body style="margin:0;padding:0;background:#080808;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
+
+  <!-- Preview text (hidden) -->
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;color:#080808;line-height:1px;">${previewText || subject}&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;</div>
+
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#080808;padding:0;margin:0;">
+    <tr>
+      <td align="center" style="padding:48px 16px;">
+        <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;width:100%;">
+
+          <!-- TOP GOLD LINE -->
+          <tr>
+            <td style="background:linear-gradient(90deg,#6b4e0a,#c5a643,#f0d07a,#c5a643,#6b4e0a);height:2px;font-size:0;line-height:0;">&nbsp;</td>
+          </tr>
+
+          <!-- HEADER -->
+          <tr>
+            <td align="center" style="background:#0f0f0f;padding:36px 40px 28px;">
+              <table cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td align="center">
+                    <p style="margin:0 0 6px;font-size:10px;letter-spacing:0.5em;text-transform:uppercase;color:#c5a643;font-weight:700;">— ALBASAX —</p>
+                    <p style="margin:0;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:#4b4b4b;">Official Newsletter</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- THIN DIVIDER -->
+          <tr>
+            <td style="background:#1a1a1a;height:1px;font-size:0;line-height:0;">&nbsp;</td>
+          </tr>
+
+          <!-- GREETING BAND -->
+          <tr>
+            <td style="background:#0f0f0f;padding:24px 48px 0;">
+              <p style="margin:0;font-size:13px;color:#6b6b6b;letter-spacing:0.05em;">Ciao <span style="color:#c5a643;font-weight:600;">${name}</span>,</p>
+            </td>
+          </tr>
+
+          <!-- BODY CONTENT -->
+          <tr>
+            <td style="background:#0f0f0f;padding:24px 48px 40px;color:#d1d5db;font-size:15px;line-height:1.85;">
+              ${html}
+            </td>
+          </tr>
+
+          <!-- BOTTOM DIVIDER -->
+          <tr>
+            <td style="background:linear-gradient(90deg,transparent,#1f1f1f,transparent);height:1px;font-size:0;line-height:0;">&nbsp;</td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td align="center" style="background:#0a0a0a;padding:32px 40px 36px;">
+              <p style="margin:0 0 4px;font-size:9px;letter-spacing:0.4em;text-transform:uppercase;color:#c5a643;font-weight:600;">ALBASAX</p>
+              <p style="margin:0 0 20px;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#333;">Music &bull; Official Newsletter</p>
+              <table cellpadding="0" cellspacing="0" role="presentation" style="margin:0 auto 20px;">
+                <tr>
+                  <td style="padding:0 10px;">
+                    <a href="https://albasax.com" style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#555;text-decoration:none;">Sito</a>
+                  </td>
+                  <td style="color:#333;font-size:9px;">&bull;</td>
+                  <td style="padding:0 10px;">
+                    <a href="https://instagram.com" style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#555;text-decoration:none;">Instagram</a>
+                  </td>
+                  <td style="color:#333;font-size:9px;">&bull;</td>
+                  <td style="padding:0 10px;">
+                    <a href="https://spotify.com" style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#555;text-decoration:none;">Spotify</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin:0;font-size:9px;color:#2a2a2a;line-height:1.8;">Stai ricevendo questa email perch&eacute; ti sei iscritto alla newsletter di Albasax.<br>
+              <a href="${unsubscribeUrl}" style="color:#3a3a3a;text-decoration:underline;text-underline-offset:2px;">Disiscriviti</a> &nbsp;&bull;&nbsp; <a href="https://albasax.com/legal/privacy" style="color:#3a3a3a;text-decoration:underline;text-underline-offset:2px;">Privacy Policy</a></p>
+            </td>
+          </tr>
+
+          <!-- BOTTOM GOLD LINE -->
+          <tr>
+            <td style="background:linear-gradient(90deg,#6b4e0a,#c5a643,#f0d07a,#c5a643,#6b4e0a);height:2px;font-size:0;line-height:0;">&nbsp;</td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
   </table>
 </body>
 </html>`;
@@ -84,6 +144,9 @@ app.use(cors({
     const allowed = [
       process.env.CLIENT_URL,
       'https://albasax.vercel.app',
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://localhost:5173',
     ].filter(Boolean);
     if (!origin || allowed.includes(origin)) return callback(null, true);
     return callback(new Error(`CORS: origin ${origin} not allowed`));

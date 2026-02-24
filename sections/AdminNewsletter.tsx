@@ -28,17 +28,17 @@ function uid() {
 function blockToHtml(block: Block): string {
   switch (block.type) {
     case 'heading':
-      return `<h2 style="margin:0 0 20px;font-family:Georgia,serif;font-size:28px;font-weight:bold;color:#ffffff;line-height:1.3;">${block.content}</h2>`;
+      return `<h2 style="margin:0 0 24px;font-family:Georgia,'Times New Roman',serif;font-size:30px;font-weight:400;color:#ffffff;line-height:1.25;letter-spacing:-0.01em;">${block.content}</h2>`;
     case 'text':
-      return `<p style="margin:0 0 20px;font-size:15px;line-height:1.8;color:#9ca3af;">${block.content.replace(/\n/g, '<br>')}</p>`;
+      return `<p style="margin:0 0 20px;font-size:15px;line-height:1.85;color:#9ca3af;font-weight:300;">${block.content.replace(/\n/g, '<br>')}</p>`;
     case 'button':
-      return `<div style="text-align:center;margin:28px 0;"><a href="${block.href || '#'}" style="display:inline-block;padding:14px 40px;background:#c5a643;color:#000000;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:0.25em;text-decoration:none;">${block.content}</a></div>`;
+      return `<div style="text-align:center;margin:36px 0;"><a href="${block.href || '#'}" style="display:inline-block;padding:16px 48px;background:transparent;color:#c5a643;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.35em;text-decoration:none;border:1px solid #c5a643;">${block.content}</a></div>`;
     case 'image':
-      return `<div style="margin:24px 0;"><img src="${block.content}" alt="" style="width:100%;max-width:100%;display:block;"></div>`;
+      return `<div style="margin:28px 0;"><img src="${block.content}" alt="" style="width:100%;max-width:100%;display:block;"></div>`;
     case 'divider':
-      return `<hr style="border:none;border-top:1px solid #1f1f1f;margin:28px 0;">`;
+      return `<table width="100%" cellpadding="0" cellspacing="0" style="margin:32px 0;"><tr><td style="background:linear-gradient(90deg,transparent,#2a2a2a,transparent);height:1px;font-size:0;line-height:0;">&nbsp;</td></tr></table>`;
     case 'spacer':
-      return `<div style="height:24px;"></div>`;
+      return `<div style="height:32px;"></div>`;
     default:
       return '';
   }
@@ -183,37 +183,54 @@ const BlockRow: React.FC<{
 
 // ─── Preview panel ────────────────────────────────────────────────────────────
 const Preview: React.FC<{ subject: string; blocks: Block[] }> = ({ subject, blocks }) => (
-  <div className="bg-[#0a0a0a] border border-gray-800 p-6 rounded text-sm overflow-auto max-h-[70vh]">
+  <div className="bg-[#080808] border border-gray-900 p-4 rounded text-sm overflow-auto max-h-[75vh]">
     <p className="text-[10px] uppercase tracking-widest text-gray-600 mb-1">Oggetto email:</p>
-    <p className="text-white font-semibold mb-6">{subject || '—'}</p>
+    <p className="text-white font-semibold mb-5">{subject || '—'}</p>
 
     {/* Simulated email */}
-    <div style={{ background: '#111111', border: '1px solid #1f1f1f', maxWidth: 540, margin: '0 auto' }}>
-      <div style={{ padding: '32px 32px 24px', borderBottom: '1px solid #1f1f1f', textAlign: 'center' }}>
-        <p style={{ margin: 0, fontSize: 9, letterSpacing: '0.35em', textTransform: 'uppercase', color: '#c5a643', fontWeight: 'bold' }}>ALBASAX</p>
+    <div style={{ maxWidth: 540, margin: '0 auto', fontFamily: "'Helvetica Neue',Helvetica,Arial,sans-serif" }}>
+      {/* Top gold line */}
+      <div style={{ background: 'linear-gradient(90deg,#6b4e0a,#c5a643,#f0d07a,#c5a643,#6b4e0a)', height: 2 }} />
+      {/* Header */}
+      <div style={{ background: '#0f0f0f', padding: '28px 32px 22px', textAlign: 'center' }}>
+        <p style={{ margin: '0 0 4px', fontSize: 9, letterSpacing: '0.5em', textTransform: 'uppercase', color: '#c5a643', fontWeight: 700 }}>— ALBASAX —</p>
+        <p style={{ margin: 0, fontSize: 8, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#4b4b4b' }}>Official Newsletter</p>
       </div>
-      <div style={{ padding: '36px 36px 28px' }}>
-        <p style={{ margin: '0 0 20px', color: '#9ca3af', fontSize: 12 }}>Ciao [nome],</p>
+      <div style={{ background: '#1a1a1a', height: 1 }} />
+      {/* Greeting */}
+      <div style={{ background: '#0f0f0f', padding: '20px 36px 0' }}>
+        <p style={{ margin: 0, fontSize: 12, color: '#6b6b6b' }}>Ciao <span style={{ color: '#c5a643', fontWeight: 600 }}>[nome]</span>,</p>
+      </div>
+      {/* Body */}
+      <div style={{ background: '#0f0f0f', padding: '20px 36px 32px' }}>
         {blocks.map(block => {
-          if (block.type === 'heading') return <h2 key={block.id} style={{ margin: '0 0 16px', fontFamily: 'Georgia,serif', fontSize: 22, color: '#ffffff', lineHeight: 1.3 }}>{block.content || <em style={{ color: '#333' }}>Titolo…</em>}</h2>;
-          if (block.type === 'text')    return <p key={block.id} style={{ margin: '0 0 16px', fontSize: 13, lineHeight: 1.8, color: '#9ca3af', whiteSpace: 'pre-wrap' }}>{block.content || <em style={{ color: '#333' }}>Testo…</em>}</p>;
+          if (block.type === 'heading') return <h2 key={block.id} style={{ margin: '0 0 18px', fontFamily: "Georgia,'Times New Roman',serif", fontSize: 24, fontWeight: 400, color: '#ffffff', lineHeight: 1.25 }}>{block.content || <em style={{ color: '#333' }}>Titolo…</em>}</h2>;
+          if (block.type === 'text')    return <p key={block.id} style={{ margin: '0 0 16px', fontSize: 13, lineHeight: 1.85, color: '#9ca3af', fontWeight: 300, whiteSpace: 'pre-wrap' }}>{block.content || <em style={{ color: '#333' }}>Testo…</em>}</p>;
           if (block.type === 'button')  return (
-            <div key={block.id} style={{ textAlign: 'center', margin: '20px 0' }}>
-              <span style={{ display: 'inline-block', padding: '11px 32px', background: '#c5a643', color: '#000', fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
+            <div key={block.id} style={{ textAlign: 'center', margin: '28px 0' }}>
+              <span style={{ display: 'inline-block', padding: '13px 36px', background: 'transparent', color: '#c5a643', fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.35em', border: '1px solid #c5a643' }}>
                 {block.content || 'Bottone'}
               </span>
             </div>
           );
-          if (block.type === 'image')   return block.content ? <img key={block.id} src={block.content} alt="" style={{ width: '100%', margin: '16px 0', display: 'block' }} /> : <div key={block.id} style={{ background: '#1a1a1a', height: 80, margin: '16px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ color: '#333', fontSize: 11 }}>Immagine</span></div>;
-          if (block.type === 'divider') return <hr key={block.id} style={{ border: 'none', borderTop: '1px solid #1f1f1f', margin: '20px 0' }} />;
-          if (block.type === 'spacer')  return <div key={block.id} style={{ height: 20 }} />;
+          if (block.type === 'image')   return block.content ? <img key={block.id} src={block.content} alt="" style={{ width: '100%', margin: '20px 0', display: 'block' }} /> : <div key={block.id} style={{ background: '#1a1a1a', height: 80, margin: '16px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ color: '#333', fontSize: 11 }}>Immagine</span></div>;
+          if (block.type === 'divider') return <div key={block.id} style={{ background: 'linear-gradient(90deg,transparent,#2a2a2a,transparent)', height: 1, margin: '24px 0' }} />;
+          if (block.type === 'spacer')  return <div key={block.id} style={{ height: 24 }} />;
           return null;
         })}
       </div>
-      <div style={{ padding: '20px 32px', borderTop: '1px solid #1f1f1f', textAlign: 'center' }}>
-        <p style={{ margin: '0 0 6px', fontSize: 9, color: '#4b5563', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Albasax Music — Official Newsletter</p>
-        <p style={{ margin: 0, fontSize: 9, color: '#374151' }}>Non vuoi più ricevere questa newsletter? <span style={{ color: '#c5a643' }}>Disiscriviti</span></p>
+      {/* Divider */}
+      <div style={{ background: 'linear-gradient(90deg,transparent,#1f1f1f,transparent)', height: 1 }} />
+      {/* Footer */}
+      <div style={{ background: '#0a0a0a', padding: '24px 32px 28px', textAlign: 'center' }}>
+        <p style={{ margin: '0 0 3px', fontSize: 8, letterSpacing: '0.4em', textTransform: 'uppercase', color: '#c5a643', fontWeight: 600 }}>ALBASAX</p>
+        <p style={{ margin: '0 0 14px', fontSize: 8, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#333' }}>Music • Official Newsletter</p>
+        <p style={{ margin: 0, fontSize: 8, color: '#2a2a2a' }}>
+          <span style={{ color: '#3a3a3a' }}>Disiscriviti</span> &nbsp;•&nbsp; <span style={{ color: '#3a3a3a' }}>Privacy Policy</span>
+        </p>
       </div>
+      {/* Bottom gold line */}
+      <div style={{ background: 'linear-gradient(90deg,#6b4e0a,#c5a643,#f0d07a,#c5a643,#6b4e0a)', height: 2 }} />
     </div>
   </div>
 );
