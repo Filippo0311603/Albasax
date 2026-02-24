@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, Lock, Plus, Trash2, Eye, EyeOff, Users, ArrowLeft, Image, Type, Link as LinkIcon, AlertCircle } from 'lucide-react';
+import { Send, Lock, Plus, Trash2, Eye, EyeOff, Users, ArrowLeft, Image, Type, Link as LinkIcon, AlertCircle, Upload, Loader } from 'lucide-react';
+import { supabase } from '../supabaseClient';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5001';
 
@@ -46,6 +47,65 @@ function blockToHtml(block: Block): string {
 function blocksToHtml(blocks: Block[]): string {
   return blocks.map(blockToHtml).join('\n');
 }
+
+// ─── Image Upload Block ───────────────────────────────────────────────────────
+const ImageUploadBlock: React.FC<{
+  value: string;
+  onChange: (url: string) => void;
+  base: string;
+}> = ({ value, onChange, base }) => {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError('');
+    try {
+      const ext = file.name.split('.').pop();
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from('newsletter-images')
+        .upload(path, file, { upsert: true });
+      if (uploadErr) throw uploadErr;
+      const { data } = supabase.storage.from('newsletter-images').getPublicUrl(path);
+      onChange(data.publicUrl);
+    } catch (err: any) {
+      setError(err.message || 'Upload failed');
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2 items-center">
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs rounded transition-all disabled:opacity-50"
+        >
+          {uploading ? <Loader size={12} className="animate-spin" /> : <Upload size={12} />}
+          {uploading ? 'Caricamento…' : 'Carica file'}
+        </button>
+        <span className="text-gray-700 text-xs">oppure</span>
+        <input
+          className={`${base} text-blue-400 text-xs flex-1`}
+          placeholder="incolla URL immagine"
+          value={value}
+          onChange={e => onChange(e.target.value)}
+        />
+        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+      </div>
+      {error && <p className="text-red-500 text-xs">{error}</p>}
+      {value && <img src={value} alt="preview" className="max-h-32 rounded border border-gray-800 object-contain" />}
+    </div>
+  );
+};
 
 // ─── Block Editor Row ─────────────────────────────────────────────────────────
 const BlockRow: React.FC<{
@@ -97,11 +157,10 @@ const BlockRow: React.FC<{
           </div>
         )}
         {block.type === 'image' && (
-          <input
-            className={`${base} text-blue-400 text-xs`}
-            placeholder="URL immagine (es. https://albasax.com/foto.jpg)"
+          <ImageUploadBlock
             value={block.content}
-            onChange={e => onChange({ ...block, content: e.target.value })}
+            onChange={url => onChange({ ...block, content: url })}
+            base={base}
           />
         )}
         {(block.type === 'divider' || block.type === 'spacer') && (
