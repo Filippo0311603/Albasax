@@ -249,7 +249,7 @@ const AdminNewsletter: React.FC = () => {
 
   const [subCount, setSubCount]   = useState<number | null>(null);
   const [sending, setSending]     = useState(false);
-  const [result, setResult]       = useState<{ sent?: number; total?: number; failed?: number; error?: string } | null>(null);
+  const [result, setResult]       = useState<{ sent?: number; total?: number; failed?: number; error?: string; dispatching?: boolean; done?: boolean; failedList?: { email: string; reason: string }[] } | null>(null);
 
   // Verify secret and load subscriber count
   const handleAuth = async (e: React.FormEvent) => {
@@ -287,10 +287,38 @@ const AdminNewsletter: React.FC = () => {
         body: JSON.stringify({ subject: subject.trim(), html: htmlBody, previewText: preview.trim() }),
       });
       const data = await res.json();
-      setResult(data);
+
+      if (data.error) {
+        setResult({ error: data.error });
+        setSending(false);
+        return;
+      }
+
+      // Invio asincrono: polling fino a done
+      if (data.dispatching && data.jobId) {
+        setResult({ dispatching: true, total: data.total, sent: 0, failed: 0, done: false });
+        const jobId = data.jobId;
+        const poll = setInterval(async () => {
+          try {
+            const statusRes = await fetch(`${SERVER_URL}/api/admin/newsletter-status/${jobId}`, {
+              headers: { 'x-admin-secret': secret },
+            });
+            const status = await statusRes.json();
+            setResult({ dispatching: !status.done, ...status });
+            if (status.done) {
+              clearInterval(poll);
+              setSending(false);
+            }
+          } catch {
+            // ignora errori di polling temporanei
+          }
+        }, 3000);
+      } else {
+        setResult(data);
+        setSending(false);
+      }
     } catch {
       setResult({ error: 'Errore di rete. Riprova.' });
-    } finally {
       setSending(false);
     }
   };
@@ -425,11 +453,36 @@ const AdminNewsletter: React.FC = () => {
 
             {/* Result */}
             {result && (
-              <div className={`p-4 border text-sm ${result.error ? 'border-red-800 bg-red-900/10 text-red-400' : 'border-green-800 bg-green-900/10 text-green-400'}`}>
-                {result.error
-                  ? <p className="flex items-center gap-2"><AlertCircle size={14} />{result.error}</p>
-                  : <p>✓ Inviata a <strong>{result.sent}</strong>/{result.total} iscritti{result.failed ? ` (${result.failed} falliti, vedi log server)` : ''}.</p>
-                }
+              <div className={`p-4 border text-sm ${
+                result.error ? 'border-red-800 bg-red-900/10 text-red-400'
+                : result.dispatching ? 'border-gold/30 bg-gold/5 text-gold'
+                : 'border-green-800 bg-green-900/10 text-green-400'
+              }`}>
+                {result.error ? (
+                  <p className="flex items-center gap-2"><AlertCircle size={14} />{result.error}</p>
+                ) : result.dispatching ? (
+                  <div className="space-y-2">
+                    <p className="flex items-center gap-2">
+                      <span className="inline-block w-2 h-2 rounded-full bg-gold animate-pulse" />
+                      Invio in corso… <strong>{result.sent}</strong>/{result.total} email consegnate
+                    </p>
+                    <div className="w-full bg-black/40 h-1 rounded">
+                      <div className="bg-gold h-1 rounded transition-all duration-500" style={{ width: result.total ? `${Math.round((result.sent / result.total) * 100)}%` : '0%' }} />
+                    </div>
+                    <p className="text-[10px] text-gold/50">La pagina può essere chiusa — l'invio continua sul server.</p>
+                  </div>
+                ) : (
+                  <div>
+                    <p>✓ Inviata a <strong>{result.sent}</strong>/{result.total} iscritti{result.failed ? ` (${result.failed} falliti)` : ''}.</p>
+                    {result.failedList && result.failedList.length > 0 && (
+                      <ul className="mt-2 text-xs text-red-400 space-y-0.5">
+                        {result.failedList.map((f: { email: string; reason: string }, i: number) => (
+                          <li key={i}>✗ {f.email} — {f.reason}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>

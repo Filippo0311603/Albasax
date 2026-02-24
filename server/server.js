@@ -278,8 +278,12 @@ app.get('/api/newsletter/unsubscribe', async (req, res) => {
 });
 
 // ADMIN: Invia newsletter a tutti gli iscritti attivi
+// Stato invii newsletter (in memoria, per status polling)
+const newsletterJobs = {};
+
 // POST /api/admin/send-newsletter  (richiede header x-admin-secret)
 // Body: { subject, html, previewText? }
+// Risponde subito con jobId; l'invio avviene in background via batch Resend
 app.post('/api/admin/send-newsletter', async (req, res) => {
   if (req.headers['x-admin-secret'] !== process.env.ADMIN_SECRET) {
     return res.status(401).json({ error: 'Unauthorized' });
@@ -292,46 +296,71 @@ app.post('/api/admin/send-newsletter', async (req, res) => {
     .select('id, email, name')
     .eq('active', true);
   if (fetchErr) return res.status(500).json({ error: fetchErr.message });
-  if (!subscribers || subscribers.length === 0) return res.json({ sent: 0, total: 0 });
+  if (!subscribers || subscribers.length === 0) return res.json({ sent: 0, total: 0, jobId: null });
 
-  const clientUrl = process.env.CLIENT_URL || 'https://albasax.com';
-  const fromAddress = process.env.NEWSLETTER_FROM || 'Albasax <newsletter@albasax.com>';
-  let sent = 0;
-  const failed = [];
+  const jobId = Date.now().toString();
+  const job = { total: subscribers.length, sent: 0, failed: 0, failedList: [], done: false };
+  newsletterJobs[jobId] = job;
 
-  for (const sub of subscribers) {
-    const token = generateUnsubscribeToken(sub.id);
-    const unsubscribeUrl = `${clientUrl}/unsubscribe?id=${sub.id}&token=${token}`;
-    const emailHtml = buildEmailTemplate({
-      subject,
-      html,
-      previewText,
-      name: sub.name || 'Friend',
-      unsubscribeUrl,
-    });
-    try {
-      console.log(`[Newsletter] Sending to ${sub.email} from "${fromAddress}"...`);
-      const result = await resend.emails.send({
+  // Rispondi subito al client
+  res.json({ dispatching: true, total: subscribers.length, jobId });
+
+  // Invio asincrono in background
+  setImmediate(async () => {
+    const clientUrl = process.env.CLIENT_URL || 'https://albasax.com';
+    const fromAddress = process.env.NEWSLETTER_FROM || 'Albasax <newsletter@albasax.com>';
+    const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+    const BATCH_SIZE = 50; // Resend batch: max 100, usiamo 50 per sicurezza
+
+    // Costruisci tutti i payload
+    const emails = subscribers.map((sub) => {
+      const token = generateUnsubscribeToken(sub.id);
+      const unsubscribeUrl = `${clientUrl}/unsubscribe?id=${sub.id}&token=${token}`;
+      return {
         from: fromAddress,
         to: sub.email,
         subject,
-        html: emailHtml,
-      });
-      console.log(`[Newsletter] Result for ${sub.email}:`, JSON.stringify(result));
-      if (result.error) {
-        console.error(`[Newsletter] Resend error for ${sub.email}:`, JSON.stringify(result.error));
-        failed.push(sub.email);
-      } else {
-        sent++;
-      }
-    } catch (err) {
-      console.error(`[Newsletter] Exception → ${sub.email}:`, err.message, JSON.stringify(err));
-      failed.push(sub.email);
-    }
-  }
+        html: buildEmailTemplate({ subject, html, previewText, name: sub.name || 'Friend', unsubscribeUrl }),
+      };
+    });
 
-  console.log(`[Newsletter] Sent ${sent}/${subscribers.length}, failed: ${failed.length}`);
-  res.json({ sent, total: subscribers.length, failed: failed.length });
+    // Spezza in chunk da BATCH_SIZE e invia con pausa tra i batch
+    for (let i = 0; i < emails.length; i += BATCH_SIZE) {
+      const chunk = emails.slice(i, i + BATCH_SIZE);
+      try {
+        console.log(`[Newsletter][${jobId}] Batch ${Math.floor(i / BATCH_SIZE) + 1}: sending ${chunk.length} emails...`);
+        const result = await resend.batch.send(chunk);
+        if (result.error) {
+          const errMsg = result.error.message || JSON.stringify(result.error);
+          console.error(`[Newsletter][${jobId}] Batch error:`, errMsg);
+          chunk.forEach((e) => job.failedList.push({ email: e.to, reason: errMsg }));
+          job.failed += chunk.length;
+        } else {
+          job.sent += chunk.length;
+          console.log(`[Newsletter][${jobId}] Batch OK — sent so far: ${job.sent}/${job.total}`);
+        }
+      } catch (err) {
+        console.error(`[Newsletter][${jobId}] Batch exception:`, err.message);
+        chunk.forEach((e) => job.failedList.push({ email: e.to, reason: err.message }));
+        job.failed += chunk.length;
+      }
+      // Pausa tra batch: 1.5 sec (rate limit Resend: 2 req/sec, abbondante margine)
+      if (i + BATCH_SIZE < emails.length) await delay(1500);
+    }
+
+    job.done = true;
+    console.log(`[Newsletter][${jobId}] DONE — sent: ${job.sent}, failed: ${job.failed}/${job.total}`);
+  });
+});
+
+// GET /api/admin/newsletter-status/:jobId
+app.get('/api/admin/newsletter-status/:jobId', (req, res) => {
+  if (req.headers['x-admin-secret'] !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const job = newsletterJobs[req.params.jobId];
+  if (!job) return res.status(404).json({ error: 'Job non trovato' });
+  res.json(job);
 });
 
 // Start
