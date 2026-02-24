@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import { Send, Check, Loader } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { useTranslation } from 'react-i18next';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
 const Newsletter: React.FC = () => {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<Status>('idle');
@@ -24,19 +26,19 @@ const Newsletter: React.FC = () => {
       if (error) throw error;
 
       setStatus('success');
-      setMessage("You're in! Welcome to the inner circle.");
+      setMessage(t('newsletter.successMsg'));
       setEmail('');
     } catch (err: any) {
       setStatus('error');
-      setMessage(err.message || 'Something went wrong. Try again.');
+      setMessage(err.message || t('newsletter.errorMsg'));
     }
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-xl font-serif mb-2 uppercase tracking-widest">Join the Newsletter</h3>
-        <p className="text-gray-500 text-sm">Be the first to know about new album drops and secret pop-up shows.</p>
+        <h3 className="text-xl font-serif mb-2 uppercase tracking-widest">{t('newsletter.title')}</h3>
+        <p className="text-gray-500 text-sm">{t('newsletter.subtitle')}</p>
       </div>
 
       {status === 'success' ? (
@@ -48,7 +50,7 @@ const Newsletter: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-0 relative group">
           <input
             type="text"
-            placeholder="YOUR NAME (OPTIONAL)"
+            placeholder={t('newsletter.namePlaceholder')}
             value={name}
             onChange={(e) => setName(e.target.value)}
             disabled={status === 'loading'}
@@ -57,7 +59,7 @@ const Newsletter: React.FC = () => {
           <div className="relative">
           <input
             type="email"
-            placeholder="ENTER YOUR EMAIL"
+            placeholder={t('newsletter.emailPlaceholder')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required

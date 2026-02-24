@@ -2,8 +2,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Play, Calendar } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Hero: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <section className="relative h-screen w-full flex items-center justify-end overflow-hidden">
       {/* Vignettatura Hero più evidente */}
@@ -50,7 +52,7 @@ const Hero: React.FC = () => {
         </div>
         
         <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl font-light leading-relaxed ml-auto">
-          GLAMOUR POP ARTIST<br />
+          {t('hero.tagline')}
         </p>
 
         <div className="flex flex-col sm:flex-row items-end justify-end gap-3 sm:gap-4 pt-4 sm:pt-4 md:pt-8 mt-16 sm:mt-0">
@@ -59,14 +61,14 @@ const Hero: React.FC = () => {
             className="w-full sm:w-auto px-6 py-3 sm:px-8 sm:py-4 bg-gold-animated text-white flex items-center justify-center space-x-2 transition-all group rounded-sm shadow-lg hover:shadow-xl"
           >
             <Play size={18} fill="currentColor" />
-            <span className="uppercase tracking-widest text-sm font-bold">Listen Now</span>
+            <span className="uppercase tracking-widest text-sm font-bold">{t('hero.listenNow')}</span>
           </Link>
           <Link 
             to="/tour"
             className="w-full sm:w-auto px-6 py-3 sm:px-8 sm:py-4 border border-white hover:bg-white hover:text-black text-white flex items-center justify-center space-x-2 transition-all rounded-sm"
           >
             <Calendar size={18} />
-            <span className="uppercase tracking-widest text-sm font-bold">View Tour Dates</span>
+            <span className="uppercase tracking-widest text-sm font-bold">{t('hero.viewTourDates')}</span>
           </Link>
         </div>
       </div>

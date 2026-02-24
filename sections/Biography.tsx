@@ -1,7 +1,8 @@
-
-import React from 'react';
+﻿import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Biography: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <div className="pt-32 pb-20 px-4 max-w-7xl mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -16,23 +17,15 @@ const Biography: React.FC = () => {
 
         <div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-700">
           <header>
-            <span className="text-gold tracking-[0.2em] md:tracking-[0.4em] uppercase text-xs md:text-sm font-bold">The Artist</span>
+            <span className="text-gold tracking-[0.2em] md:tracking-[0.4em] uppercase text-xs md:text-sm font-bold">{t('bio.sectionLabel')}</span>
             <h2 className="text-4xl sm:text-5xl md:text-7xl font-serif mt-2">Albasax</h2>
           </header>
 
           <div className="space-y-6 text-gray-300 leading-relaxed text-base md:text-lg font-light">
-            <p>
-              ALBASAX is an international Pop Artist, Performer, Singer and Saxophonist, blending what he loves to define as his “Cinematic Glamour Pop” with live instruments and dramatic performance into a single artistic universe. Graduated from the prestigious Santa Cecilia Conservatory of Rome, he combines a solid musical foundation with contemporary pop, electronic soundscapes and theatrical storytelling.
-            </p>
-            <p>
-              His artistic world is inspired by Hollywood cinema, theatrical aesthetics and pop spectacle, shaping a distinctive identity where elegance, glamour, vulnerability and power coexist.
-            </p>
-            <p>
-              Driven by the belief that music is not only meant to be heard, but also seen, felt and lived, ALBASAX transforms each performance into a cinematic experience where music becomes a film and the stage becomes a scene.
-            </p>
-            <p>
-              He is currently working on his international debut album, written in English and Spanish, conceived as a cinematic journey designed for a global audience, where sound, image and performance merge into one immersive vision.
-            </p>
+            <p>{t('bio.p1')}</p>
+            <p>{t('bio.p2')}</p>
+            <p>{t('bio.p3')}</p>
+            <p>{t('bio.p4')}</p>
           </div>
 
           <div className="pt-4">

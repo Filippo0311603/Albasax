@@ -2,6 +2,7 @@
 import React from 'react';
 import { Instagram, Youtube, Facebook, ArrowUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Newsletter from './Newsletter';
 
 // Icone custom per Spotify e Apple Music
@@ -18,6 +19,7 @@ const AppleMusicIcon = () => (
 );
 
 const Footer: React.FC = () => {
+  const { t } = useTranslation();
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -39,7 +41,7 @@ const Footer: React.FC = () => {
               </h2>
             </div>
             <p className="text-gray-400 max-w-md leading-relaxed">
-              Official website of Albasax. Pop artist and performer, he turns every song into Glamour Cinematic Scenes. Join the community of “The Dramatics”. Stay connected for exclusive content and tour updates.
+              {t('footer.description')}
             </p>
             <div className="flex space-x-6">
               <a href="https://www.instagram.com/albasax_official/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gold transition-colors">
@@ -67,13 +69,13 @@ const Footer: React.FC = () => {
 
         <div className="flex flex-col md:flex-row justify-between items-center pt-10 border-t border-gray-900 gap-6">
           <p className="text-gray-600 text-xs tracking-widest uppercase">
-            &copy; {new Date().getFullYear()} Albasax Music. All rights reserved.
+            &copy; {new Date().getFullYear()} Albasax Music. {t('footer.copyright')}
           </p>
           
           <div className="flex space-x-8">
-            <Link to="/legal/privacy" className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em]">Privacy Policy</Link>
-            <Link to="/legal/terms" className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em]">Terms of Use</Link>
-            <Link to="/legal/cookies" className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em]">Cookie Settings</Link>
+            <Link to="/legal/privacy" className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em]">{t('footer.privacy')}</Link>
+            <Link to="/legal/terms" className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em]">{t('footer.terms')}</Link>
+            <Link to="/legal/cookies" className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em]">{t('footer.cookies')}</Link>
           </div>
 
           <button 

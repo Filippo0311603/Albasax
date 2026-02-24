@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import { Package, Bell, Check, Loader } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { useTranslation } from 'react-i18next';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
 const Shop: React.FC = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState('');
@@ -23,11 +25,11 @@ const Shop: React.FC = () => {
       if (error) throw error;
 
       setStatus('success');
-      setMessage("You'll be the first to know when the shop goes live.");
+      setMessage(t('shop.successMsg'));
       setEmail('');
     } catch (err: any) {
       setStatus('error');
-      setMessage(err.message || 'Something went wrong. Try again.');
+      setMessage(err.message || t('shop.errorMsg'));
     }
   };
 
@@ -41,10 +43,10 @@ const Shop: React.FC = () => {
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-4xl md:text-5xl font-serif">Official Shop</h2>
-          <p className="text-xl md:text-2xl text-gold font-light tracking-widest uppercase italic">Coming Soon</p>
+          <h2 className="text-4xl md:text-5xl font-serif">{t('shop.title')}</h2>
+          <p className="text-xl md:text-2xl text-gold font-light tracking-widest uppercase italic">{t('shop.comingSoon')}</p>
           <p className="text-sm md:text-base text-gray-400 max-w-sm mx-auto">
-            Our exclusive collection of vinyl, apparel, and limited edition prints is currently in production. 
+            {t('shop.description')}
           </p>
         </div>
 
@@ -56,11 +58,11 @@ const Shop: React.FC = () => {
             </div>
           ) : (
             <>
-              <p className="text-sm tracking-widest uppercase font-bold text-gray-300">Notify me on launch</p>
+              <p className="text-sm tracking-widest uppercase font-bold text-gray-300">{t('shop.notifyTitle')}</p>
               <form onSubmit={handleNotify} className="flex flex-col sm:flex-row gap-3">
                 <input 
                   type="email" 
-                  placeholder="Your email address"
+                  placeholder={t('shop.emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={status === 'loading'}
@@ -76,13 +78,13 @@ const Shop: React.FC = () => {
                     ? <Loader size={16} className="animate-spin mr-2" />
                     : <Bell size={16} className="mr-2" />
                   }
-                  Subscribe
+                  {t('shop.subscribeBtn')}
                 </button>
               </form>
               {status === 'error' && (
                 <p className="text-red-500 text-xs">{message}</p>
               )}
-              <p className="text-[10px] text-gray-500 italic">By subscribing, you agree to receive promotional updates from Albasax.</p>
+              <p className="text-[10px] text-gray-500 italic">{t('shop.legalText')}</p>
             </>
           )}
         </div>

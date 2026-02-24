@@ -1,0 +1,86 @@
+{
+  "nav": {
+    "home": "Home",
+    "music": "Music",
+    "tour": "Tour",
+    "bio": "Bio",
+    "dancers": "Dancers",
+    "media": "Media",
+    "shop": "Shop",
+    "press": "Press"
+  },
+  "hero": {
+    "tagline": "GLAMOUR POP ARTIST",
+    "listenNow": "Listen Now",
+    "viewTourDates": "View Tour Dates"
+  },
+  "bio": {
+    "sectionLabel": "The Artist",
+    "p1": "ALBASAX is an international Pop Artist, Performer, Singer and Saxophonist, blending what he loves to define as his \"Cinematic Glamour Pop\" with live instruments and dramatic performance into a single artistic universe. Graduated from the prestigious Santa Cecilia Conservatory of Rome, he combines a solid musical foundation with contemporary pop, electronic soundscapes and theatrical storytelling.",
+    "p2": "His artistic world is inspired by Hollywood cinema, theatrical aesthetics and pop spectacle, shaping a distinctive identity where elegance, glamour, vulnerability and power coexist.",
+    "p3": "Driven by the belief that music is not only meant to be heard, but also seen, felt and lived, ALBASAX transforms each performance into a cinematic experience where music becomes a film and the stage becomes a scene.",
+    "p4": "He is currently working on his international debut album, written in English and Spanish, conceived as a cinematic journey designed for a global audience, where sound, image and performance merge into one immersive vision."
+  },
+  "tour": {
+    "title": "Tour Dates",
+    "getTickets": "Get Tickets",
+    "soldOut": "Sold Out"
+  },
+  "shop": {
+    "title": "Official Shop",
+    "comingSoon": "Coming Soon",
+    "description": "Our exclusive collection of vinyl, apparel, and limited edition prints is currently in production.",
+    "notifyTitle": "Notify me on launch",
+    "emailPlaceholder": "Your email address",
+    "subscribeBtn": "Subscribe",
+    "successMsg": "You'll be the first to know when the shop goes live.",
+    "legalText": "By subscribing, you agree to receive promotional updates from Albasax.",
+    "errorMsg": "Something went wrong. Try again."
+  },
+  "newsletter": {
+    "title": "Join the Newsletter",
+    "subtitle": "Be the first to know about new album drops and secret pop-up shows.",
+    "namePlaceholder": "YOUR NAME (OPTIONAL)",
+    "emailPlaceholder": "ENTER YOUR EMAIL",
+    "successMsg": "You're in! Welcome to the inner circle.",
+    "errorMsg": "Something went wrong. Try again."
+  },
+  "footer": {
+    "description": "Official website of Albasax. Pop artist and performer, he turns every song into Glamour Cinematic Scenes. Join the community of \"The Dramatics\". Stay connected for exclusive content and tour updates.",
+    "copyright": "All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use",
+    "cookies": "Cookie Settings"
+  },
+  "dancers": {
+    "title": "Albasax's Dancers"
+  },
+  "press": {
+    "title": "Press",
+    "readMore": "Read More",
+    "noArticles": "No articles available."
+  },
+  "media": {
+    "title": "Media"
+  },
+  "music": {
+    "title": "Music",
+    "listenOn": "Listen on",
+    "streamNow": "Stream Now"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signOut": "Sign Out"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred.",
+    "backToTop": "Back to top"
+  }
+}

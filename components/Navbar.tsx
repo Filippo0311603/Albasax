@@ -2,8 +2,10 @@
 import React, { useState, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ShoppingBag, User, Menu, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { User as UserType } from '../types';
 import MusicNoteEffect from './MusicNoteEffect';
+import LanguageSwitcher from './LanguageSwitcher';
 
 interface NavbarProps {
   user: UserType | null;
@@ -19,6 +21,7 @@ interface NoteExplosion {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [explosions, setExplosions] = useState<NoteExplosion[]>([]);
   const [explosionId, setExplosionId] = useState(0);
@@ -67,14 +70,14 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
   };
 
   const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Music', path: '/music' },
-    { name: 'Tour', path: '/tour' },
-    { name: 'Bio', path: '/bio' },
-    { name: 'Dancers', path: '/dancers' },
-    { name: 'Media', path: '/media' },
-    { name: 'Shop', path: '/shop' },
-    { name: 'Press', path: '/press' },
+    { name: t('nav.home'),    path: '/' },
+    { name: t('nav.music'),   path: '/music' },
+    { name: t('nav.tour'),    path: '/tour' },
+    { name: t('nav.bio'),     path: '/bio' },
+    { name: t('nav.dancers'), path: '/dancers' },
+    { name: t('nav.media'),   path: '/media' },
+    { name: t('nav.shop'),    path: '/shop' },
+    { name: t('nav.press'),   path: '/press' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -102,7 +105,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
               <div key={link.name} className="relative group">
                 <Link
                   to={link.path}
-                  className="nav-link-underline text-sm tracking-widest uppercase transition-colors duration-200 font-navbar relative"
+                  className="nav-link-underline text-sm tracking-widest uppercase transition-colors duration-200 font-sans relative"
                   onMouseEnter={(e) => {
                     // Crea note musicali eleganti su hover desktop
                     const rect = e.currentTarget.getBoundingClientRect();
@@ -148,6 +151,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
 
           {/* Actions */}
           <div className="flex items-center space-x-5">
+            <LanguageSwitcher />
             <button 
               onClick={onCartClick}
               className="relative p-2 text-gray-300 hover:text-white transition-colors"
@@ -185,7 +189,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
                 <Link
                   to={link.path}
                   onClick={(e) => handleMobileNavClick(e, link.path)}
-                  className={`block px-3 py-4 text-base font-medium tracking-widest uppercase font-navbar ${
+                  className={`block px-3 py-4 text-base font-medium tracking-widest uppercase font-sans ${
                     isActive(link.path) ? 'text-gold' : 'text-gray-300 hover:text-gold'
                   }`}
                 >
@@ -193,6 +197,9 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
                 </Link>
               </MusicNoteEffect>
             ))}
+            <div className="px-3 py-3 border-t border-gray-800 mt-2">
+              <LanguageSwitcher />
+            </div>
           </div>
           
           {/* Explosion Effects */}

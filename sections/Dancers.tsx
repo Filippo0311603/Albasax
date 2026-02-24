@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
 import { DANCERS } from '../constants';
+import { useTranslation } from 'react-i18next';
 
 const Dancers: React.FC = () => {
+  const { t } = useTranslation();
   useEffect(() => {
     document.title = "Albasax's Dancers | Albasax";
   }, []);
@@ -9,7 +11,7 @@ const Dancers: React.FC = () => {
   return (
     <div className="pt-32 pb-20 px-4 max-w-6xl mx-auto">
       <header className="mb-16 text-center">
-        <h2 className="text-5xl font-serif mb-4">Albasax's Dancers</h2>
+        <h2 className="text-5xl font-serif mb-4">{t('dancers.title')}</h2>
         <div className="h-1 w-20 bg-gold mx-auto" />
       </header>
 
@@ -52,7 +54,7 @@ const Dancers: React.FC = () => {
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end justify-center p-8">
           <h3 className="text-3xl font-serif text-white group-hover:text-gold transition-colors tracking-widest uppercase">
-            Albasax's Dancers
+            {t('dancers.title')}
           </h3>
         </div>
       </div>

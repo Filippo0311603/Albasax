@@ -2,8 +2,10 @@
 import React from 'react';
 import { TOUR_DATES } from '../constants';
 import { MapPin, Ticket } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Tour: React.FC = () => {
+  const { t } = useTranslation();
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('en-US', {
       month: 'short',
@@ -15,7 +17,7 @@ const Tour: React.FC = () => {
   return (
     <div className="pt-24 md:pt-32 pb-16 md:pb-20 px-4 max-w-7xl mx-auto">
       <header className="mb-10 md:mb-16 text-center">
-        <h2 className="text-4xl md:text-5xl font-serif mb-4">Tour Dates</h2>
+        <h2 className="text-4xl md:text-5xl font-serif mb-4">{t('tour.title')}</h2>
         <div className="h-1 w-20 bg-gold mx-auto" />
       </header>
 
@@ -51,7 +53,7 @@ const Tour: React.FC = () => {
                 `}
               >
                 <Ticket size={18} className="mr-2" />
-                {tour.status === 'Sold Out' ? 'Sold Out' : 'Get Tickets'}
+                {tour.status === 'Sold Out' ? t('tour.soldOut') : t('tour.getTickets')}
               </a>
             </div>
           </div>
