@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import PageTransition from './components/PageTransition';
@@ -36,6 +36,15 @@ const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  // ── Redirect to /auth when Supabase appends #type=recovery to the Site URL ──
+  useEffect(() => {
+    if (window.location.hash.includes('type=recovery')) {
+      navigate('/auth', { replace: true });
+    }
+  }, []);
 
   // ── Supabase session persistence ───────────────────────────────────────
   useEffect(() => {
