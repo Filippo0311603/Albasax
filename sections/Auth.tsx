@@ -123,14 +123,21 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
   }, [user]);
 
   // â”€â”€ Password strength â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // Detect recovery mode: either from URL hash or from Supabase onAuthStateChange event
+  // Detect recovery mode: sessionStorage flag (set by App.tsx before navigate), hash fallback, or live event
   React.useEffect(() => {
-    // Check hash on mount (fallback)
+    // 1. Check sessionStorage flag (most reliable — survives lazy load + navigation)
+    if (sessionStorage.getItem('pw_recovery')) {
+      sessionStorage.removeItem('pw_recovery');
+      setIsResetMode(true);
+      return;
+    }
+    // 2. Hash fallback (if Auth.tsx was already mounted when link was clicked)
     if (window.location.hash.includes('type=recovery')) {
       setIsResetMode(true);
       window.history.replaceState(null, '', window.location.pathname);
+      return;
     }
-    // Listen for PASSWORD_RECOVERY event from Supabase
+    // 3. Live event fallback (if Auth is already mounted when Supabase fires the event)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
         setIsResetMode(true);

@@ -42,6 +42,7 @@ const App: React.FC = () => {
   // ── Redirect to /auth when Supabase appends #type=recovery to the Site URL ──
   useEffect(() => {
     if (window.location.hash.includes('type=recovery')) {
+      sessionStorage.setItem('pw_recovery', '1');
       navigate('/auth', { replace: true });
     }
   }, []);
@@ -67,6 +68,7 @@ const App: React.FC = () => {
       // Quando l'utente clicca il link di reset password, NON fare login automatico
       // ma reindirizza ad /auth dove mostreremo il form "Nuova Password"
       if (event === 'PASSWORD_RECOVERY') {
+        sessionStorage.setItem('pw_recovery', '1');
         navigate('/auth', { replace: true });
         return;
       }
