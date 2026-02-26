@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -36,50 +36,26 @@ const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  // True while the user is in the recovery flow (clicked reset-password email link)
+  const [isRecoveryMode, setIsRecoveryMode] = useState(false);
 
   const navigate = useNavigate();
 
-  // Initialized SYNCHRONOUSLY before any effect/Promise runs.
-  // Prevents getSession().then() from calling setUser() during recovery flow.
-  const isRecovery = useRef(window.location.hash.includes('type=recovery'));
-
-  // ── Redirect to /auth when Supabase appends #type=recovery to the Site URL ──
+  // ── Single source of truth for auth state ─────────────────────────────
+  // We use ONLY onAuthStateChange (Supabase v2 recommended pattern).
+  // It fires on mount with the current session AND on every subsequent change.
+  // This avoids the race condition with getSession() resolving after PASSWORD_RECOVERY.
   useEffect(() => {
-    if (window.location.hash.includes('type=recovery')) {
-      isRecovery.current = true;
-      sessionStorage.setItem('pw_recovery', '1');
-      navigate('/auth', { replace: true });
-    }
-  }, []);
-
-  // ── Supabase session persistence ───────────────────────────────────────
-  useEffect(() => {
-    // Ripristina la sessione al caricamento della pagina
-    // Skip if we're in a password recovery flow (would log the user in prematurely)
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (isRecovery.current) return;
-      if (session?.user) {
-        const meta = session.user.user_metadata;
-        const fullName = [meta?.first_name, meta?.last_name].filter(Boolean).join(' ') || session.user.email!;
-        setUser({
-          email: session.user.email!,
-          name: fullName,
-          firstName: meta?.first_name,
-          lastName: meta?.last_name,
-        });
-      }
-    });
-
-    // Ascolta tutti i cambiamenti di autenticazione (login, logout, refresh token)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      // Quando l'utente clicca il link di reset password, NON fare login automatico
-      // ma reindirizza ad /auth dove mostreremo il form "Nuova Password"
       if (event === 'PASSWORD_RECOVERY') {
-        isRecovery.current = true;
-        sessionStorage.setItem('pw_recovery', '1');
+        // User clicked the reset-password link in their email.
+        // Do NOT log them in — show the "set new password" form instead.
+        setIsRecoveryMode(true);
+        setUser(null);
         navigate('/auth', { replace: true });
         return;
       }
+
       if (session?.user) {
         const meta = session.user.user_metadata;
         const fullName = [meta?.first_name, meta?.last_name].filter(Boolean).join(' ') || session.user.email!;
@@ -141,7 +117,15 @@ const App: React.FC = () => {
               <Route path="/dancers" element={<Dancers />} />
               <Route path="/press" element={<Press />} />
               <Route path="/press/:id" element={<ArticleView />} />
-              <Route path="/auth" element={<Auth user={user} onLogin={setUser} onLogout={() => setUser(null)} />} />
+              <Route path="/auth" element={
+                <Auth
+                  user={user}
+                  onLogin={setUser}
+                  onLogout={() => setUser(null)}
+                  isRecoveryMode={isRecoveryMode}
+                  onRecoveryComplete={() => setIsRecoveryMode(false)}
+                />
+              } />
               <Route path="/verified" element={<Verified />} />
               <Route path="/legal/:type" element={<Legal />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />

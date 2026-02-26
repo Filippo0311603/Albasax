@@ -65,9 +65,11 @@ interface AuthProps {
   user: User | null;
   onLogin: (user: User) => void;
   onLogout: () => void;
+  isRecoveryMode?: boolean;
+  onRecoveryComplete?: () => void;
 }
 
-const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
+const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout, isRecoveryMode = false, onRecoveryComplete }) => {
   const [isLogin, setIsLogin]       = useState(true);
   const [loading, setLoading]       = useState(false);
   const [errorMSG, setErrorMSG]     = useState('');
@@ -123,28 +125,12 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
   }, [user]);
 
   // â”€â”€ Password strength â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // Detect recovery mode: sessionStorage flag (set by App.tsx before navigate), hash fallback, or live event
+  // Recovery mode is driven by the prop passed down from App.tsx (set via onAuthStateChange)
   React.useEffect(() => {
-    // 1. Check sessionStorage flag (most reliable — survives lazy load + navigation)
-    if (sessionStorage.getItem('pw_recovery')) {
-      sessionStorage.removeItem('pw_recovery');
+    if (isRecoveryMode) {
       setIsResetMode(true);
-      return;
     }
-    // 2. Hash fallback (if Auth.tsx was already mounted when link was clicked)
-    if (window.location.hash.includes('type=recovery')) {
-      setIsResetMode(true);
-      window.history.replaceState(null, '', window.location.pathname);
-      return;
-    }
-    // 3. Live event fallback (if Auth is already mounted when Supabase fires the event)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        setIsResetMode(true);
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, []);
+  }, [isRecoveryMode]);
 
     const pwChecks = useMemo(() => checkPassword(formData.password), [formData.password]);
   const pwStrong = pwChecks.every(c => c.pass);
@@ -278,8 +264,9 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
     try {
       const { error } = await supabase.auth.updateUser({ password: resetPw });
       if (error) throw new Error(mapAuthError(error.message));
-      // Sign out the recovery session so the user logs in fresh
+      // Sign out the recovery session so the user logs in fresh with the new password
       await supabase.auth.signOut();
+      onRecoveryComplete?.();
       setResetDone(true);
     } catch (err: any) {
       setErrorMSG(err.message);
@@ -508,7 +495,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
                 <h2 className="text-2xl font-serif">Password aggiornata!</h2>
                 <p className="text-gray-400 text-sm">Puoi ora accedere con la tua nuova password.</p>
               </div>
-              <button onClick={() => { setIsResetMode(false); setResetDone(false); setResetPw(''); setResetPwConfirm(''); setIsLogin(true); setErrorMSG(''); }}
+              <button onClick={() => { setIsResetMode(false); setResetDone(false); setResetPw(''); setResetPwConfirm(''); setIsLogin(true); setErrorMSG(''); onRecoveryComplete?.(); }}
                 className="w-full py-4 bg-gold text-black font-bold uppercase tracking-widest text-xs hover:bg-gold/90 transition-all">
                 Vai al login
               </button>
