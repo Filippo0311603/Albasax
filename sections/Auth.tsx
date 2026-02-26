@@ -11,6 +11,26 @@ import Modal from '../components/Modal';
 import { supabase } from '../supabaseClient';
 
 // â”€â”€â”€ Password strength â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Error mapper: converte errori Supabase in messaggi user-friendly
+function mapAuthError(msg: string): string {
+  const m = msg.toLowerCase();
+  if (m.includes('invalid login credentials') || m.includes('invalid email or password'))
+    return 'Email o password non corretti. Riprova.';
+  if (m.includes('email not confirmed'))
+    return 'Devi confermare la tua email prima di accedere. Controlla la casella di posta (anche spam).';
+  if (m.includes('user already registered') || m.includes('already been registered'))
+    return 'Questa email è già registrata. Prova ad accedere oppure usa "Password dimenticata?".';
+  if (m.includes('password should be at least'))
+    return 'La password deve essere di almeno 8 caratteri.';
+  if (m.includes('unable to validate email') || m.includes('email address not authorized') || m.includes('invalid email'))
+    return "Email non accettata. Se usi un provider italiano (libero.it, virgilio.it, tiscali.it) prova con Gmail o Outlook, oppure contattaci.";
+  if (m.includes('rate limit') || m.includes('too many'))
+    return 'Troppe richieste. Attendi qualche minuto e riprova.';
+  if (m.includes('failed to fetch') || m.includes('network'))
+    return 'Errore di connessione. Controlla la tua rete e riprova.';
+  return msg;
+}
+
 interface PasswordCheck { label: string; pass: boolean }
 function checkPassword(pw: string): PasswordCheck[] {
   return [
@@ -56,6 +76,10 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
   const [emailSent, setEmailSent]   = useState(false);
   const [sentEmail, setSentEmail]   = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
+  // Forgot password
+  const [isForgotPw, setIsForgotPw]     = useState(false);
+  const [forgotEmail, setForgotEmail]   = useState('');
+  const [forgotSent, setForgotSent]     = useState(false);
   const navigate = useNavigate();
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -117,12 +141,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
         password: formData.password,
       });
       if (error) {
-        // Supabase returns a generic error for unconfirmed email
-        if (error.message.toLowerCase().includes('email not confirmed')) {
-          setErrorMSG('Please confirm your email before logging in. Check your inbox.');
-        } else {
-          throw new Error(error.message);
-        }
+        setErrorMSG(mapAuthError(error.message));
         return;
       }
       onLogin({
@@ -132,7 +151,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
         lastName:  data.user.user_metadata?.last_name,
       });
     } catch (error: any) {
-      setErrorMSG(error.message || 'Authentication failed');
+      setErrorMSG(mapAuthError(error.message) || 'Accesso fallito. Riprova.');
     } finally {
       setLoading(false);
     }
@@ -182,7 +201,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
           emailRedirectTo: `${window.location.origin}/verified`,
         },
       });
-      if (error) throw new Error(error.message);
+      if (error) throw new Error(mapAuthError(error.message));
 
       // Subscribe to newsletter if opted in
       if (formData.newsletter && data.user) {
@@ -203,14 +222,32 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
       setResendCooldown(60);
 
     } catch (error: any) {
-      setErrorMSG(error.message || 'Registration failed. Please try again.');
+      setErrorMSG(mapAuthError(error.message) || 'Registrazione fallita. Riprova tra qualche istante.');
     } finally {
       setLoading(false);
     }
   };
 
   // â”€â”€ RESEND CONFIRMATION EMAIL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  const handleResend = async () => {
+  // ── FORGOT PASSWORD ────────────────────────────────────────────────────────
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail.trim()) return;
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail.trim(), {
+        redirectTo: `${window.location.origin}/auth?reset=1`,
+      });
+      if (error) throw new Error(mapAuthError(error.message));
+      setForgotSent(true);
+    } catch (err: any) {
+      showModal('Errore', err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+    const handleResend = async () => {
     if (resendCooldown > 0) return;
     setLoading(true);
     try {
@@ -345,7 +382,60 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
         </div>
 
       /* â”€â”€ EMAIL CONFIRMATION SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-      ) : emailSent ? (
+      ) : isForgotPw ? (
+        /* ── FORGOT PASSWORD SCREEN ── */
+        <div className="max-w-md w-full glass p-10 shadow-2xl border-gray-800 space-y-8 animate-in fade-in duration-500">
+          {!forgotSent ? (
+            <>
+              <header className="text-center">
+                <h2 className="text-3xl font-serif mb-2">Recupera Password</h2>
+                <p className="text-gray-500 text-sm">Inserisci la tua email e ti invieremo un link per reimpostare la password.</p>
+              </header>
+              <form onSubmit={handleForgotPassword} className="space-y-5">
+                <div className="space-y-2">
+                  <label className={labelCls}><Mail size={11} className="mr-2" />Email</label>
+                  <input
+                    type="email" required
+                    placeholder="nome@esempio.com"
+                    value={forgotEmail}
+                    onChange={e => setForgotEmail(e.target.value)}
+                    className={inputCls}
+                    autoFocus
+                  />
+                </div>
+                <button type="submit" disabled={loading}
+                  className="w-full py-4 bg-gold hover:bg-gold/90 disabled:opacity-50 text-white font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2">
+                  {loading ? <Loader className="animate-spin" size={16} /> : <ArrowRight size={14} />}
+                  Invia link di recupero
+                </button>
+              </form>
+              <button onClick={() => { setIsForgotPw(false); setForgotEmail(''); }}
+                className="w-full text-center text-xs text-gray-500 hover:text-gray-300 transition-colors">
+                ← Torna al login
+              </button>
+            </>
+          ) : (
+            <div className="text-center space-y-6">
+              <div className="mx-auto w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center border border-gold/30">
+                <Mail size={36} className="text-gold" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-serif">Email inviata!</h2>
+                <p className="text-gray-400 text-sm">
+                  Abbiamo inviato un link per reimpostare la password a<br />
+                  <span className="text-white font-semibold">{forgotEmail}</span>
+                </p>
+                <p className="text-gray-500 text-xs pt-1">Controlla anche la cartella spam. Il link scade in 1 ora.</p>
+              </div>
+              <button onClick={() => { setIsForgotPw(false); setForgotSent(false); setForgotEmail(''); setIsLogin(true); setErrorMSG(''); }}
+                className="w-full py-4 bg-gold text-black font-bold uppercase tracking-widest text-xs hover:bg-gold/90 transition-all">
+                Torna al login
+              </button>
+            </div>
+          )}
+        </div>
+
+            ) : emailSent ? (
         <div className="max-w-md w-full glass p-10 shadow-2xl border-gray-800 text-center space-y-8 animate-in fade-in duration-500">
           <div className="mx-auto w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center border border-gold/30">
             <Mail size={36} className="text-gold" />
@@ -437,6 +527,10 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
                 {loading ? <Loader className="animate-spin mr-2" size={16} /> : null}
                 Log In
                 <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+              </button>
+              <button type="button" onClick={() => { setIsForgotPw(true); setForgotEmail(formData.email); setErrorMSG(''); }}
+                className="w-full text-center text-xs text-gray-600 hover:text-gold transition-colors pt-2">
+                Password dimenticata?
               </button>
             </form>
           )}

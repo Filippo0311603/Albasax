@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { MEDIA_GALLERY } from '../constants';
-import { Play, Maximize2, X } from 'lucide-react';
+import { Play, X } from 'lucide-react';
 import { MediaItem } from '../types';
 
 const Media: React.FC = () => {
@@ -26,7 +26,7 @@ const Media: React.FC = () => {
                 <img 
                   src={item.thumbnail} 
                   alt={item.title} 
-                  className="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-500"
+                  className="w-full h-auto grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
                 />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/20 transition-all">
                   <div className="p-4 bg-white/20 backdrop-blur-md rounded-full border border-white/30">
@@ -38,16 +38,11 @@ const Media: React.FC = () => {
               <img 
                 src={item.url} 
                 alt={item.title} 
-                className="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-500"
+                className="w-full h-auto grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
               />
             )}
             
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
-              <div className="flex justify-between items-center w-full">
-                <p className="text-white text-sm font-bold tracking-widest uppercase">{item.title}</p>
-                <Maximize2 size={16} className="text-white" />
-              </div>
-            </div>
+
           </div>
         ))}
       </div>
