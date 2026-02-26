@@ -123,13 +123,20 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
   }, [user]);
 
   // â”€â”€ Password strength â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // Detect recovery token in URL (user clicked reset-password email link)
+  // Detect recovery mode: either from URL hash or from Supabase onAuthStateChange event
   React.useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.includes('type=recovery')) {
+    // Check hash on mount (fallback)
+    if (window.location.hash.includes('type=recovery')) {
       setIsResetMode(true);
       window.history.replaceState(null, '', window.location.pathname);
     }
+    // Listen for PASSWORD_RECOVERY event from Supabase
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsResetMode(true);
+      }
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
     const pwChecks = useMemo(() => checkPassword(formData.password), [formData.password]);

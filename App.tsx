@@ -63,7 +63,13 @@ const App: React.FC = () => {
     });
 
     // Ascolta tutti i cambiamenti di autenticazione (login, logout, refresh token)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // Quando l'utente clicca il link di reset password, NON fare login automatico
+      // ma reindirizza ad /auth dove mostreremo il form "Nuova Password"
+      if (event === 'PASSWORD_RECOVERY') {
+        navigate('/auth', { replace: true });
+        return;
+      }
       if (session?.user) {
         const meta = session.user.user_metadata;
         const fullName = [meta?.first_name, meta?.last_name].filter(Boolean).join(' ') || session.user.email!;
