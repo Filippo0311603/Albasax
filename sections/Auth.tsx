@@ -235,9 +235,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
     if (!forgotEmail.trim()) return;
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail.trim(), {
-        redirectTo: `${window.location.origin}/auth?reset=1`,
-      });
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail.trim());
       if (error) throw new Error(mapAuthError(error.message));
       setForgotSent(true);
     } catch (err: any) {
