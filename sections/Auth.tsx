@@ -80,6 +80,12 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
   const [isForgotPw, setIsForgotPw]     = useState(false);
   const [forgotEmail, setForgotEmail]   = useState('');
   const [forgotSent, setForgotSent]     = useState(false);
+  // Reset password (after clicking email link)
+  const [isResetMode, setIsResetMode]   = useState(false);
+  const [resetPw, setResetPw]           = useState('');
+  const [resetPwConfirm, setResetPwConfirm] = useState('');
+  const [showResetPw, setShowResetPw]   = useState(false);
+  const [resetDone, setResetDone]       = useState(false);
   const navigate = useNavigate();
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -115,7 +121,16 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
   }, [user]);
 
   // â”€â”€ Password strength â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  const pwChecks = useMemo(() => checkPassword(formData.password), [formData.password]);
+  // Detect recovery token in URL (user clicked reset-password email link)
+  React.useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.includes('type=recovery')) {
+      setIsResetMode(true);
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  }, []);
+
+    const pwChecks = useMemo(() => checkPassword(formData.password), [formData.password]);
   const pwStrong = pwChecks.every(c => c.pass);
 
   // â”€â”€ Resend cooldown timer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -230,12 +245,39 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
 
   // â”€â”€ RESEND CONFIRMATION EMAIL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // ── FORGOT PASSWORD ────────────────────────────────────────────────────────
-  const handleForgotPassword = async (e: React.FormEvent) => {
+  // ── RESET PASSWORD (after clicking email link) ───────────────────────────
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (resetPw !== resetPwConfirm) {
+      setErrorMSG('Le password non coincidono.');
+      return;
+    }
+    const checks = checkPassword(resetPw);
+    if (!checks.every(ch => ch.pass)) {
+      setErrorMSG('La password non soddisfa i requisiti di sicurezza.');
+      return;
+    }
+    setLoading(true);
+    setErrorMSG('');
+    try {
+      const { error } = await supabase.auth.updateUser({ password: resetPw });
+      if (error) throw new Error(mapAuthError(error.message));
+      setResetDone(true);
+    } catch (err: any) {
+      setErrorMSG(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+    const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!forgotEmail.trim()) return;
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail.trim());
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail.trim(), {
+        redirectTo: `${window.location.origin}/auth`,
+      });
       if (error) throw new Error(mapAuthError(error.message));
       setForgotSent(true);
     } catch (err: any) {
@@ -380,7 +422,85 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
         </div>
 
       /* â”€â”€ EMAIL CONFIRMATION SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-      ) : isForgotPw ? (
+      ) : isResetMode ? (
+        /* ── SET NEW PASSWORD SCREEN ── */
+        <div className="max-w-md w-full glass p-10 shadow-2xl border-gray-800 space-y-8 animate-in fade-in duration-500">
+          {!resetDone ? (
+            <>
+              <header className="text-center">
+                <h2 className="text-3xl font-serif mb-2">Nuova Password</h2>
+                <p className="text-gray-500 text-sm">Scegli una nuova password per il tuo account.</p>
+              </header>
+              {errorMSG && (
+                <p className="text-red-400 text-xs bg-red-500/10 p-3 border border-red-500/20 flex items-center gap-2">
+                  <AlertCircle size={14} className="shrink-0" />{errorMSG}
+                </p>
+              )}
+              <form onSubmit={handleResetPassword} className="space-y-5">
+                <div className="space-y-2">
+                  <label className={labelCls}><Lock size={11} className="mr-2" />Nuova password</label>
+                  <div className="relative">
+                    <input
+                      type={showResetPw ? 'text' : 'password'} required
+                      placeholder="Crea una password sicura"
+                      value={resetPw}
+                      onChange={e => setResetPw(e.target.value)}
+                      className={inputCls + ' pr-12'}
+                      autoFocus
+                    />
+                    <button type="button" onClick={() => setShowResetPw(v => !v)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gold transition-colors">
+                      {showResetPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                  {resetPw.length > 0 && (
+                    <div className="grid grid-cols-2 gap-1 pt-1">
+                      {checkPassword(resetPw).map(ch => (
+                        <p key={ch.label} className={`text-[10px] flex items-center gap-1 ${ch.pass ? 'text-green-500' : 'text-gray-600'}`}>
+                          <CheckCircle size={10} />{ch.label}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <label className={labelCls}><Lock size={11} className="mr-2" />Conferma password</label>
+                  <input
+                    type={showResetPw ? 'text' : 'password'} required
+                    placeholder="Ripeti la password"
+                    value={resetPwConfirm}
+                    onChange={e => setResetPwConfirm(e.target.value)}
+                    className={`${inputCls} ${resetPwConfirm && resetPw !== resetPwConfirm ? 'border-red-700' : ''}`}
+                  />
+                  {resetPwConfirm && resetPw !== resetPwConfirm && (
+                    <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle size={12} />Le password non coincidono.</p>
+                  )}
+                </div>
+                <button type="submit" disabled={loading || !checkPassword(resetPw).every(ch => ch.pass) || resetPw !== resetPwConfirm}
+                  className="w-full py-4 bg-gold hover:bg-gold/90 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2">
+                  {loading ? <Loader className="animate-spin" size={16} /> : <ArrowRight size={14} />}
+                  Salva nuova password
+                </button>
+              </form>
+            </>
+          ) : (
+            <div className="text-center space-y-6">
+              <div className="mx-auto w-20 h-20 bg-green-900/20 rounded-full flex items-center justify-center border border-green-800/40">
+                <CheckCircle size={36} className="text-green-500" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-serif">Password aggiornata!</h2>
+                <p className="text-gray-400 text-sm">Puoi ora accedere con la tua nuova password.</p>
+              </div>
+              <button onClick={() => { setIsResetMode(false); setResetDone(false); setResetPw(''); setResetPwConfirm(''); setIsLogin(true); setErrorMSG(''); }}
+                className="w-full py-4 bg-gold text-black font-bold uppercase tracking-widest text-xs hover:bg-gold/90 transition-all">
+                Vai al login
+              </button>
+            </div>
+          )}
+        </div>
+
+            ) : isForgotPw ? (
         /* ── FORGOT PASSWORD SCREEN ── */
         <div className="max-w-md w-full glass p-10 shadow-2xl border-gray-800 space-y-8 animate-in fade-in duration-500">
           {!forgotSent ? (
