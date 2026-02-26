@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -39,9 +39,14 @@ const App: React.FC = () => {
 
   const navigate = useNavigate();
 
+  // Initialized SYNCHRONOUSLY before any effect/Promise runs.
+  // Prevents getSession().then() from calling setUser() during recovery flow.
+  const isRecovery = useRef(window.location.hash.includes('type=recovery'));
+
   // ── Redirect to /auth when Supabase appends #type=recovery to the Site URL ──
   useEffect(() => {
     if (window.location.hash.includes('type=recovery')) {
+      isRecovery.current = true;
       sessionStorage.setItem('pw_recovery', '1');
       navigate('/auth', { replace: true });
     }
@@ -50,7 +55,9 @@ const App: React.FC = () => {
   // ── Supabase session persistence ───────────────────────────────────────
   useEffect(() => {
     // Ripristina la sessione al caricamento della pagina
+    // Skip if we're in a password recovery flow (would log the user in prematurely)
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (isRecovery.current) return;
       if (session?.user) {
         const meta = session.user.user_metadata;
         const fullName = [meta?.first_name, meta?.last_name].filter(Boolean).join(' ') || session.user.email!;
@@ -68,6 +75,7 @@ const App: React.FC = () => {
       // Quando l'utente clicca il link di reset password, NON fare login automatico
       // ma reindirizza ad /auth dove mostreremo il form "Nuova Password"
       if (event === 'PASSWORD_RECOVERY') {
+        isRecovery.current = true;
         sessionStorage.setItem('pw_recovery', '1');
         navigate('/auth', { replace: true });
         return;

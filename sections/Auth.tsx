@@ -278,6 +278,8 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout }) => {
     try {
       const { error } = await supabase.auth.updateUser({ password: resetPw });
       if (error) throw new Error(mapAuthError(error.message));
+      // Sign out the recovery session so the user logs in fresh
+      await supabase.auth.signOut();
       setResetDone(true);
     } catch (err: any) {
       setErrorMSG(err.message);
