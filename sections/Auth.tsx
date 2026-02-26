@@ -28,6 +28,8 @@ function mapAuthError(msg: string): string {
     return 'Troppe richieste. Attendi qualche minuto e riprova.';
   if (m.includes('failed to fetch') || m.includes('network'))
     return 'Errore di connessione. Controlla la tua rete e riprova.';
+  if (m.includes('error sending') || m.includes('500') || m.includes('unexpected') || m.includes('internal server'))
+    return 'Il servizio email è temporaneamente non disponibile. Riprova tra qualche minuto o contatta l\'assistenza.';
   return msg;
 }
 
