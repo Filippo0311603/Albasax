@@ -393,8 +393,12 @@ app.post('/api/newsletter/subscribe', async (req, res) => {
   if (upsertErr) return res.status(500).json({ error: upsertErr.message });
 
   // Invia email di conferma
+  // Il link punta al SERVER (Railway) che verifica il token e reindirizza al frontend
   const clientUrl = process.env.CLIENT_URL || 'https://albasax.com';
-  const confirmUrl = `${clientUrl}/newsletter/confirm?id=${sub.id}&token=${token}`;
+  const proto = req.headers['x-forwarded-proto'] || req.protocol;
+  const host  = req.headers['x-forwarded-host']  || req.get('host');
+  const serverUrl = process.env.SERVER_URL || `${proto}://${host}`;
+  const confirmUrl = `${serverUrl}/api/newsletter/confirm?id=${sub.id}&token=${token}`;
   const fromAddress = process.env.NEWSLETTER_FROM || 'Albasax <newsletter@albasax.com>';
 
   try {
