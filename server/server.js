@@ -110,11 +110,11 @@ function buildEmailTemplate({ subject, html, previewText, name, unsubscribeUrl }
                   </td>
                   <td style="color:#333;font-size:9px;">&bull;</td>
                   <td style="padding:0 10px;">
-                    <a href="https://instagram.com" style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#555;text-decoration:none;">Instagram</a>
+                    <a href="https://www.instagram.com/albasax_official/" style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#555;text-decoration:none;">Instagram</a>
                   </td>
                   <td style="color:#333;font-size:9px;">&bull;</td>
                   <td style="padding:0 10px;">
-                    <a href="https://spotify.com" style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#555;text-decoration:none;">Spotify</a>
+                    <a href="https://open.spotify.com/intl-it/artist/3aOCpeC6zsfwRk6C62d6aL" style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#555;text-decoration:none;">Spotify</a>
                   </td>
                 </tr>
               </table>
