@@ -280,7 +280,9 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout, isRecoveryMode = f
     if (!forgotEmail.trim()) return;
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail.trim());
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail.trim(), {
+        redirectTo: `${window.location.origin}/auth`,
+      });
       if (error) throw new Error(mapAuthError(error.message));
       setForgotSent(true);
     } catch (err: any) {
@@ -356,7 +358,9 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout, isRecoveryMode = f
       />
 
       {/* â”€â”€ LOGGED IN: Profile view â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-      {user ? (
+      {/* user && !isResetMode: prevents profile showing during recovery flow
+           even if Supabase fires SIGNED_IN before PASSWORD_RECOVERY */}
+      {(user && !isResetMode) ? (
         <div className="max-w-md w-full glass p-8 md:p-12 shadow-2xl border-gray-800 text-center space-y-8 animate-in fade-in duration-500">
           <div className="mx-auto w-24 h-24 bg-gold/20 rounded-full flex items-center justify-center border-2 border-gold">
             <span className="text-4xl font-serif text-gold">
