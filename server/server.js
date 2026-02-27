@@ -35,6 +35,32 @@ function generateUnsubscribeToken(subscriberId) {
     .digest('hex');
 }
 
+// Genera versione plain text dall'HTML della newsletter
+function buildPlainText({ subject, html, name, unsubscribeUrl }) {
+  // Rimuovi tag HTML e normalizza whitespace
+  const stripped = html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<\/div>/gi, '\n')
+    .replace(/<\/h[1-6]>/gi, '\n\n')
+    .replace(/<\/li>/gi, '\n')
+    .replace(/<li[^>]*>/gi, '• ')
+    .replace(/<a\s[^>]*href="([^"]+)"[^>]*>([^<]+)<\/a>/gi, '$2 ($1)')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&bull;/g, '•')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  return `Ciao ${name},\n\n${stripped}\n\n— ALBASAX —\n\nStai ricevendo questa email perché ti sei iscritto alla newsletter di Albasax.\nPer disiscriverti: ${unsubscribeUrl}\nPrivacy Policy: https://albasax.com/legal/privacy`;
+}
+
 // Template HTML email newsletter
 function buildEmailTemplate({ subject, html, previewText, name, unsubscribeUrl }) {
   return `<!DOCTYPE html>
@@ -319,8 +345,15 @@ app.post('/api/admin/send-newsletter', async (req, res) => {
       return {
         from: fromAddress,
         to: sub.email,
+        reply_to: 'info@albasax.com',
         subject,
+        text: buildPlainText({ subject, html, name: sub.name || 'Friend', unsubscribeUrl }),
         html: buildEmailTemplate({ subject, html, previewText, name: sub.name || 'Friend', unsubscribeUrl }),
+        headers: {
+          'List-Unsubscribe': `<${unsubscribeUrl}>`,
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+          'Precedence': 'bulk',
+        },
       };
     });
 
