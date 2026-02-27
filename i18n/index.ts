@@ -35,10 +35,10 @@ i18n
 export default i18n;
 
 export const LANGUAGES = [
-  { code: 'en', label: 'English',    flag: '🇬🇧' },
-  { code: 'it', label: 'Italiano',   flag: '🇮🇹' },
-  { code: 'fr', label: 'Français',   flag: '🇫🇷' },
-  { code: 'es', label: 'Español',    flag: '🇪🇸' },
-  { code: 'de', label: 'Deutsch',    flag: '🇩🇪' },
-  { code: 'pt', label: 'Português',  flag: '🇵🇹' },
+  { code: 'en', label: 'English',    flag: '🇬🇧', flagCode: 'gb' },
+  { code: 'it', label: 'Italiano',   flag: '🇮🇹', flagCode: 'it' },
+  { code: 'fr', label: 'Français',   flag: '🇫🇷', flagCode: 'fr' },
+  { code: 'es', label: 'Español',    flag: '🇪🇸', flagCode: 'es' },
+  { code: 'de', label: 'Deutsch',    flag: '🇩🇪', flagCode: 'de' },
+  { code: 'pt', label: 'Português',  flag: '🇵🇹', flagCode: 'pt' },
 ] as const;

@@ -30,7 +30,13 @@ const LanguageSwitcher: React.FC = () => {
         className="flex items-center gap-1.5 px-2 py-1 text-sm text-gray-400 hover:text-white transition-colors select-none"
         aria-label="Select language"
       >
-        <span className="text-xl leading-none" style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif' }}>{current.flag}</span>
+        <img
+          src={`https://flagcdn.com/w20/${current.flagCode}.png`}
+          width={20}
+          height={15}
+          alt={current.label}
+          className="rounded-sm object-cover"
+        />
       </button>
 
       {open && (
@@ -42,7 +48,13 @@ const LanguageSwitcher: React.FC = () => {
               className={`w-full flex items-center gap-3 px-4 py-2.5 text-xs uppercase tracking-widest transition-colors text-left
                 ${lang.code === current.code ? 'text-gold' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
             >
-              <span className="text-base">{lang.flag}</span>
+              <img
+                src={`https://flagcdn.com/w20/${lang.flagCode}.png`}
+                width={20}
+                height={15}
+                alt={lang.label}
+                className="rounded-sm object-cover"
+              />
               <span style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif' }}>{lang.label}</span>
             </button>
           ))}
