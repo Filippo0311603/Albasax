@@ -10,6 +10,8 @@ import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { supabase } from '../supabaseClient';
 
+const API = import.meta.env.VITE_SERVER_URL || 'https://albasax-production.up.railway.app';
+
 // â”€â”€â”€ Password strength â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Error mapper: converte errori Supabase in messaggi user-friendly
 function mapAuthError(msg: string): string {
@@ -220,17 +222,17 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout, isRecoveryMode = f
       });
       if (error) throw new Error(mapAuthError(error.message));
 
-      // Subscribe to newsletter if opted in
+      // Subscribe to newsletter if opted in (double opt-in: sends confirmation email)
       if (formData.newsletter && data.user) {
-        await supabase.from('newsletter_subscribers').upsert(
-          {
+        fetch(`${API}/api/newsletter/subscribe`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
             email:  formData.email,
             name:   `${formData.firstName} ${formData.lastName}`.trim(),
             source: 'registration',
-            active: true,
-          },
-          { onConflict: 'email' }
-        );
+          }),
+        }).catch(() => {/* non blocca la registrazione */});
       }
 
       // â† data.session is null when email confirmation is required

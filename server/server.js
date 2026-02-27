@@ -61,6 +61,59 @@ function buildPlainText({ subject, html, name, unsubscribeUrl }) {
   return `Ciao ${name},\n\n${stripped}\n\n— ALBASAX —\n\nStai ricevendo questa email perché ti sei iscritto alla newsletter di Albasax.\nPer disiscriverti: ${unsubscribeUrl}\nPrivacy Policy: https://albasax.com/legal/privacy`;
 }
 
+// Template HTML email di conferma iscrizione newsletter
+function buildConfirmEmailTemplate({ name, confirmUrl }) {
+  const greeting = name ? `Ciao ${name},` : 'Ciao,';
+  return `<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Conferma iscrizione – Albasax Newsletter</title>
+</head>
+<body style="margin:0;padding:0;background:#080808;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#080808;padding:0;margin:0;">
+    <tr>
+      <td align="center" style="padding:48px 16px;">
+        <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;width:100%;">
+          <tr><td style="background:linear-gradient(90deg,#6b4e0a,#c5a643,#f0d07a,#c5a643,#6b4e0a);height:2px;font-size:0;line-height:0;">&nbsp;</td></tr>
+          <tr>
+            <td align="center" style="background:#0f0f0f;padding:40px 40px 32px;">
+              <p style="margin:0 0 6px;font-size:10px;letter-spacing:0.5em;text-transform:uppercase;color:#c5a643;font-weight:700;">— ALBASAX —</p>
+              <p style="margin:0;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:#4b4b4b;">Official Newsletter</p>
+            </td>
+          </tr>
+          <tr><td style="background:#1a1a1a;height:1px;font-size:0;line-height:0;">&nbsp;</td></tr>
+          <tr>
+            <td style="background:#0f0f0f;padding:40px 48px;">
+              <p style="margin:0 0 16px;font-size:14px;color:#8a8a8a;letter-spacing:0.05em;">${greeting}</p>
+              <p style="margin:0 0 32px;font-size:15px;color:#d1d5db;line-height:1.8;">Grazie per esserti iscritto alla newsletter di Albasax.<br>Clicca il pulsante qui sotto per <strong style="color:#c5a643;">confermare la tua iscrizione</strong> e iniziare a ricevere aggiornamenti su musica, concerti e novità.</p>
+              <table cellpadding="0" cellspacing="0" role="presentation" style="margin:0 auto;">
+                <tr>
+                  <td align="center" style="background:linear-gradient(135deg,#b8860b,#d4af37);padding:16px 40px;">
+                    <a href="${confirmUrl}" style="font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:#080808;text-decoration:none;font-weight:700;">Conferma Iscrizione</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin:32px 0 0;font-size:11px;color:#3a3a3a;line-height:1.8;">Oppure copia e incolla questo link nel browser:<br><a href="${confirmUrl}" style="color:#555;word-break:break-all;">${confirmUrl}</a></p>
+              <p style="margin:24px 0 0;font-size:10px;color:#2a2a2a;">Se non hai richiesto questa iscrizione, ignora questa email.</p>
+            </td>
+          </tr>
+          <tr><td style="background:linear-gradient(90deg,transparent,#1f1f1f,transparent);height:1px;font-size:0;line-height:0;">&nbsp;</td></tr>
+          <tr>
+            <td align="center" style="background:#0a0a0a;padding:24px 40px;">
+              <p style="margin:0;font-size:9px;letter-spacing:0.4em;text-transform:uppercase;color:#c5a643;font-weight:600;">ALBASAX</p>
+            </td>
+          </tr>
+          <tr><td style="background:linear-gradient(90deg,#6b4e0a,#c5a643,#f0d07a,#c5a643,#6b4e0a);height:2px;font-size:0;line-height:0;">&nbsp;</td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
 // Template HTML email newsletter
 function buildEmailTemplate({ subject, html, previewText, name, unsubscribeUrl }) {
   return `<!DOCTYPE html>
@@ -303,6 +356,104 @@ app.get('/api/newsletter/unsubscribe', async (req, res) => {
   res.json({ success: true });
 });
 
+// NEWSLETTER: Subscribe con double opt-in
+// POST /api/newsletter/subscribe
+// Body: { email, name?, source? }
+app.post('/api/newsletter/subscribe', async (req, res) => {
+  const { email, name, source } = req.body;
+  if (!email || typeof email !== 'string') {
+    return res.status(400).json({ error: 'Email non valida' });
+  }
+  const normalizedEmail = email.toLowerCase().trim();
+
+  // Se già confermato non ri-inviamo l'email
+  const { data: existing } = await supabase
+    .from('newsletter_subscribers')
+    .select('id, confirmed')
+    .eq('email', normalizedEmail)
+    .maybeSingle();
+
+  if (existing?.confirmed) {
+    return res.json({ alreadyConfirmed: true });
+  }
+
+  // Genera token casuale sicuro
+  const token = crypto.randomBytes(32).toString('hex');
+
+  // Upsert: non attivo finché non confermato
+  const { data: sub, error: upsertErr } = await supabase
+    .from('newsletter_subscribers')
+    .upsert(
+      { email: normalizedEmail, name: name?.trim() || null, source: source || 'newsletter', active: false, confirmed: false, confirm_token: token },
+      { onConflict: 'email' }
+    )
+    .select('id')
+    .single();
+
+  if (upsertErr) return res.status(500).json({ error: upsertErr.message });
+
+  // Invia email di conferma
+  const clientUrl = process.env.CLIENT_URL || 'https://albasax.com';
+  const confirmUrl = `${clientUrl}/newsletter/confirm?id=${sub.id}&token=${token}`;
+  const fromAddress = process.env.NEWSLETTER_FROM || 'Albasax <newsletter@albasax.com>';
+
+  try {
+    await resend.emails.send({
+      from: fromAddress,
+      to: normalizedEmail,
+      reply_to: 'info@albasax.com',
+      subject: 'Conferma la tua iscrizione alla newsletter di Albasax',
+      text: `Ciao${name ? ' ' + name.trim() : ''},\n\nClicca il link qui sotto per confermare la tua iscrizione alla newsletter di Albasax:\n${confirmUrl}\n\nSe non hai richiesto questa iscrizione, ignora questa email.\n\n— ALBASAX —`,
+      html: buildConfirmEmailTemplate({ name: name?.trim() || '', confirmUrl }),
+    });
+  } catch (emailErr) {
+    console.error('[Subscribe] Email send error:', emailErr.message);
+  }
+
+  res.json({ pending: true });
+});
+
+// NEWSLETTER: Conferma iscrizione via link email
+// GET /api/newsletter/confirm?id=xxx&token=xxx
+app.get('/api/newsletter/confirm', async (req, res) => {
+  const { id, token } = req.query;
+  const clientUrl = process.env.CLIENT_URL || 'https://albasax.com';
+
+  if (!id || !token || typeof id !== 'string' || typeof token !== 'string') {
+    return res.redirect(`${clientUrl}/newsletter/confirm?status=error`);
+  }
+
+  const { data: sub, error } = await supabase
+    .from('newsletter_subscribers')
+    .select('confirm_token, confirmed')
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error || !sub) return res.redirect(`${clientUrl}/newsletter/confirm?status=error`);
+  if (sub.confirmed) return res.redirect(`${clientUrl}/newsletter/confirm?status=already`);
+
+  // Confronto sicuro del token (64 hex chars = 32 bytes)
+  let valid = false;
+  try {
+    if (token.length === 64 && sub.confirm_token?.length === 64) {
+      const a = Buffer.from(token, 'hex');
+      const b = Buffer.from(sub.confirm_token, 'hex');
+      valid = crypto.timingSafeEqual(a, b);
+    }
+  } catch (_) { valid = false; }
+
+  if (!valid) return res.redirect(`${clientUrl}/newsletter/confirm?status=error`);
+
+  const { error: updateErr } = await supabase
+    .from('newsletter_subscribers')
+    .update({ confirmed: true, active: true, confirm_token: null })
+    .eq('id', id);
+
+  if (updateErr) return res.redirect(`${clientUrl}/newsletter/confirm?status=error`);
+
+  res.redirect(`${clientUrl}/newsletter/confirm?status=success`);
+});
+
 // ADMIN: Invia newsletter a tutti gli iscritti attivi
 // Stato invii newsletter (in memoria, per status polling)
 const newsletterJobs = {};
@@ -320,7 +471,8 @@ app.post('/api/admin/send-newsletter', async (req, res) => {
   const { data: subscribers, error: fetchErr } = await supabase
     .from('newsletter_subscribers')
     .select('id, email, name')
-    .eq('active', true);
+    .eq('active', true)
+    .eq('confirmed', true);
   if (fetchErr) return res.status(500).json({ error: fetchErr.message });
   if (!subscribers || subscribers.length === 0) return res.json({ sent: 0, total: 0, jobId: null });
 

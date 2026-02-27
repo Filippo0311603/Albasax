@@ -32,7 +32,7 @@ const Dancers: React.FC = () => {
 
             {/* Overlay con nome */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-6">
-              <h3 className="text-2xl font-serif text-white group-hover:text-gold transition-colors">
+              <h3 className="text-2xl text-white group-hover:text-gold transition-colors tracking-wider uppercase" style={{ fontFamily: 'ClassyVogue, sans-serif' }}>
                 {dancer.firstName}
               </h3>
               <p className="text-lg text-gray-300 tracking-wider uppercase">

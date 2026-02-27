@@ -34,6 +34,7 @@
     "emailPlaceholder": "Deine E-Mail-Adresse",
     "subscribeBtn": "Abonnieren",
     "successMsg": "Du wirst als Erster informiert, wenn der Shop live geht.",
+    "checkEmail": "Prüfe deine E-Mail und klicke auf den Link zur Bestätigung.",
     "legalText": "Mit der Anmeldung stimmst du zu, Werbeupdates von Albasax zu erhalten.",
     "errorMsg": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
   },
@@ -43,6 +44,8 @@
     "namePlaceholder": "DEIN NAME (OPTIONAL)",
     "emailPlaceholder": "DEINE E-MAIL EINGEBEN",
     "successMsg": "Willkommen im inneren Kreis!",
+    "checkEmail": "Überprüfe deine E-Mail und klicke auf den Link, um dein Abonnement zu bestätigen.",
+    "alreadyConfirmed": "Du bist bereits für den Newsletter angemeldet!",
     "errorMsg": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
   },
   "footer": {

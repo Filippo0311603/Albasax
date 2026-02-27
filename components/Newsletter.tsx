@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
 import { Send, Check, Loader } from 'lucide-react';
-import { supabase } from '../supabaseClient';
 import { useTranslation } from 'react-i18next';
+
+const API = import.meta.env.VITE_SERVER_URL || 'https://albasax-production.up.railway.app';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
@@ -17,17 +18,18 @@ const Newsletter: React.FC = () => {
     e.preventDefault();
     setStatus('loading');
     try {
-      const { error } = await supabase
-        .from('newsletter_subscribers')
-        .upsert(
-          { email: email.toLowerCase().trim(), name: name.trim() || null, source: 'newsletter', active: true },
-          { onConflict: 'email' }
-        );
-      if (error) throw error;
+      const res = await fetch(`${API}/api/newsletter/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.toLowerCase().trim(), name: name.trim() || null, source: 'newsletter' }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || t('newsletter.errorMsg'));
 
       setStatus('success');
-      setMessage(t('newsletter.successMsg'));
+      setMessage(data.alreadyConfirmed ? t('newsletter.alreadyConfirmed') : t('newsletter.checkEmail'));
       setEmail('');
+      setName('');
     } catch (err: any) {
       setStatus('error');
       setMessage(err.message || t('newsletter.errorMsg'));

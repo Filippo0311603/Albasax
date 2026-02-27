@@ -20,9 +20,10 @@ const Dancers     = lazy(() => import('./sections/Dancers'));
 const Auth        = lazy(() => import('./sections/Auth'));
 const Verified    = lazy(() => import('./sections/Verified'));
 const Legal       = lazy(() => import('./sections/Legal'));
-const Unsubscribe     = lazy(() => import('./sections/Unsubscribe'));
-const AdminNewsletter = lazy(() => import('./sections/AdminNewsletter'));
-const Cart            = lazy(() => import('./sections/Cart'));
+const Unsubscribe         = lazy(() => import('./sections/Unsubscribe'));
+const AdminNewsletter     = lazy(() => import('./sections/AdminNewsletter'));
+const NewsletterConfirm   = lazy(() => import('./sections/NewsletterConfirm'));
+const Cart                = lazy(() => import('./sections/Cart'));
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -138,6 +139,7 @@ const App: React.FC = () => {
               <Route path="/verified" element={<Verified />} />
               <Route path="/legal/:type" element={<Legal />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
+              <Route path="/newsletter/confirm" element={<NewsletterConfirm />} />
               <Route path="/admin/newsletter" element={<AdminNewsletter />} />
             </Routes>
           </Suspense>

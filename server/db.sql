@@ -163,3 +163,14 @@ CREATE POLICY "Users can read own order items"
 CREATE TRIGGER update_orders_updated_at
     BEFORE UPDATE ON orders
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ─────────────────────────────────────────────
+-- 8. MIGRATION: Double opt-in newsletter
+-- Esegui questi comandi nel SQL Editor di Supabase
+-- ─────────────────────────────────────────────
+ALTER TABLE newsletter_subscribers
+  ADD COLUMN IF NOT EXISTS confirmed BOOLEAN DEFAULT FALSE,
+  ADD COLUMN IF NOT EXISTS confirm_token TEXT;
+
+-- I vecchi iscritti (già attivi) vengono considerati confermati
+UPDATE newsletter_subscribers SET confirmed = TRUE WHERE active = TRUE;

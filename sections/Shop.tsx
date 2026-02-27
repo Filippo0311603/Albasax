@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
 import { Package, Bell, Check, Loader } from 'lucide-react';
-import { supabase } from '../supabaseClient';
 import { useTranslation } from 'react-i18next';
+
+const API = import.meta.env.VITE_SERVER_URL || 'https://albasax-production.up.railway.app';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
@@ -16,16 +17,16 @@ const Shop: React.FC = () => {
     e.preventDefault();
     setStatus('loading');
     try {
-      const { error } = await supabase
-        .from('newsletter_subscribers')
-        .upsert(
-          { email: email.toLowerCase().trim(), source: 'shop_notify', active: true },
-          { onConflict: 'email' }
-        );
-      if (error) throw error;
+      const res = await fetch(`${API}/api/newsletter/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.toLowerCase().trim(), source: 'shop_notify' }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || t('shop.errorMsg'));
 
       setStatus('success');
-      setMessage(t('shop.successMsg'));
+      setMessage(data.alreadyConfirmed ? t('newsletter.alreadyConfirmed') : t('shop.checkEmail'));
       setEmail('');
     } catch (err: any) {
       setStatus('error');

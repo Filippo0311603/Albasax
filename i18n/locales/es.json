@@ -34,6 +34,7 @@
     "emailPlaceholder": "Tu dirección de correo",
     "subscribeBtn": "Suscribirse",
     "successMsg": "Serás el primero en saber cuando la tienda esté activa.",
+    "checkEmail": "Revisa tu email y haz clic en el enlace para confirmar.",
     "legalText": "Al suscribirte, aceptas recibir actualizaciones promocionales de Albasax.",
     "errorMsg": "Algo salió mal. Inténtalo de nuevo."
   },
@@ -43,6 +44,8 @@
     "namePlaceholder": "TU NOMBRE (OPCIONAL)",
     "emailPlaceholder": "INTRODUCE TU EMAIL",
     "successMsg": "¡Bienvenido al círculo íntimo!",
+    "checkEmail": "Revisa tu email y haz clic en el enlace para confirmar tu suscripción.",
+    "alreadyConfirmed": "¡Ya estás suscrito a la newsletter!",
     "errorMsg": "Algo salió mal. Inténtalo de nuevo."
   },
   "footer": {
