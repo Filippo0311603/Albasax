@@ -1,13 +1,8 @@
 
 import { TourDate, MusicRelease, PressArticle, MediaItem, Dancer } from './types';
 
-export const TOUR_DATES: TourDate[] = [
-  { id: '1', date: '2024-08-15', venue: 'Jazz Blue Club', location: 'London, UK', status: 'Available', ticketUrl: '#' },
-  { id: '2', date: '2024-09-02', venue: 'Royal Albert Hall', location: 'London, UK', status: 'Sold Out', ticketUrl: '#' },
-  { id: '3', date: '2024-09-20', venue: 'Blue Note', location: 'New York, USA', status: 'Available', ticketUrl: '#' },
-  { id: '4', date: '2024-10-05', venue: 'Le Trianon', location: 'Paris, France', status: 'Available', ticketUrl: '#' },
-  { id: '5', date: '2024-11-12', venue: 'Teatro degli Arcimboldi', location: 'Milan, Italy', status: 'Available', ticketUrl: '#' },
-];
+export const TOUR_DATES: TourDate[] = [];
+
 
 export const MUSIC_RELEASES: MusicRelease[] = [
   {

@@ -52,8 +52,8 @@ const Dancers: React.FC = () => {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end justify-center p-8">
-          <h3 className="text-3xl font-serif text-white group-hover:text-gold transition-colors tracking-widest uppercase">
+        <div className="py-5 px-6 text-center border-t border-gray-800 bg-black/60">
+          <h3 className="text-2xl font-serif text-white group-hover:text-gold transition-colors tracking-widest uppercase">
             {t('dancers.title')}
           </h3>
         </div>

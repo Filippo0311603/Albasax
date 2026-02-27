@@ -47,7 +47,7 @@ const Footer: React.FC = () => {
               <a href="https://www.instagram.com/albasax_official/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gold transition-colors">
                 <Instagram size={20} />
               </a>
-              <a href="https://www.youtube.com/channel/UCIpGeq5gMj7GVYxoHaVlwsg" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gold transition-colors">
+              <a href="https://www.youtube.com/@albasaxofficial" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gold transition-colors">
                 <Youtube size={20} />
               </a>
               <a href="https://www.facebook.com/profile.php?id=100063638557257&locale=it_IT" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gold transition-colors">

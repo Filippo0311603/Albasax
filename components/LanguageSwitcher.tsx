@@ -30,8 +30,7 @@ const LanguageSwitcher: React.FC = () => {
         className="flex items-center gap-1.5 px-2 py-1 text-sm text-gray-400 hover:text-white transition-colors select-none"
         aria-label="Select language"
       >
-        <span className="text-base leading-none">{current.flag}</span>
-        <span className="text-[10px] uppercase tracking-widest hidden sm:inline">{current.code}</span>
+        <span className="text-xl leading-none" style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif' }}>{current.flag}</span>
       </button>
 
       {open && (

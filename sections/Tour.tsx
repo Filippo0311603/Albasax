@@ -22,7 +22,12 @@ const Tour: React.FC = () => {
       </header>
 
       <div className="space-y-4">
-        {TOUR_DATES.map((tour) => (
+        {TOUR_DATES.length === 0 ? (
+          <div className="glass p-16 text-center border-gray-800">
+            <p className="text-2xl font-serif text-gray-400 mb-2">No upcoming shows</p>
+            <p className="text-sm text-gray-600 tracking-widest uppercase">Stay tuned for new dates</p>
+          </div>
+        ) : TOUR_DATES.map((tour) => (
           <div 
             key={tour.id} 
             className="glass p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 hover:border-gold transition-colors group"
