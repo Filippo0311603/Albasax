@@ -68,6 +68,21 @@
 </head>
 <body>
     <div id="root"></div>
+    <!-- Capture Supabase auth type from URL hash BEFORE the JS bundle loads.
+         Once Supabase SDK initializes it clears the hash, so this is the only
+         reliable place to detect recovery / signup verification links. -->
+    <script>
+      (function() {
+        var h = window.location.hash || '';
+        var s = window.location.search || '';
+        var url = h + s;
+        if (url.indexOf('type=recovery') !== -1) {
+          sessionStorage.setItem('supabase_auth_type', 'recovery');
+        } else if (url.indexOf('type=signup') !== -1 || url.indexOf('type=email_change') !== -1) {
+          sessionStorage.setItem('supabase_auth_type', 'signup');
+        }
+      })();
+    </script>
     <script type="module" src="/index.tsx"></script>
 </body>
 </html>

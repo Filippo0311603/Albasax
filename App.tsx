@@ -42,21 +42,23 @@ const App: React.FC = () => {
   const navigate = useNavigate();
 
   // ── Single source of truth for auth state ─────────────────────────────
-  // We use ONLY onAuthStateChange (Supabase v2 recommended pattern).
-  // It fires on mount with the current session AND on every subsequent change.
-  // This avoids the race condition with getSession() resolving after PASSWORD_RECOVERY.
+  // sessionStorage.supabase_auth_type is set by the inline <script> in index.html
+  // BEFORE the Supabase SDK loads and clears the URL hash. This is the only
+  // reliable way to know which type of auth link the user clicked.
   useEffect(() => {
+    const authType = sessionStorage.getItem('supabase_auth_type');
+    // Consume immediately so it doesn't persist across normal navigations
+    if (authType) sessionStorage.removeItem('supabase_auth_type');
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
-        // User clicked the reset-password link in their email.
-        // Do NOT log them in — show the "set new password" form instead.
         setIsRecoveryMode(true);
         setUser(null);
         navigate('/auth', { replace: true });
         return;
       }
 
-      if (session?.user) {
+      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && session?.user) {
         const meta = session.user.user_metadata;
         const fullName = [meta?.first_name, meta?.last_name].filter(Boolean).join(' ') || session.user.email!;
         setUser({
@@ -65,7 +67,14 @@ const App: React.FC = () => {
           firstName: meta?.first_name,
           lastName: meta?.last_name,
         });
-      } else {
+        // If the user arrived via an email verification link, send them to /verified
+        if (event === 'SIGNED_IN' && authType === 'signup') {
+          navigate('/verified', { replace: true });
+        }
+        return;
+      }
+
+      if (!session) {
         setUser(null);
       }
     });
