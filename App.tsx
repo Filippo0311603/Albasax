@@ -8,6 +8,7 @@ import AtmosphereOverlay from './components/AtmosphereOverlay';
 import CookieBanner from './components/CookieBanner';
 import { User } from './types';
 import { supabase } from './supabaseClient';
+import i18n from './i18n/index';
 
 const Hero        = lazy(() => import('./sections/Hero'));
 const Biography   = lazy(() => import('./sections/Biography'));
@@ -25,6 +26,7 @@ const Unsubscribe         = lazy(() => import('./sections/Unsubscribe'));
 const AdminNewsletter     = lazy(() => import('./sections/AdminNewsletter'));
 const NewsletterConfirm   = lazy(() => import('./sections/NewsletterConfirm'));
 const Cart                = lazy(() => import('./sections/Cart'));
+const NotFound            = lazy(() => import('./sections/NotFound'));
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -84,26 +86,53 @@ const App: React.FC = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // SEO Title updates — pathname reflects real URL with BrowserRouter
+  // SEO Title + Description + Canonical — updated per route
   const location = useLocation();
   useEffect(() => {
     const path = location.pathname.replace(/^\//, '').split('/')[0];
-    const pageNames: Record<string, string> = {
-      '':         'Albasax | Official Website',
-      'bio':      'Biography | Albasax',
-      'tour':     'Tour | Albasax',
-      'music':    'Music | Albasax',
-      'shop':     'Shop | Albasax',
-      'media':    'Media | Albasax',
-      'dancers':  'Dancers | Albasax',
-      'press':    'Press | Albasax',
-      'auth':     'Account | Albasax',
-      'verified': 'Email Verified | Albasax',
-      'legal':       'Legal | Albasax',
-      'unsubscribe':  'Unsubscribe | Albasax',
+    const pageMeta: Record<string, { title: string; description: string }> = {
+      '':          { title: 'Albasax | Official Website',  description: 'Sito ufficiale di Albasax. Scopri la nuova musica, le date del tour, la biografia e contenuti esclusivi.' },
+      'bio':       { title: 'Biography | Albasax',         description: 'La storia di Albasax: biografia, influenze artistiche e percorso musicale dell\'artista.' },
+      'tour':      { title: 'Tour | Albasax',              description: 'Concerti e date del tour di Albasax. Trova i biglietti per il prossimo evento live vicino a te.' },
+      'music':     { title: 'Music | Albasax',             description: 'Ascolta la musica di Albasax: singoli e album disponibili su Spotify, Apple Music e YouTube.' },
+      'shop':      { title: 'Shop | Albasax',              description: 'Shop ufficiale di Albasax: merchandise esclusivo e prodotti in edizione limitata.' },
+      'media':     { title: 'Media | Albasax',             description: 'Foto e video ufficiali di Albasax. Galleria media dell\'artista.' },
+      'dancers':   { title: 'Dancers | Albasax',           description: 'I ballerini ufficiali di Albasax: storie, profili e gallery.' },
+      'press':     { title: 'Press | Albasax',             description: 'Rassegna stampa e articoli su Albasax: interviste, recensioni e press kit.' },
+      'auth':      { title: 'Account | Albasax',           description: 'Accedi o registrati al sito ufficiale di Albasax.' },
+      'legal':     { title: 'Legal | Albasax',             description: 'Privacy Policy, Termini di Utilizzo e Cookie Policy di Albasax.' },
     };
-    document.title = pageNames[path] ?? `${path.charAt(0).toUpperCase() + path.slice(1)} | Albasax`;
+    const meta = pageMeta[path] ?? {
+      title: `${path.charAt(0).toUpperCase() + path.slice(1)} | Albasax`,
+      description: 'Sito ufficiale di Albasax.',
+    };
+
+    document.title = meta.title;
+
+    // Meta description
+    const descEl = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    if (descEl) descEl.content = meta.description;
+
+    // Canonical
+    const canonicalEl = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (canonicalEl) canonicalEl.href = `https://albasax.com${location.pathname}`;
+
+    // OG title + description
+    const ogTitle = document.querySelector<HTMLMetaElement>('meta[property="og:title"]');
+    if (ogTitle) ogTitle.content = meta.title;
+    const ogDesc = document.querySelector<HTMLMetaElement>('meta[property="og:description"]');
+    if (ogDesc) ogDesc.content = meta.description;
+    const ogUrl = document.querySelector<HTMLMetaElement>('meta[property="og:url"]');
+    if (ogUrl) ogUrl.content = `https://albasax.com${location.pathname}`;
   }, [location]);
+
+  // html lang — updated when i18n language changes
+  useEffect(() => {
+    const updateLang = (lng: string) => { document.documentElement.lang = lng; };
+    updateLang(i18n.language);
+    i18n.on('languageChanged', updateLang);
+    return () => i18n.off('languageChanged', updateLang);
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col selection:bg-gold-400 selection:text-black">
@@ -142,6 +171,7 @@ const App: React.FC = () => {
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="/newsletter/confirm" element={<NewsletterConfirm />} />
               <Route path="/admin/newsletter" element={<AdminNewsletter />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </main>

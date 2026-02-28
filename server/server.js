@@ -1,5 +1,7 @@
 ﻿import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import { rateLimit } from 'express-rate-limit';
 import dotenv from 'dotenv';
 import crypto from 'crypto';
 import Stripe from 'stripe';
@@ -218,6 +220,10 @@ function buildEmailTemplate({ subject, html, previewText, name, unsubscribeUrl }
 // Middleware
 // NOTA: il webhook Stripe richiede il body RAW (prima di express.json)
 app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' }, // needed for API used by external frontend
+  contentSecurityPolicy: false, // API server, no HTML pages to protect
+}));
 app.use(cors({
   origin: (origin, callback) => {
     const allowed = [
@@ -359,7 +365,14 @@ app.get('/api/newsletter/unsubscribe', async (req, res) => {
 // NEWSLETTER: Subscribe con double opt-in
 // POST /api/newsletter/subscribe
 // Body: { email, name?, source? }
-app.post('/api/newsletter/subscribe', async (req, res) => {
+const newsletterRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minuti
+  max: 5,                    // max 5 richieste per IP per finestra
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'Troppe richieste. Riprova tra qualche minuto.' },
+});
+app.post('/api/newsletter/subscribe', newsletterRateLimit, async (req, res) => {
   const { email, name, source } = req.body;
   if (!email || typeof email !== 'string') {
     return res.status(400).json({ error: 'Email non valida' });
