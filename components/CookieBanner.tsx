@@ -45,9 +45,7 @@ const CookieBanner: React.FC = () => {
   useEffect(() => {
     const consent = loadConsent();
     if (!consent) {
-      // Small delay so page renders first
-      const t = setTimeout(() => setVisible(true), 800);
-      return () => clearTimeout(t);
+      setVisible(true);
     }
   }, []);
 
