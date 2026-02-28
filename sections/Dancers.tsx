@@ -1,12 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { DANCERS } from '../constants';
 import { useTranslation } from 'react-i18next';
 
 const Dancers: React.FC = () => {
   const { t } = useTranslation();
-  useEffect(() => {
-    document.title = "Albasax's Dancers | Albasax";
-  }, []);
 
   return (
     <div className="pt-32 pb-20 px-4 max-w-6xl mx-auto">
