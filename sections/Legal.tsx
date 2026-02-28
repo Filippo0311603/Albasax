@@ -56,10 +56,7 @@ const COOKIES = {
     { heading: '6. Updates', body: `This Cookie Policy may be updated periodically.` },
   ],
 };
-    {
-      heading: '2. Intellectual Property',
-      body: `All content on this Website — including but not limited to music, photographs, videos, graphics, logos, and text — is the exclusive property of Albasax or its licensors and is protected by Italian and international copyright law. Unauthorized reproduction, distribution, or use of any content without prior written permission is strictly prohibited.`,
-    },
+
 const CONTENT: Record<LegalType, typeof TERMS> = {
   terms: TERMS,
   privacy: PRIVACY,
