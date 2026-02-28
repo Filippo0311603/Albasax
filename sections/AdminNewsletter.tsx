@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Send, Lock, Plus, Trash2, Eye, EyeOff, Users, ArrowLeft, Image, Type, Link as LinkIcon, AlertCircle, Upload, Loader } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5001';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://albasax-production.up.railway.app';
 
 // ─── Block types ─────────────────────────────────────────────────────────────
 type BlockType = 'heading' | 'text' | 'button' | 'image' | 'divider' | 'spacer';

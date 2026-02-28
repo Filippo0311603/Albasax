@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, AlertCircle, Loader } from 'lucide-react';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5001';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://albasax-production.up.railway.app';
 
 const Unsubscribe: React.FC = () => {
   const [searchParams] = useSearchParams();
