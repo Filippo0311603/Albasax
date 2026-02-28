@@ -228,6 +228,7 @@ app.use(cors({
   origin: (origin, callback) => {
     const allowed = [
       process.env.CLIENT_URL,
+      'https://albasax.com',
       'https://albasax.vercel.app',
       'http://localhost:3000',
       'http://localhost:3001',

@@ -109,6 +109,17 @@ const App: React.FC = () => {
 
     document.title = meta.title;
 
+    // Robots: noindex for private/utility pages
+    const PRIVATE_PATHS = ['auth', 'verified', 'admin', 'unsubscribe', 'newsletter'];
+    const isPrivate = PRIVATE_PATHS.some(p => path === p || location.pathname.startsWith(`/${p}`));
+    let robotsEl = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
+    if (!robotsEl) {
+      robotsEl = document.createElement('meta');
+      robotsEl.setAttribute('name', 'robots');
+      document.head.appendChild(robotsEl);
+    }
+    robotsEl.content = isPrivate ? 'noindex,nofollow' : 'index,follow';
+
     // Meta description
     const descEl = document.querySelector<HTMLMetaElement>('meta[name="description"]');
     if (descEl) descEl.content = meta.description;
