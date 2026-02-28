@@ -80,7 +80,7 @@ const Footer: React.FC = () => {
               onClick={() => window.dispatchEvent(new Event('albasax:open-cookie-settings'))}
               className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em] transition-colors"
             >
-              Cookie Settings
+              {t('footer.cookieSettings')}
             </button>
           </div>
 
