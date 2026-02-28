@@ -6,7 +6,7 @@ import {
   CheckCircle, AlertCircle, ChevronDown
 } from 'lucide-react';
 import { User } from '../types';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { supabase } from '../supabaseClient';
 
@@ -783,8 +783,8 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout, isRecoveryMode = f
                     onChange={e => fd('terms', e.target.checked)}
                     className="mt-0.5 form-checkbox bg-transparent border-gray-700 text-gold rounded-sm shrink-0" />
                   <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors">
-                    I accept the <span className="text-gold underline cursor-pointer">Terms of Service</span> and{' '}
-                    <span className="text-gold underline cursor-pointer">Privacy Policy</span>. I understand my data will be processed securely. <span className="text-red-500">*</span>
+                    I accept the <Link to="/legal/terms" className="text-gold underline" target="_blank">Terms of Service</Link> and{' '}
+                    <Link to="/legal/privacy" className="text-gold underline" target="_blank">Privacy Policy</Link>. I understand my data will be processed securely. <span className="text-red-500">*</span>
                   </span>
                 </label>
               </div>
