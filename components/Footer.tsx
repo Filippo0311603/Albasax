@@ -76,6 +76,12 @@ const Footer: React.FC = () => {
             <Link to="/legal/privacy" className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em]">{t('footer.privacy')}</Link>
             <Link to="/legal/terms" className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em]">{t('footer.terms')}</Link>
             <Link to="/legal/cookies" className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em]">{t('footer.cookies')}</Link>
+            <button
+              onClick={() => window.dispatchEvent(new Event('albasax:open-cookie-settings'))}
+              className="text-gray-600 hover:text-white text-[10px] uppercase tracking-[0.2em] transition-colors"
+            >
+              Cookie Settings
+            </button>
           </div>
 
           <button 

@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import PageTransition from './components/PageTransition';
 import AtmosphereOverlay from './components/AtmosphereOverlay';
+import CookieBanner from './components/CookieBanner';
 import { User } from './types';
 import { supabase } from './supabaseClient';
 
@@ -150,6 +151,7 @@ const App: React.FC = () => {
       
       {/* Dynamic Overlay Components */}
       {isCartOpen && <Cart onClose={() => setIsCartOpen(false)} items={cartItems} />}
+      <CookieBanner />
     </div>
   );
 };

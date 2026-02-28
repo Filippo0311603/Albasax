@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Send, Check, Loader } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 const API = import.meta.env.VITE_SERVER_URL || 'https://albasax-production.up.railway.app';
@@ -11,11 +12,13 @@ const Newsletter: React.FC = () => {
   const { t } = useTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [gdprChecked, setGdprChecked] = useState(false);
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!gdprChecked) return;
     setStatus('loading');
     try {
       const res = await fetch(`${API}/api/newsletter/subscribe`, {
@@ -79,6 +82,21 @@ const Newsletter: React.FC = () => {
           {status === 'error' && (
             <p className="text-red-500 text-xs mt-2">{message}</p>
           )}
+          {/* GDPR Checkbox */}
+          <div className="flex items-start gap-3 pt-3">
+            <input
+              id="newsletter-gdpr"
+              type="checkbox"
+              checked={gdprChecked}
+              onChange={(e) => setGdprChecked(e.target.checked)}
+              required
+              className="mt-0.5 w-3.5 h-3.5 accent-gold cursor-pointer flex-shrink-0"
+            />
+            <label htmlFor="newsletter-gdpr" className="text-[10px] text-gray-500 leading-relaxed cursor-pointer">
+              I agree to receive email updates about upcoming releases and artistic projects in accordance with the{' '}
+              <Link to="/legal/privacy" className="text-gray-400 hover:text-gold underline">Privacy Policy</Link>.
+            </label>
+          </div>
         </form>
       )}
     </div>
