@@ -201,23 +201,6 @@ const Navbar: React.FC<NavbarProps> = ({ user, cartCount, onCartClick }) => {
               <LanguageSwitcher />
             </div>
           </div>
-          
-          {/* Explosion Effects */}
-          {explosions.map(note => (
-            <span
-              key={note.id}
-              className="fixed pointer-events-none text-gold animate-float-up opacity-0"
-              style={{
-                left: `${note.x}px`,
-                top: `${note.y}px`,
-                fontSize: '18px',
-                animation: `float-up 0.8s ease-out forwards`,
-                textShadow: '0 0 8px rgba(197, 166, 67, 0.6)',
-              }}
-            >
-              {note.symbol}
-            </span>
-          ))}
         </div>
       )}
 

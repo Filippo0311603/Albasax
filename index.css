@@ -20,13 +20,6 @@
 }
 
 @font-face {
-  font-family: 'Core Deco A1';
-  src: url('/fonts/Core Deco A1.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
   font-family: 'Park Lane';
   src: url('/fonts/Park Lane NF.ttf') format('truetype');
   font-weight: normal;
