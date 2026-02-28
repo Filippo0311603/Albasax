@@ -91,20 +91,20 @@ const App: React.FC = () => {
   useEffect(() => {
     const path = location.pathname.replace(/^\//, '').split('/')[0];
     const pageMeta: Record<string, { title: string; description: string }> = {
-      '':          { title: 'Albasax | Official Website',  description: 'Sito ufficiale di Albasax. Scopri la nuova musica, le date del tour, la biografia e contenuti esclusivi.' },
-      'bio':       { title: 'Biography | Albasax',         description: 'La storia di Albasax: biografia, influenze artistiche e percorso musicale dell\'artista.' },
-      'tour':      { title: 'Tour | Albasax',              description: 'Concerti e date del tour di Albasax. Trova i biglietti per il prossimo evento live vicino a te.' },
-      'music':     { title: 'Music | Albasax',             description: 'Ascolta la musica di Albasax: singoli e album disponibili su Spotify, Apple Music e YouTube.' },
-      'shop':      { title: 'Shop | Albasax',              description: 'Shop ufficiale di Albasax: merchandise esclusivo e prodotti in edizione limitata.' },
-      'media':     { title: 'Media | Albasax',             description: 'Foto e video ufficiali di Albasax. Galleria media dell\'artista.' },
-      'dancers':   { title: 'Dancers | Albasax',           description: 'I ballerini ufficiali di Albasax: storie, profili e gallery.' },
-      'press':     { title: 'Press | Albasax',             description: 'Rassegna stampa e articoli su Albasax: interviste, recensioni e press kit.' },
-      'auth':      { title: 'Account | Albasax',           description: 'Accedi o registrati al sito ufficiale di Albasax.' },
-      'legal':     { title: 'Legal | Albasax',             description: 'Privacy Policy, Termini di Utilizzo e Cookie Policy di Albasax.' },
+      '':          { title: 'Albasax | Official Website',  description: 'Official website of Albasax. Discover new music, tour dates, biography and exclusive content.' },
+      'bio':       { title: 'Biography | Albasax',         description: 'The story of Albasax: biography, artistic influences and musical journey.' },
+      'tour':      { title: 'Tour | Albasax',              description: 'Albasax tour dates and live events. Find tickets for the next show near you.' },
+      'music':     { title: 'Music | Albasax',             description: 'Listen to Albasax\'s music: singles and albums on Spotify, Apple Music and YouTube.' },
+      'shop':      { title: 'Shop | Albasax',              description: 'Official Albasax shop: exclusive merchandise and limited edition products.' },
+      'media':     { title: 'Media | Albasax',             description: 'Official Albasax photos and videos. Artist media gallery.' },
+      'dancers':   { title: 'Dancers | Albasax',           description: 'The official Albasax dancers: stories, profiles and gallery.' },
+      'press':     { title: 'Press | Albasax',             description: 'Press coverage and articles about Albasax: interviews, reviews and press kit.' },
+      'auth':      { title: 'Account | Albasax',           description: 'Sign in or create your Albasax account.' },
+      'legal':     { title: 'Legal | Albasax',             description: 'Privacy Policy, Terms of Use and Cookie Policy of Albasax.' },
     };
     const meta = pageMeta[path] ?? {
       title: `${path.charAt(0).toUpperCase() + path.slice(1)} | Albasax`,
-      description: 'Sito ufficiale di Albasax.',
+      description: 'Official website of Albasax.',
     };
 
     document.title = meta.title;
