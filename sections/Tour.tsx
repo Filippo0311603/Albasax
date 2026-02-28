@@ -51,6 +51,8 @@ const Tour: React.FC = () => {
             <div className="w-full md:w-auto">
               <a 
                 href={tour.ticketUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className={`w-full md:w-auto inline-flex items-center justify-center px-8 py-3 rounded-sm transition-all tracking-widest text-sm font-bold uppercase
                   ${tour.status === 'Available' 
                     ? 'bg-white text-black hover:bg-gold hover:text-white' 
