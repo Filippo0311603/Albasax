@@ -22,9 +22,8 @@ i18n
       pt: { translation: pt },
     },
     fallbackLng: 'en',
-    lng: 'en', // default English
     detection: {
-      order: ['localStorage', 'navigator'],
+      order: ['localStorage'],
       caches: ['localStorage'],
     },
     interpolation: {
