@@ -2,12 +2,14 @@
 import React from 'react';
 import { PRESS_ARTICLES } from '../constants';
 import { ExternalLink, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Press: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <div className="pt-32 pb-20 px-4 max-w-5xl mx-auto">
       <header className="mb-12 text-center">
-        <h2 className="text-5xl font-serif mb-4">Press</h2>
+        <h2 className="text-5xl font-serif mb-4">{t('press.title')}</h2>
         <div className="h-1 w-20 bg-gold mx-auto" />
       </header>
 
@@ -59,7 +61,7 @@ const Press: React.FC = () => {
                 {/* Link esterno */}
                 <div className="flex items-center gap-1 text-gray-500 text-xs mt-2">
                   <ExternalLink size={12} />
-                  <span className="group-hover:text-gold transition-colors">Read full article</span>
+                  <span className="group-hover:text-gold transition-colors">{t('press.readMore')}</span>
                 </div>
               </div>
             </article>

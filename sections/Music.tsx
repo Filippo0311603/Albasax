@@ -1,13 +1,14 @@
 
 import React from 'react';
 import { MUSIC_RELEASES } from '../constants';
-import { ExternalLink } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Music: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <div className="pt-24 md:pt-32 pb-16 md:pb-20 px-4 max-w-7xl mx-auto">
       <header className="mb-10 md:mb-16 text-center">
-        <h2 className="text-4xl md:text-5xl font-serif mb-4">Music</h2>
+        <h2 className="text-4xl md:text-5xl font-serif mb-4">{t('music.title')}</h2>
         <div className="h-1 w-20 bg-gold mx-auto" />
       </header>
 
