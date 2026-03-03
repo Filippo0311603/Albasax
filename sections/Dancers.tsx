@@ -48,7 +48,7 @@ const Dancers: React.FC = () => {
             <img
               src="/dancers/foto-gruppo-alb.webp"
               alt="Albasax's Dancers - Foto di gruppo"
-              className="w-full h-auto sm:h-full object-contain sm:object-cover group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-auto sm:h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           </picture>
         </div>
