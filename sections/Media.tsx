@@ -18,7 +18,7 @@ const Media: React.FC = () => {
         {MEDIA_GALLERY.map((item) => (
           <div 
             key={item.id} 
-            className="relative break-inside-avoid group cursor-pointer overflow-hidden"
+            className="relative break-inside-avoid group cursor-pointer overflow-hidden border border-transparent hover:border-gold active:border-gold transition-all duration-300"
             onClick={() => setSelectedItem(item)}
           >
             {item.type === 'video' ? (
