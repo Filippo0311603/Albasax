@@ -16,20 +16,20 @@ const Dancers: React.FC = () => {
         {DANCERS.map((dancer) => (
           <div
             key={dancer.id}
-            className="group relative overflow-hidden bg-gray-900/50 border border-gray-800 hover:border-gold transition-all duration-300"
+            className="group relative overflow-hidden bg-gray-900/50 border border-gray-800 hover:border-gold active:border-gold transition-all duration-300"
           >
             {/* Foto */}
             <div className="aspect-[3/4] overflow-hidden">
               <img
                 src={dancer.photoUrl}
                 alt={`${dancer.firstName} ${dancer.lastName}`}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full object-cover group-hover:scale-105 group-active:scale-105 transition-transform duration-500"
               />
             </div>
 
             {/* Overlay con nome */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-6">
-              <h3 className="text-2xl text-white group-hover:text-gold transition-colors tracking-wider uppercase" style={{ fontFamily: 'ClassyVogue, sans-serif' }}>
+              <h3 className="text-2xl text-white group-hover:text-gold group-active:text-gold transition-colors tracking-wider uppercase" style={{ fontFamily: 'ClassyVogue, sans-serif' }}>
                 {dancer.firstName}
               </h3>
               <p className="text-lg text-gray-300 tracking-wider uppercase">
@@ -41,16 +41,16 @@ const Dancers: React.FC = () => {
       </div>
 
       {/* Foto di gruppo */}
-      <div className="mt-16 group relative overflow-hidden bg-gray-900/50 border border-gray-800 hover:border-gold transition-all duration-300">
+      <div className="mt-16 group relative overflow-hidden bg-gray-900/50 border border-gray-800 hover:border-gold active:border-gold transition-all duration-300">
         <div className="w-full sm:aspect-[16/9] md:aspect-[21/9] overflow-hidden">
           <img
             src="/dancers/foto-gruppo-mobile.webp"
             alt="Albasax's Dancers - Foto di gruppo"
-            className="w-full h-auto sm:h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-auto sm:h-full object-cover group-hover:scale-105 group-active:scale-105 transition-transform duration-500"
           />
         </div>
         <div className="py-5 px-6 text-center border-t border-gray-800 bg-black/60">
-          <h3 className="text-2xl font-serif text-white group-hover:text-gold transition-colors tracking-widest uppercase">
+          <h3 className="text-2xl font-serif text-white group-hover:text-gold group-active:text-gold transition-colors tracking-widest uppercase">
             {t('dancers.title')}
           </h3>
         </div>

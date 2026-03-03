@@ -26,7 +26,7 @@ const Media: React.FC = () => {
                 <img 
                   src={item.thumbnail} 
                   alt={item.title} 
-                  className="w-full h-auto grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+                  className="w-full h-auto grayscale group-hover:grayscale-0 group-active:grayscale-0 group-hover:scale-105 group-active:scale-105 transition-all duration-500"
                 />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/20 transition-all">
                   <div className="p-4 bg-white/20 backdrop-blur-md rounded-full border border-white/30">
@@ -38,7 +38,7 @@ const Media: React.FC = () => {
               <img 
                 src={item.url} 
                 alt={item.title} 
-                className="w-full h-auto grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+                className="w-full h-auto grayscale group-hover:grayscale-0 group-active:grayscale-0 group-hover:scale-105 group-active:scale-105 transition-all duration-500"
               />
             )}
             

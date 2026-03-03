@@ -10,9 +10,9 @@ const Biography: React.FC = () => {
           <img 
             src="/IMG_2492.webp" 
             alt="Albasax Portrait" 
-            className="w-full h-auto grayscale hover:grayscale-0 transition-all duration-1000 shadow-2xl"
+            className="w-full h-auto grayscale hover:grayscale-0 active:grayscale-0 transition-all duration-1000 shadow-2xl"
           />
-          <div className="absolute -bottom-8 -right-8 w-64 h-64 border-8 border-gold -z-10 hidden md:block" />
+          <div className="absolute -bottom-4 -right-4 md:-bottom-8 md:-right-8 w-32 h-32 md:w-64 md:h-64 border-4 md:border-8 border-gold -z-10" />
         </div>
 
         <div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-700">
