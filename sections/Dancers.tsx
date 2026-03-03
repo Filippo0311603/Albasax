@@ -43,14 +43,11 @@ const Dancers: React.FC = () => {
       {/* Foto di gruppo */}
       <div className="mt-16 group relative overflow-hidden bg-gray-900/50 border border-gray-800 hover:border-gold transition-all duration-300">
         <div className="w-full sm:aspect-[16/9] md:aspect-[21/9] overflow-hidden">
-          <picture>
-            <source media="(max-width: 767px)" srcSet="/dancers/foto-gruppo-mobile.webp" />
-            <img
-              src="/dancers/foto-gruppo-alb.webp"
-              alt="Albasax's Dancers - Foto di gruppo"
-              className="w-full h-auto sm:h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-          </picture>
+          <img
+            src="/dancers/foto-gruppo-mobile.webp"
+            alt="Albasax's Dancers - Foto di gruppo"
+            className="w-full h-auto sm:h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
         </div>
         <div className="py-5 px-6 text-center border-t border-gray-800 bg-black/60">
           <h3 className="text-2xl font-serif text-white group-hover:text-gold transition-colors tracking-widest uppercase">
