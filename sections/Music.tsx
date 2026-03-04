@@ -12,11 +12,15 @@ const Music: React.FC = () => {
   useEffect(() => {
     supabase.from('music_releases').select('*').order('sort_order').order('created_at').then(({ data }) => {
       if (data && data.length > 0) {
-        setReleases(data.map(r => ({
+        const fromDb: MusicRelease[] = data.map(r => ({
           id: r.id, title: r.title, year: r.year, type: r.type,
           coverUrl: r.cover_url,
           links: { spotify: r.spotify_url || '#', apple: r.apple_url || '#' },
-        })));
+        }));
+        // Keep constants that haven't been added to Supabase yet (dedup by title)
+        const dbTitles = new Set(fromDb.map(r => r.title.toLowerCase()));
+        const onlyInConstants = MUSIC_RELEASES.filter(r => !dbTitles.has(r.title.toLowerCase()));
+        setReleases([...fromDb, ...onlyInConstants]);
       }
     });
   }, []);

@@ -391,11 +391,15 @@ const Admin: React.FC = () => {
 
   const seedMusic = async () => {
     setSeeding('music');
-    const rows = MUSIC_RELEASES.map((r, i) => ({
-      title: r.title, year: r.year, type: r.type,
-      cover_url: r.coverUrl, spotify_url: r.links?.spotify || '',
-      apple_url: r.links?.apple || '', sort_order: i,
-    }));
+    const existing = new Set(musicList.map((r: any) => r.title.toLowerCase()));
+    const rows = MUSIC_RELEASES
+      .filter(r => !existing.has(r.title.toLowerCase()))
+      .map((r, i) => ({
+        title: r.title, year: r.year, type: r.type,
+        cover_url: r.coverUrl, spotify_url: r.links?.spotify || '',
+        apple_url: r.links?.apple || '', sort_order: musicList.length + i,
+      }));
+    if (rows.length === 0) { showToast('Già tutti presenti'); setSeeding(null); return; }
     const { error } = await supabase.from('music_releases').insert(rows);
     setSeeding(null);
     if (error) { showToast(error.message, 'error'); return; }
@@ -406,10 +410,14 @@ const Admin: React.FC = () => {
 
   const seedPress = async () => {
     setSeeding('press');
-    const rows = PRESS_ARTICLES.map((r, i) => ({
-      title: r.title, outlet: r.outlet, date: r.date,
-      excerpt: r.excerpt, image_url: r.imageUrl, url: r.url, sort_order: i,
-    }));
+    const existing = new Set(pressList.map((r: any) => r.url?.toLowerCase()));
+    const rows = PRESS_ARTICLES
+      .filter(r => !existing.has(r.url?.toLowerCase()))
+      .map((r, i) => ({
+        title: r.title, outlet: r.outlet, date: r.date,
+        excerpt: r.excerpt, image_url: r.imageUrl, url: r.url, sort_order: pressList.length + i,
+      }));
+    if (rows.length === 0) { showToast('Già tutti presenti'); setSeeding(null); return; }
     const { error } = await supabase.from('press_articles').insert(rows);
     setSeeding(null);
     if (error) { showToast(error.message, 'error'); return; }
@@ -420,9 +428,13 @@ const Admin: React.FC = () => {
 
   const seedMedia = async () => {
     setSeeding('media');
-    const rows = MEDIA_GALLERY.map((r, i) => ({
-      type: r.type, url: r.url, thumbnail: r.thumbnail || '', title: r.title || '', sort_order: i,
-    }));
+    const existing = new Set(mediaList.map((r: any) => r.url?.toLowerCase()));
+    const rows = MEDIA_GALLERY
+      .filter(r => !existing.has(r.url?.toLowerCase()))
+      .map((r, i) => ({
+        type: r.type, url: r.url, thumbnail: r.thumbnail || '', title: r.title || '', sort_order: mediaList.length + i,
+      }));
+    if (rows.length === 0) { showToast('Già tutti presenti'); setSeeding(null); return; }
     const { error } = await supabase.from('media_gallery').insert(rows);
     setSeeding(null);
     if (error) { showToast(error.message, 'error'); return; }

@@ -13,10 +13,13 @@ const Press: React.FC = () => {
   useEffect(() => {
     supabase.from('press_articles').select('*').order('sort_order').order('created_at').then(({ data }) => {
       if (data && data.length > 0) {
-        setArticles(data.map(r => ({
+        const fromDb: PressArticle[] = data.map(r => ({
           id: r.id, title: r.title, outlet: r.outlet,
           date: r.date, excerpt: r.excerpt, imageUrl: r.image_url, url: r.url,
-        })));
+        }));
+        const dbUrls = new Set(fromDb.map(r => r.url?.toLowerCase()));
+        const onlyInConstants = PRESS_ARTICLES.filter(r => !dbUrls.has(r.url?.toLowerCase()));
+        setArticles([...fromDb, ...onlyInConstants]);
       }
     });
   }, []);

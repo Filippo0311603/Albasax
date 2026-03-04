@@ -12,10 +12,13 @@ const Media: React.FC = () => {
   useEffect(() => {
     supabase.from('media_gallery').select('*').order('sort_order').order('created_at').then(({ data }) => {
       if (data && data.length > 0) {
-        setGallery(data.map(r => ({
+        const fromDb: MediaItem[] = data.map(r => ({
           id: r.id, type: r.type as 'image' | 'video',
           url: r.url, thumbnail: r.thumbnail || undefined, title: r.title,
-        })));
+        }));
+        const dbUrls = new Set(fromDb.map(r => r.url.toLowerCase()));
+        const onlyInConstants = MEDIA_GALLERY.filter(r => !dbUrls.has(r.url.toLowerCase()));
+        setGallery([...fromDb, ...onlyInConstants]);
       }
     });
   }, []);
