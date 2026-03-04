@@ -340,6 +340,18 @@ app.get('/api/admin/subscribers', async (req, res) => {
   res.json({ count: data.length, subscribers: data });
 });
 
+// ADMIN: Elimina iscritto
+// DELETE /api/admin/subscribers/:id
+app.delete('/api/admin/subscribers/:id', async (req, res) => {
+  if (req.headers['x-admin-secret'] !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const { id } = req.params;
+  const { error } = await supabase.from('newsletter_subscribers').delete().eq('id', id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true });
+});
+
 // NEWSLETTER: Unsubscribe via link email
 // GET /api/newsletter/unsubscribe?id=xxx&token=xxx
 app.get('/api/newsletter/unsubscribe', async (req, res) => {

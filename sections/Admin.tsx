@@ -169,6 +169,7 @@ const Admin: React.FC = () => {
   // UI
   const [activeTab, setActiveTab] = useState<Tab>('newsletter');
   const [toast, setToast] = useState<{ msg: string; type: 'ok' | 'error' } | null>(null);
+  const [showSubscribers, setShowSubscribers] = useState(false);
   const showToast = (msg: string, type: 'ok' | 'error' = 'ok') => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 4000);
@@ -176,6 +177,7 @@ const Admin: React.FC = () => {
 
   // ── Newsletter state ──
   const [subCount, setSubCount] = useState<number | null>(null);
+  const [subscribers, setSubscribers] = useState<any[]>([]);
   const [nlSubject, setNlSubject] = useState('');
   const [nlPreview, setNlPreview] = useState('');
   const [blocks, setBlocks] = useState<Block[]>(defaultBlocks());
@@ -217,6 +219,7 @@ const Admin: React.FC = () => {
     if (!res || !res.ok) { setAuthErr('Password errata o server non raggiungibile.'); return; }
     const data = await res.json();
     setSubCount(data.count ?? 0);
+    if (data.subscribers) setSubscribers(data.subscribers);
     setAuthed(true);
     loadAll();
   };
@@ -234,6 +237,18 @@ const Admin: React.FC = () => {
     if (p.data) setPressList(p.data);
     if (med.data) setMediaList(med.data);
     if (s.data) setShopList(s.data);
+  };
+
+  // ── Newsletter subscribers ─────────────────────────────────────────────────
+  const deleteSubscriber = async (id: string) => {
+    const res = await fetch(`${SERVER_URL}/api/admin/subscribers/${id}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-secret': secret },
+    }).catch(() => null);
+    if (!res || !res.ok) { showToast('Errore eliminazione iscritto', 'error'); return; }
+    setSubscribers(prev => prev.filter(s => s.id !== id));
+    setSubCount(prev => (prev ?? 1) - 1);
+    showToast('Iscritto eliminato');
   };
 
   // ── Newsletter ────────────────────────────────────────────────────────────
@@ -477,6 +492,32 @@ const Admin: React.FC = () => {
                   <Send size={14} />
                   {sending ? 'Invio…' : `Invia a ${subCount} iscritti`}
                 </button>
+              </div>
+              {/* Subscriber list */}
+              <div className="glass border border-gray-800 p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Iscritti ({subCount})</h2>
+                  <button onClick={() => setShowSubscribers(v => !v)} className="text-[10px] uppercase tracking-widest text-gray-600 hover:text-gold transition-colors">
+                    {showSubscribers ? 'Nascondi' : 'Mostra lista'}
+                  </button>
+                </div>
+                {showSubscribers && (
+                  <div className="space-y-1 max-h-96 overflow-y-auto">
+                    {subscribers.length === 0 && <p className="text-gray-700 text-sm">Nessun iscritto.</p>}
+                    {subscribers.map(s => (
+                      <div key={s.id} className="flex items-center gap-3 py-2 border-b border-gray-900 group">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white text-sm truncate">{s.email}</p>
+                          <p className="text-gray-700 text-xs">{s.name || '—'} · {s.active ? <span className="text-green-600">attivo</span> : <span className="text-red-700">inattivo</span>}</p>
+                        </div>
+                        <button onClick={() => deleteSubscriber(s.id)}
+                          className="opacity-0 group-hover:opacity-100 text-gray-700 hover:text-red-500 transition-all flex-shrink-0">
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               {sendResult && (
                 <div className={`p-4 border text-sm ${sendResult.error ? 'border-red-800 bg-red-900/10 text-red-400' : sendResult.dispatching ? 'border-gold/30 bg-gold/5 text-gold' : 'border-green-800 bg-green-900/10 text-green-400'}`}>
