@@ -4,9 +4,10 @@ import {
   Send, Lock, Plus, Trash2, Eye, EyeOff, Users, ArrowLeft, Image,
   Type, Link as LinkIcon, AlertCircle, Upload, Loader, Music2,
   MapPin, Newspaper, ImageIcon, ShoppingBag, X, Check, Save,
-  Mail, Calendar, ExternalLink,
+  Mail, Calendar, ExternalLink, Database,
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { MUSIC_RELEASES, PRESS_ARTICLES, MEDIA_GALLERY } from '../constants';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://albasax-production.up.railway.app';
 
@@ -385,6 +386,51 @@ const Admin: React.FC = () => {
     showToast('Eliminato');
   };
 
+  // ── Seed dati di default ──────────────────────────────────────────────────
+  const [seeding, setSeeding] = useState<string | null>(null);
+
+  const seedMusic = async () => {
+    setSeeding('music');
+    const rows = MUSIC_RELEASES.map((r, i) => ({
+      title: r.title, year: r.year, type: r.type,
+      cover_url: r.coverUrl, spotify_url: r.links?.spotify || '',
+      apple_url: r.links?.apple || '', sort_order: i,
+    }));
+    const { error } = await supabase.from('music_releases').insert(rows);
+    setSeeding(null);
+    if (error) { showToast(error.message, 'error'); return; }
+    const { data } = await supabase.from('music_releases').select('*').order('sort_order').order('created_at');
+    if (data) setMusicList(data);
+    showToast(`${rows.length} brani importati!`);
+  };
+
+  const seedPress = async () => {
+    setSeeding('press');
+    const rows = PRESS_ARTICLES.map((r, i) => ({
+      title: r.title, outlet: r.outlet, date: r.date,
+      excerpt: r.excerpt, image_url: r.imageUrl, url: r.url, sort_order: i,
+    }));
+    const { error } = await supabase.from('press_articles').insert(rows);
+    setSeeding(null);
+    if (error) { showToast(error.message, 'error'); return; }
+    const { data } = await supabase.from('press_articles').select('*').order('sort_order').order('created_at');
+    if (data) setPressList(data);
+    showToast(`${rows.length} articoli importati!`);
+  };
+
+  const seedMedia = async () => {
+    setSeeding('media');
+    const rows = MEDIA_GALLERY.map((r, i) => ({
+      type: r.type, url: r.url, thumbnail: r.thumbnail || '', title: r.title || '', sort_order: i,
+    }));
+    const { error } = await supabase.from('media_gallery').insert(rows);
+    setSeeding(null);
+    if (error) { showToast(error.message, 'error'); return; }
+    const { data } = await supabase.from('media_gallery').select('*').order('sort_order').order('created_at');
+    if (data) setMediaList(data);
+    showToast(`${rows.length} elementi importati!`);
+  };
+
   // ── Login screen ──────────────────────────────────────────────────────────
   if (!authed) return (
     <div className="min-h-screen bg-black flex items-center justify-center px-4">
@@ -545,7 +591,14 @@ const Admin: React.FC = () => {
           <div className="space-y-8">
             {/* List */}
             <div className="glass border border-gray-800 p-6">
-              <h2 className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-6">Singoli & Album pubblicati ({musicList.length})</h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Singoli & Album pubblicati ({musicList.length})</h2>
+                <button onClick={seedMusic} disabled={seeding === 'music'}
+                  className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-800 text-gray-600 hover:border-gold hover:text-gold text-[10px] uppercase tracking-widest transition-all disabled:opacity-50">
+                  {seeding === 'music' ? <Loader size={10} className="animate-spin" /> : <Database size={10} />}
+                  Importa default
+                </button>
+              </div>
               {musicList.length === 0
                 ? <p className="text-gray-700 text-sm">Nessun contenuto in Supabase. Aggiungi il primo qui sotto.</p>
                 : <div className="space-y-3">
@@ -632,7 +685,14 @@ const Admin: React.FC = () => {
         {activeTab === 'press' && (
           <div className="space-y-8">
             <div className="glass border border-gray-800 p-6">
-              <h2 className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-6">Articoli press ({pressList.length})</h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Articoli press ({pressList.length})</h2>
+                <button onClick={seedPress} disabled={seeding === 'press'}
+                  className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-800 text-gray-600 hover:border-gold hover:text-gold text-[10px] uppercase tracking-widest transition-all disabled:opacity-50">
+                  {seeding === 'press' ? <Loader size={10} className="animate-spin" /> : <Database size={10} />}
+                  Importa default
+                </button>
+              </div>
               {pressList.length === 0
                 ? <p className="text-gray-700 text-sm">Nessun articolo in Supabase.</p>
                 : <div className="space-y-3">
@@ -672,7 +732,14 @@ const Admin: React.FC = () => {
         {activeTab === 'media' && (
           <div className="space-y-8">
             <div className="glass border border-gray-800 p-6">
-              <h2 className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-6">Galleria media ({mediaList.length})</h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Galleria media ({mediaList.length})</h2>
+                <button onClick={seedMedia} disabled={seeding === 'media'}
+                  className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-800 text-gray-600 hover:border-gold hover:text-gold text-[10px] uppercase tracking-widest transition-all disabled:opacity-50">
+                  {seeding === 'media' ? <Loader size={10} className="animate-spin" /> : <Database size={10} />}
+                  Importa default
+                </button>
+              </div>
               {mediaList.length === 0
                 ? <p className="text-gray-700 text-sm">Nessun contenuto in Supabase.</p>
                 : <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
