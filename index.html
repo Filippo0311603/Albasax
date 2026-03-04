@@ -131,5 +131,19 @@
       })();
     </script>
     <script type="module" src="/index.tsx"></script>
+    <script>
+      // PWA manifest + service worker only active on /admin
+      if (window.location.pathname.startsWith('/admin')) {
+        var link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = '/manifest.json';
+        document.head.appendChild(link);
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js').catch(function() {});
+          });
+        }
+      }
+    </script>
 </body>
 </html>

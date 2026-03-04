@@ -1,0 +1,39 @@
+{
+  "name": "Albasax Admin",
+  "short_name": "Albasax",
+  "description": "Albasax official website & admin panel",
+  "start_url": "/admin",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#c5a643",
+  "orientation": "any",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/logo_alb.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Admin Panel",
+      "short_name": "Admin",
+      "url": "/admin",
+      "description": "Accedi al pannello di gestione"
+    },
+    {
+      "name": "Sito Ufficiale",
+      "short_name": "Sito",
+      "url": "/",
+      "description": "Homepage Albasax"
+    }
+  ]
+}
