@@ -1,11 +1,25 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { TOUR_DATES } from '../constants';
+import { supabase } from '../supabaseClient';
+import { TourDate } from '../types';
 import { MapPin, Ticket } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const Tour: React.FC = () => {
   const { t } = useTranslation();
+  const [dates, setDates] = useState<TourDate[]>(TOUR_DATES);
+
+  useEffect(() => {
+    supabase.from('tour_dates').select('*').order('date').then(({ data }) => {
+      if (data && data.length > 0) {
+        setDates(data.map(r => ({
+          id: r.id, date: r.date, venue: r.venue,
+          location: r.location, status: r.status, ticketUrl: r.ticket_url || '#',
+        })));
+      }
+    });
+  }, []);
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('en-US', {
       month: 'short',
@@ -22,12 +36,12 @@ const Tour: React.FC = () => {
       </header>
 
       <div className="space-y-4">
-        {TOUR_DATES.length === 0 ? (
+        {dates.length === 0 ? (
           <div className="glass p-16 text-center border-gray-800">
             <p className="text-2xl font-serif text-gray-400 mb-2">No upcoming shows</p>
             <p className="text-sm text-gray-600 tracking-widest uppercase">Stay tuned for new dates</p>
           </div>
-        ) : TOUR_DATES.map((tour) => (
+        ) : dates.map((tour) => (
           <div 
             key={tour.id} 
             className="glass p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 hover:border-gold transition-colors group"

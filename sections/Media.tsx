@@ -1,11 +1,24 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MEDIA_GALLERY } from '../constants';
+import { supabase } from '../supabaseClient';
 import { Play, X } from 'lucide-react';
 import { MediaItem } from '../types';
 
 const Media: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
+  const [gallery, setGallery] = useState<MediaItem[]>(MEDIA_GALLERY);
+
+  useEffect(() => {
+    supabase.from('media_gallery').select('*').order('sort_order').order('created_at').then(({ data }) => {
+      if (data && data.length > 0) {
+        setGallery(data.map(r => ({
+          id: r.id, type: r.type as 'image' | 'video',
+          url: r.url, thumbnail: r.thumbnail || undefined, title: r.title,
+        })));
+      }
+    });
+  }, []);
 
   return (
     <div className="pt-32 pb-20 px-4 max-w-7xl mx-auto">
@@ -15,7 +28,7 @@ const Media: React.FC = () => {
       </header>
 
       <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-        {MEDIA_GALLERY.map((item) => (
+        {gallery.map((item) => (
           <div 
             key={item.id} 
             className="relative break-inside-avoid group cursor-pointer overflow-hidden border border-transparent hover:border-gold active:border-gold transition-all duration-300"

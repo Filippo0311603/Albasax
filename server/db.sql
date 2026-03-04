@@ -174,3 +174,65 @@ ALTER TABLE newsletter_subscribers
 
 -- I vecchi iscritti (già attivi) vengono considerati confermati
 UPDATE newsletter_subscribers SET confirmed = TRUE WHERE active = TRUE;
+
+-- ─────────────────────────────────────────────
+-- 9. CONTENT TABLES (gestite dall'Admin panel)
+--    Eseguire nel Supabase SQL Editor
+-- ─────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS music_releases (
+  id          TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  title       TEXT NOT NULL,
+  year        TEXT NOT NULL,
+  type        TEXT NOT NULL DEFAULT 'Single',
+  cover_url   TEXT NOT NULL DEFAULT '',
+  spotify_url TEXT DEFAULT '',
+  apple_url   TEXT DEFAULT '',
+  sort_order  INTEGER DEFAULT 0,
+  created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+ALTER TABLE music_releases ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public read music_releases" ON music_releases FOR SELECT USING (true);
+CREATE POLICY "Admin all music_releases"   ON music_releases FOR ALL USING (true) WITH CHECK (true);
+
+CREATE TABLE IF NOT EXISTS tour_dates (
+  id          TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  date        DATE NOT NULL,
+  venue       TEXT NOT NULL,
+  location    TEXT NOT NULL,
+  status      TEXT NOT NULL DEFAULT 'Available',
+  ticket_url  TEXT DEFAULT '',
+  sort_order  INTEGER DEFAULT 0,
+  created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+ALTER TABLE tour_dates ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public read tour_dates" ON tour_dates FOR SELECT USING (true);
+CREATE POLICY "Admin all tour_dates"   ON tour_dates FOR ALL USING (true) WITH CHECK (true);
+
+CREATE TABLE IF NOT EXISTS press_articles (
+  id          TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  title       TEXT NOT NULL,
+  outlet      TEXT NOT NULL,
+  date        TEXT NOT NULL,
+  excerpt     TEXT DEFAULT '',
+  image_url   TEXT DEFAULT '',
+  url         TEXT NOT NULL,
+  sort_order  INTEGER DEFAULT 0,
+  created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+ALTER TABLE press_articles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public read press_articles" ON press_articles FOR SELECT USING (true);
+CREATE POLICY "Admin all press_articles"   ON press_articles FOR ALL USING (true) WITH CHECK (true);
+
+CREATE TABLE IF NOT EXISTS media_gallery (
+  id          TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  type        TEXT NOT NULL DEFAULT 'image',
+  url         TEXT NOT NULL,
+  thumbnail   TEXT DEFAULT '',
+  title       TEXT DEFAULT '',
+  sort_order  INTEGER DEFAULT 0,
+  created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+ALTER TABLE media_gallery ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public read media_gallery" ON media_gallery FOR SELECT USING (true);
+CREATE POLICY "Admin all media_gallery"   ON media_gallery FOR ALL USING (true) WITH CHECK (true);

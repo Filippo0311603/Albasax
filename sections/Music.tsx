@@ -1,10 +1,25 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { MUSIC_RELEASES } from '../constants';
+import { supabase } from '../supabaseClient';
+import { MusicRelease } from '../types';
 import { useTranslation } from 'react-i18next';
 
 const Music: React.FC = () => {
   const { t } = useTranslation();
+  const [releases, setReleases] = useState<MusicRelease[]>(MUSIC_RELEASES);
+
+  useEffect(() => {
+    supabase.from('music_releases').select('*').order('sort_order').order('created_at').then(({ data }) => {
+      if (data && data.length > 0) {
+        setReleases(data.map(r => ({
+          id: r.id, title: r.title, year: r.year, type: r.type,
+          coverUrl: r.cover_url,
+          links: { spotify: r.spotify_url || '#', apple: r.apple_url || '#' },
+        })));
+      }
+    });
+  }, []);
   return (
     <div className="pt-24 md:pt-32 pb-16 md:pb-20 px-4 max-w-7xl mx-auto">
       <header className="mb-10 md:mb-16 text-center">
@@ -13,7 +28,7 @@ const Music: React.FC = () => {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-        {MUSIC_RELEASES.map((release) => (
+        {releases.map((release) => (
           <div key={release.id} className="group cursor-pointer">
             <div className="relative aspect-square mb-6 overflow-hidden">
               <img 
