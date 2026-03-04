@@ -242,6 +242,37 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// ─── Admin rate limiter: max 10 requests / 15 min per IP ──────────────────────
+const adminRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Troppi tentativi. Riprova tra 15 minuti.' },
+});
+
+// Failed-auth lockout: after 5 wrong passwords, block IP for 30 min
+const failedAttempts = new Map(); // ip -> { count, lockedUntil }
+function checkAuthLockout(ip) {
+  const entry = failedAttempts.get(ip);
+  if (!entry) return null;
+  if (entry.lockedUntil && Date.now() < entry.lockedUntil) {
+    const mins = Math.ceil((entry.lockedUntil - Date.now()) / 60000);
+    return `IP bloccato per troppi tentativi errati. Riprova tra ${mins} minuti.`;
+  }
+  return null;
+}
+function recordFailedAuth(ip) {
+  const entry = failedAttempts.get(ip) || { count: 0, lockedUntil: null };
+  entry.count += 1;
+  if (entry.count >= 5) {
+    entry.lockedUntil = Date.now() + 30 * 60 * 1000;
+    entry.count = 0;
+  }
+  failedAttempts.set(ip, entry);
+}
+function clearFailedAuth(ip) { failedAttempts.delete(ip); }
+
 // Health check
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -328,10 +359,15 @@ app.post('/api/stripe/webhook', async (req, res) => {
 
 // ADMIN: Lista iscritti alla newsletter
 // GET /api/admin/subscribers  (richiede header x-admin-secret)
-app.get('/api/admin/subscribers', async (req, res) => {
+app.get('/api/admin/subscribers', adminRateLimit, async (req, res) => {
+  const ip = req.ip;
+  const lockMsg = checkAuthLockout(ip);
+  if (lockMsg) return res.status(429).json({ error: lockMsg });
   if (req.headers['x-admin-secret'] !== process.env.ADMIN_SECRET) {
+    recordFailedAuth(ip);
     return res.status(401).json({ error: 'Unauthorized' });
   }
+  clearFailedAuth(ip);
   const { data, error } = await supabase
     .from('newsletter_subscribers')
     .select('*')
@@ -342,8 +378,12 @@ app.get('/api/admin/subscribers', async (req, res) => {
 
 // ADMIN: Elimina iscritto
 // DELETE /api/admin/subscribers/:id
-app.delete('/api/admin/subscribers/:id', async (req, res) => {
+app.delete('/api/admin/subscribers/:id', adminRateLimit, async (req, res) => {
+  const ip = req.ip;
+  const lockMsg = checkAuthLockout(ip);
+  if (lockMsg) return res.status(429).json({ error: lockMsg });
   if (req.headers['x-admin-secret'] !== process.env.ADMIN_SECRET) {
+    recordFailedAuth(ip);
     return res.status(401).json({ error: 'Unauthorized' });
   }
   const { id } = req.params;
@@ -492,8 +532,9 @@ const newsletterJobs = {};
 // POST /api/admin/send-newsletter  (richiede header x-admin-secret)
 // Body: { subject, html, previewText? }
 // Risponde subito con jobId; l'invio avviene in background via batch Resend
-app.post('/api/admin/send-newsletter', async (req, res) => {
+app.post('/api/admin/send-newsletter', adminRateLimit, async (req, res) => {
   if (req.headers['x-admin-secret'] !== process.env.ADMIN_SECRET) {
+    recordFailedAuth(req.ip);
     return res.status(401).json({ error: 'Unauthorized' });
   }
   const { subject, html, previewText } = req.body;
@@ -570,13 +611,44 @@ app.post('/api/admin/send-newsletter', async (req, res) => {
 });
 
 // GET /api/admin/newsletter-status/:jobId
-app.get('/api/admin/newsletter-status/:jobId', (req, res) => {
+app.get('/api/admin/newsletter-status/:jobId', adminRateLimit, (req, res) => {
   if (req.headers['x-admin-secret'] !== process.env.ADMIN_SECRET) {
+    recordFailedAuth(req.ip);
     return res.status(401).json({ error: 'Unauthorized' });
   }
   const job = newsletterJobs[req.params.jobId];
   if (!job) return res.status(404).json({ error: 'Job non trovato' });
   res.json(job);
+});
+
+// ADMIN: Content table CRUD (usa service_role, bypassa RLS)
+// Tabelle consentite — whitelist per evitare SQL injection generica
+const ALLOWED_TABLES = new Set(['music_releases', 'tour_dates', 'press_articles', 'media_gallery', 'products']);
+
+// POST /api/admin/content/:table — inserisce una riga
+app.post('/api/admin/content/:table', adminRateLimit, async (req, res) => {
+  if (req.headers['x-admin-secret'] !== process.env.ADMIN_SECRET) {
+    recordFailedAuth(req.ip);
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const { table } = req.params;
+  if (!ALLOWED_TABLES.has(table)) return res.status(400).json({ error: 'Tabella non consentita' });
+  const { data, error } = await supabase.from(table).insert([req.body]).select().single();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ data });
+});
+
+// DELETE /api/admin/content/:table/:id — elimina una riga
+app.delete('/api/admin/content/:table/:id', adminRateLimit, async (req, res) => {
+  if (req.headers['x-admin-secret'] !== process.env.ADMIN_SECRET) {
+    recordFailedAuth(req.ip);
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const { table, id } = req.params;
+  if (!ALLOWED_TABLES.has(table)) return res.status(400).json({ error: 'Tabella non consentita' });
+  const { error } = await supabase.from(table).delete().eq('id', id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true });
 });
 
 // Start

@@ -176,8 +176,10 @@ ALTER TABLE newsletter_subscribers
 UPDATE newsletter_subscribers SET confirmed = TRUE WHERE active = TRUE;
 
 -- ─────────────────────────────────────────────
--- 9. CONTENT TABLES (gestite dall'Admin panel)
+-- 9. CONTENT TABLES (gestite dall'Admin panel via Railway service_role)
 --    Eseguire nel Supabase SQL Editor
+--    NOTA SICUREZZA: solo SELECT è permesso all'anon key.
+--    Le scritture passano da Railway (service_role bypassa RLS).
 -- ─────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS music_releases (
@@ -193,7 +195,7 @@ CREATE TABLE IF NOT EXISTS music_releases (
 );
 ALTER TABLE music_releases ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public read music_releases" ON music_releases FOR SELECT USING (true);
-CREATE POLICY "Admin all music_releases"   ON music_releases FOR ALL USING (true) WITH CHECK (true);
+-- Scritture solo via service_role (Railway) — nessuna policy per anon
 
 CREATE TABLE IF NOT EXISTS tour_dates (
   id          TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
@@ -207,7 +209,6 @@ CREATE TABLE IF NOT EXISTS tour_dates (
 );
 ALTER TABLE tour_dates ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public read tour_dates" ON tour_dates FOR SELECT USING (true);
-CREATE POLICY "Admin all tour_dates"   ON tour_dates FOR ALL USING (true) WITH CHECK (true);
 
 CREATE TABLE IF NOT EXISTS press_articles (
   id          TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
@@ -222,7 +223,6 @@ CREATE TABLE IF NOT EXISTS press_articles (
 );
 ALTER TABLE press_articles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public read press_articles" ON press_articles FOR SELECT USING (true);
-CREATE POLICY "Admin all press_articles"   ON press_articles FOR ALL USING (true) WITH CHECK (true);
 
 CREATE TABLE IF NOT EXISTS media_gallery (
   id          TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
@@ -235,4 +235,10 @@ CREATE TABLE IF NOT EXISTS media_gallery (
 );
 ALTER TABLE media_gallery ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public read media_gallery" ON media_gallery FOR SELECT USING (true);
-CREATE POLICY "Admin all media_gallery"   ON media_gallery FOR ALL USING (true) WITH CHECK (true);
+
+-- ── Se hai già eseguito le tabelle con le policy aperte, esegui questo
+--    per chiuderle (rimuove write pubblico):
+-- DROP POLICY IF EXISTS "Admin all music_releases"   ON music_releases;
+-- DROP POLICY IF EXISTS "Admin all tour_dates"        ON tour_dates;
+-- DROP POLICY IF EXISTS "Admin all press_articles"    ON press_articles;
+-- DROP POLICY IF EXISTS "Admin all media_gallery"     ON media_gallery;

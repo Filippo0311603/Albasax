@@ -166,6 +166,8 @@ const Admin: React.FC = () => {
   const [secret, setSecret] = useState('');
   const [authed, setAuthed] = useState(false);
   const [authErr, setAuthErr] = useState('');
+  const [authAttempts, setAuthAttempts] = useState(0);
+  const [lockedUntil, setLockedUntil] = useState<number | null>(null);
 
   // UI
   const [activeTab, setActiveTab] = useState<Tab>('newsletter');
@@ -214,13 +216,31 @@ const Admin: React.FC = () => {
   // ── Auth ──────────────────────────────────────────────────────────────────
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault(); setAuthErr('');
+    if (lockedUntil && Date.now() < lockedUntil) {
+      const mins = Math.ceil((lockedUntil - Date.now()) / 60000);
+      setAuthErr(`Troppi tentativi errati. Riprova tra ${mins} minuto${mins > 1 ? 'i' : ''}.`);
+      return;
+    }
     const res = await fetch(`${SERVER_URL}/api/admin/subscribers`, {
       headers: { 'x-admin-secret': secret },
     }).catch(() => null);
-    if (!res || !res.ok) { setAuthErr('Password errata o server non raggiungibile.'); return; }
+    if (!res || !res.ok) {
+      const newAttempts = authAttempts + 1;
+      setAuthAttempts(newAttempts);
+      if (newAttempts >= 5) {
+        setLockedUntil(Date.now() + 30 * 60 * 1000);
+        setAuthAttempts(0);
+        setAuthErr('Troppi tentativi errati. Account bloccato per 30 minuti.');
+      } else {
+        setAuthErr(`Password errata. Tentativi rimasti: ${5 - newAttempts}`);
+      }
+      return;
+    }
     const data = await res.json();
     setSubCount(data.count ?? 0);
     if (data.subscribers) setSubscribers(data.subscribers);
+    setAuthAttempts(0);
+    setLockedUntil(null);
     setAuthed(true);
     loadAll();
   };
@@ -238,6 +258,26 @@ const Admin: React.FC = () => {
     if (p.data) setPressList(p.data);
     if (med.data) setMediaList(med.data);
     if (s.data) setShopList(s.data);
+  };
+
+  // Helper: writes through Railway (service_role key, bypasses Supabase RLS)
+  const adminPost = async (table: string, body: object) => {
+    const res = await fetch(`${SERVER_URL}/api/admin/content/${table}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': secret },
+      body: JSON.stringify(body),
+    }).catch(() => null);
+    if (!res) throw new Error('Errore di rete');
+    const json = await res.json();
+    if (!res.ok || json.error) throw new Error(json.error || 'Errore server');
+    return json.data;
+  };
+  const adminDelete = async (table: string, id: string) => {
+    const res = await fetch(`${SERVER_URL}/api/admin/content/${table}/${id}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-secret': secret },
+    }).catch(() => null);
+    if (!res || !res.ok) throw new Error('Errore eliminazione');
   };
 
   // ── Newsletter subscribers ─────────────────────────────────────────────────
@@ -285,105 +325,95 @@ const Admin: React.FC = () => {
   const saveMusic = async () => {
     if (!musicForm.title.trim() || !musicForm.year.trim()) { showToast('Titolo e anno obbligatori', 'error'); return; }
     setMusicSaving(true);
-    const { error } = await supabase.from('music_releases').insert([{
-      ...musicForm, sort_order: musicList.length,
-    }]);
+    try {
+      await adminPost('music_releases', { ...musicForm, sort_order: musicList.length });
+      showToast('Singolo/Album aggiunto!');
+      setMusicForm({ title: '', year: new Date().getFullYear().toString(), type: 'Single', cover_url: '', spotify_url: '', apple_url: '' });
+      const { data } = await supabase.from('music_releases').select('*').order('sort_order').order('created_at');
+      if (data) setMusicList(data);
+    } catch (e: any) { showToast(e.message, 'error'); }
     setMusicSaving(false);
-    if (error) { showToast(error.message, 'error'); return; }
-    showToast('Singolo/Album aggiunto!');
-    setMusicForm({ title: '', year: new Date().getFullYear().toString(), type: 'Single', cover_url: '', spotify_url: '', apple_url: '' });
-    const { data } = await supabase.from('music_releases').select('*').order('sort_order').order('created_at');
-    if (data) setMusicList(data);
   };
   const deleteMusic = async (id: string) => {
-    await supabase.from('music_releases').delete().eq('id', id);
-    setMusicList(prev => prev.filter(r => r.id !== id));
-    showToast('Eliminato');
+    try { await adminDelete('music_releases', id); setMusicList(prev => prev.filter(r => r.id !== id)); showToast('Eliminato'); }
+    catch (e: any) { showToast(e.message, 'error'); }
   };
 
   // ── Tour CRUD ─────────────────────────────────────────────────────────────
   const saveTour = async () => {
     if (!tourForm.date || !tourForm.venue.trim() || !tourForm.location.trim()) { showToast('Data, venue e location obbligatori', 'error'); return; }
     setTourSaving(true);
-    const { error } = await supabase.from('tour_dates').insert([tourForm]);
+    try {
+      await adminPost('tour_dates', tourForm);
+      showToast('Data aggiunta!');
+      setTourForm({ date: '', venue: '', location: '', status: 'Available', ticket_url: '' });
+      const { data } = await supabase.from('tour_dates').select('*').order('date');
+      if (data) setTourList(data);
+    } catch (e: any) { showToast(e.message, 'error'); }
     setTourSaving(false);
-    if (error) { showToast(error.message, 'error'); return; }
-    showToast('Data aggiunta!');
-    setTourForm({ date: '', venue: '', location: '', status: 'Available', ticket_url: '' });
-    const { data } = await supabase.from('tour_dates').select('*').order('date');
-    if (data) setTourList(data);
   };
   const deleteTour = async (id: string) => {
-    await supabase.from('tour_dates').delete().eq('id', id);
-    setTourList(prev => prev.filter(r => r.id !== id));
-    showToast('Eliminato');
+    try { await adminDelete('tour_dates', id); setTourList(prev => prev.filter(r => r.id !== id)); showToast('Eliminato'); }
+    catch (e: any) { showToast(e.message, 'error'); }
   };
 
   // ── Press CRUD ────────────────────────────────────────────────────────────
   const savePress = async () => {
     if (!pressForm.title.trim() || !pressForm.outlet.trim() || !pressForm.url.trim()) { showToast('Titolo, outlet e URL obbligatori', 'error'); return; }
     setPressSaving(true);
-    const { error } = await supabase.from('press_articles').insert([{
-      ...pressForm, sort_order: pressList.length,
-    }]);
+    try {
+      await adminPost('press_articles', { ...pressForm, sort_order: pressList.length });
+      showToast('Articolo aggiunto!');
+      setPressForm({ title: '', outlet: '', date: '', excerpt: '', image_url: '', url: '' });
+      const { data } = await supabase.from('press_articles').select('*').order('sort_order').order('created_at');
+      if (data) setPressList(data);
+    } catch (e: any) { showToast(e.message, 'error'); }
     setPressSaving(false);
-    if (error) { showToast(error.message, 'error'); return; }
-    showToast('Articolo aggiunto!');
-    setPressForm({ title: '', outlet: '', date: '', excerpt: '', image_url: '', url: '' });
-    const { data } = await supabase.from('press_articles').select('*').order('sort_order').order('created_at');
-    if (data) setPressList(data);
   };
   const deletePress = async (id: string) => {
-    await supabase.from('press_articles').delete().eq('id', id);
-    setPressList(prev => prev.filter(r => r.id !== id));
-    showToast('Eliminato');
+    try { await adminDelete('press_articles', id); setPressList(prev => prev.filter(r => r.id !== id)); showToast('Eliminato'); }
+    catch (e: any) { showToast(e.message, 'error'); }
   };
 
   // ── Media CRUD ────────────────────────────────────────────────────────────
   const saveMedia = async () => {
     if (!mediaForm.url.trim()) { showToast('URL immagine/video obbligatorio', 'error'); return; }
     setMediaSaving(true);
-    const { error } = await supabase.from('media_gallery').insert([{
-      ...mediaForm, sort_order: mediaList.length,
-    }]);
+    try {
+      await adminPost('media_gallery', { ...mediaForm, sort_order: mediaList.length });
+      showToast('Aggiunto alla galleria!');
+      setMediaForm({ type: 'image', url: '', thumbnail: '', title: '' });
+      const { data } = await supabase.from('media_gallery').select('*').order('sort_order').order('created_at');
+      if (data) setMediaList(data);
+    } catch (e: any) { showToast(e.message, 'error'); }
     setMediaSaving(false);
-    if (error) { showToast(error.message, 'error'); return; }
-    showToast('Aggiunto alla galleria!');
-    setMediaForm({ type: 'image', url: '', thumbnail: '', title: '' });
-    const { data } = await supabase.from('media_gallery').select('*').order('sort_order').order('created_at');
-    if (data) setMediaList(data);
   };
   const deleteMedia = async (id: string) => {
-    await supabase.from('media_gallery').delete().eq('id', id);
-    setMediaList(prev => prev.filter(r => r.id !== id));
-    showToast('Eliminato');
+    try { await adminDelete('media_gallery', id); setMediaList(prev => prev.filter(r => r.id !== id)); showToast('Eliminato'); }
+    catch (e: any) { showToast(e.message, 'error'); }
   };
 
   // ── Shop CRUD ─────────────────────────────────────────────────────────────
   const saveShop = async () => {
     if (!shopForm.name.trim() || !shopForm.price) { showToast('Nome e prezzo obbligatori', 'error'); return; }
     setShopSaving(true);
-    const { error } = await supabase.from('products').insert([{
-      name: shopForm.name.trim(),
-      description: shopForm.description.trim(),
-      price: parseFloat(shopForm.price),
-      image_url: shopForm.image_url,
-      category: shopForm.category,
-      stock: parseInt(shopForm.stock) || 0,
-      stripe_price_id: shopForm.stripe_price_id.trim() || null,
-      active: true,
-    }]);
+    try {
+      await adminPost('products', {
+        name: shopForm.name.trim(), description: shopForm.description.trim(),
+        price: parseFloat(shopForm.price), image_url: shopForm.image_url,
+        category: shopForm.category, stock: parseInt(shopForm.stock) || 0,
+        stripe_price_id: shopForm.stripe_price_id.trim() || null, active: true,
+      });
+      showToast('Prodotto aggiunto!');
+      setShopForm({ name: '', description: '', price: '', image_url: '', category: 'vinyl', stock: '0', stripe_price_id: '' });
+      const { data } = await supabase.from('products').select('*').order('created_at');
+      if (data) setShopList(data);
+    } catch (e: any) { showToast(e.message, 'error'); }
     setShopSaving(false);
-    if (error) { showToast(error.message, 'error'); return; }
-    showToast('Prodotto aggiunto!');
-    setShopForm({ name: '', description: '', price: '', image_url: '', category: 'vinyl', stock: '0', stripe_price_id: '' });
-    const { data } = await supabase.from('products').select('*').order('created_at');
-    if (data) setShopList(data);
   };
   const deleteShop = async (id: string) => {
-    await supabase.from('products').delete().eq('id', id);
-    setShopList(prev => prev.filter(r => r.id !== id));
-    showToast('Eliminato');
+    try { await adminDelete('products', id); setShopList(prev => prev.filter(r => r.id !== id)); showToast('Eliminato'); }
+    catch (e: any) { showToast(e.message, 'error'); }
   };
 
   // ── Seed dati di default ──────────────────────────────────────────────────
@@ -400,12 +430,13 @@ const Admin: React.FC = () => {
         apple_url: r.links?.apple || '', sort_order: musicList.length + i,
       }));
     if (rows.length === 0) { showToast('Già tutti presenti'); setSeeding(null); return; }
-    const { error } = await supabase.from('music_releases').insert(rows);
+    try {
+      for (const row of rows) await adminPost('music_releases', row);
+      const { data } = await supabase.from('music_releases').select('*').order('sort_order').order('created_at');
+      if (data) setMusicList(data);
+      showToast(`${rows.length} brani importati!`);
+    } catch (e: any) { showToast(e.message, 'error'); }
     setSeeding(null);
-    if (error) { showToast(error.message, 'error'); return; }
-    const { data } = await supabase.from('music_releases').select('*').order('sort_order').order('created_at');
-    if (data) setMusicList(data);
-    showToast(`${rows.length} brani importati!`);
   };
 
   const seedPress = async () => {
@@ -418,12 +449,13 @@ const Admin: React.FC = () => {
         excerpt: r.excerpt, image_url: r.imageUrl, url: r.url, sort_order: pressList.length + i,
       }));
     if (rows.length === 0) { showToast('Già tutti presenti'); setSeeding(null); return; }
-    const { error } = await supabase.from('press_articles').insert(rows);
+    try {
+      for (const row of rows) await adminPost('press_articles', row);
+      const { data } = await supabase.from('press_articles').select('*').order('sort_order').order('created_at');
+      if (data) setPressList(data);
+      showToast(`${rows.length} articoli importati!`);
+    } catch (e: any) { showToast(e.message, 'error'); }
     setSeeding(null);
-    if (error) { showToast(error.message, 'error'); return; }
-    const { data } = await supabase.from('press_articles').select('*').order('sort_order').order('created_at');
-    if (data) setPressList(data);
-    showToast(`${rows.length} articoli importati!`);
   };
 
   const seedMedia = async () => {
@@ -435,12 +467,13 @@ const Admin: React.FC = () => {
         type: r.type, url: r.url, thumbnail: r.thumbnail || '', title: r.title || '', sort_order: mediaList.length + i,
       }));
     if (rows.length === 0) { showToast('Già tutti presenti'); setSeeding(null); return; }
-    const { error } = await supabase.from('media_gallery').insert(rows);
+    try {
+      for (const row of rows) await adminPost('media_gallery', row);
+      const { data } = await supabase.from('media_gallery').select('*').order('sort_order').order('created_at');
+      if (data) setMediaList(data);
+      showToast(`${rows.length} elementi importati!`);
+    } catch (e: any) { showToast(e.message, 'error'); }
     setSeeding(null);
-    if (error) { showToast(error.message, 'error'); return; }
-    const { data } = await supabase.from('media_gallery').select('*').order('sort_order').order('created_at');
-    if (data) setMediaList(data);
-    showToast(`${rows.length} elementi importati!`);
   };
 
   // ── Login screen ──────────────────────────────────────────────────────────
@@ -459,7 +492,8 @@ const Admin: React.FC = () => {
               className="w-full bg-transparent border border-gray-800 pl-9 pr-4 py-3 text-sm text-white outline-none focus:border-gold transition-all" />
           </div>
           {authErr && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle size={12} />{authErr}</p>}
-          <button type="submit" className="w-full py-3 bg-gold text-black font-bold uppercase tracking-widest text-xs hover:bg-gold/90 transition-all">Accedi</button>
+          <button type="submit" disabled={!!(lockedUntil && Date.now() < lockedUntil)}
+            className="w-full py-3 bg-gold text-black font-bold uppercase tracking-widest text-xs hover:bg-gold/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed">Accedi</button>
         </form>
       </div>
     </div>
