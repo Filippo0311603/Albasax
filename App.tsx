@@ -6,9 +6,13 @@ import Footer from './components/Footer';
 import PageTransition from './components/PageTransition';
 import AtmosphereOverlay from './components/AtmosphereOverlay';
 import CookieBanner from './components/CookieBanner';
+import ComingSoon from './components/ComingSoon';
 import { User } from './types';
 import { supabase } from './supabaseClient';
 import i18n from './i18n/index';
+
+// Data e ora di lancio: sabato 7 marzo 2026 ore 14:00 CET
+const LAUNCH_DATE = new Date('2026-03-07T13:00:00Z');
 
 const Hero        = lazy(() => import('./sections/Hero'));
 const Biography   = lazy(() => import('./sections/Biography'));
@@ -41,10 +45,29 @@ const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  // True while the user is in the recovery flow (clicked reset-password email link)
   const [isRecoveryMode, setIsRecoveryMode] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // ── Coming Soon guard ─────────────────────────────────────────────────
+  // Admin bypass: path /admin/* OPPURE ?backstage=albasax2026
+  const isAdminBypass =
+    location.pathname.startsWith('/admin') ||
+    new URLSearchParams(location.search).get('backstage') === 'albasax2026';
+
+  const [revealed, setRevealed] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    if (Date.now() >= LAUNCH_DATE.getTime()) return true;       // già scaduto
+    return localStorage.getItem('albasax_sipario') === 'true';  // già aperto da questo browser
+  });
+
+  const handleReveal = () => {
+    localStorage.setItem('albasax_sipario', 'true');
+    setRevealed(true);
+  };
+
+  const showCurtain = !isAdminBypass && !revealed;
 
   // ── Single source of truth for auth state ─────────────────────────────
   // sessionStorage.supabase_auth_type is set by the inline <script> in index.html
@@ -88,7 +111,6 @@ const App: React.FC = () => {
   }, []);
 
   // SEO Title + Description + Canonical — updated per route
-  const location = useLocation();
   useEffect(() => {
     const path = location.pathname.replace(/^\//, '').split('/')[0];
     const pageMeta: Record<string, { title: string; description: string }> = {
@@ -150,6 +172,10 @@ const App: React.FC = () => {
     <div className="min-h-screen flex flex-col selection:bg-gold-400 selection:text-black">
       <AtmosphereOverlay />
       <ScrollToTop />
+
+      {/* Coming Soon curtain — overlay sopra tutto, trasparente dopo reveal */}
+      {showCurtain && <ComingSoon onReveal={handleReveal} />}
+
       <Navbar 
         user={user} 
         cartCount={cartItems.length} 
