@@ -598,7 +598,9 @@ const newsletterJobs = {};
 
 // POST /api/admin/send-newsletter  (richiede header x-admin-secret)
 // Body: { subject, html, previewText? }
-// Risponde subito con jobId; l'invio avviene in background via batch Resend
+// 1. Crea campagna + coda persistente su Supabase
+// 2. Invia subito fino a 90 email — le rimanenti vengono processate dal cron notturno
+// 3. Ogni destinatario è garantito di ricevere l'email (massimo qualche giorno di ritardo)
 app.post('/api/admin/send-newsletter', adminRateLimit, async (req, res) => {
   if (req.headers['x-admin-secret'] !== process.env.ADMIN_SECRET) {
     recordFailedAuth(req.ip);
@@ -615,25 +617,65 @@ app.post('/api/admin/send-newsletter', adminRateLimit, async (req, res) => {
   if (fetchErr) return res.status(500).json({ error: fetchErr.message });
   if (!subscribers || subscribers.length === 0) return res.json({ sent: 0, total: 0, jobId: null });
 
-  const jobId = Date.now().toString();
-  const job = { total: subscribers.length, sent: 0, failed: 0, failedList: [], done: false };
+  // 1. Crea campagna persistente
+  const { data: campaign, error: campErr } = await supabase
+    .from('newsletter_campaigns')
+    .insert([{ subject, preview_text: previewText || '', html_body: html, total: subscribers.length, status: 'queued' }])
+    .select('id')
+    .single();
+  if (campErr) return res.status(500).json({ error: campErr.message });
+
+  // 2. Inserisce tutta la coda in un unico batch
+  const queueRows = subscribers.map(sub => ({
+    campaign_id: campaign.id,
+    subscriber_id: sub.id,
+    email: sub.email,
+    name: sub.name || '',
+    sent: false,
+  }));
+  const { error: queueErr } = await supabase.from('newsletter_queue').insert(queueRows);
+  if (queueErr) return res.status(500).json({ error: queueErr.message });
+
+  // Aggiorna stato campagna
+  await supabase.from('newsletter_campaigns').update({ status: 'sending' }).eq('id', campaign.id);
+
+  const jobId = campaign.id;
+  const job = { total: subscribers.length, sent: 0, failed: 0, done: false, campaignId: campaign.id };
   newsletterJobs[jobId] = job;
 
   // Rispondi subito al client
   res.json({ dispatching: true, total: subscribers.length, jobId });
 
-  // Invio asincrono in background
-  setImmediate(async () => {
-    const clientUrl = process.env.CLIENT_URL || 'https://albasax.com';
-    const fromAddress = process.env.NEWSLETTER_FROM || 'Albasax <newsletter@albasax.com>';
-    const delay = (ms) => new Promise((r) => setTimeout(r, ms));
-    const BATCH_SIZE = 50; // Resend batch: max 100, usiamo 50 per sicurezza
+  // 3. Invia subito (fino a 90 per rispettare il limite giornaliero)
+  setImmediate(() => processNewsletterQueue(campaign.id, subject, html, previewText, job));
+});
 
-    // Costruisci tutti i payload
-    const emails = subscribers.map((sub) => {
-      const token = generateUnsubscribeToken(sub.id);
-      const unsubscribeUrl = `${clientUrl}/unsubscribe?id=${sub.id}&token=${token}`;
-      return {
+// ── Processa coda newsletter: invia fino a maxEmails per sessione ────────────
+async function processNewsletterQueue(campaignId, subject, html, previewText, job, maxEmails = 90) {
+  const { data: pending } = await supabase
+    .from('newsletter_queue')
+    .select('id, email, name, subscriber_id')
+    .eq('campaign_id', campaignId)
+    .eq('sent', false)
+    .order('created_at', { ascending: true })
+    .limit(maxEmails);
+
+  if (!pending || pending.length === 0) {
+    await finalizeCampaign(campaignId, job);
+    return;
+  }
+
+  const fromAddress = process.env.NEWSLETTER_FROM || 'Albasax <newsletter@albasax.com>';
+  const serverUrl = process.env.SERVER_URL || 'https://albasax-production.up.railway.app';
+  const delay = (ms) => new Promise(r => setTimeout(r, ms));
+  const BATCH_SIZE = 50;
+
+  const emails = pending.map(sub => {
+    const token = generateUnsubscribeToken(sub.subscriber_id);
+    const unsubscribeUrl = `${serverUrl}/api/newsletter/unsubscribe?id=${sub.subscriber_id}&token=${token}`;
+    return {
+      queueId: sub.id,
+      payload: {
         from: fromAddress,
         to: sub.email,
         reply_to: 'info@albasax.com',
@@ -645,37 +687,58 @@ app.post('/api/admin/send-newsletter', adminRateLimit, async (req, res) => {
           'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
           'Precedence': 'bulk',
         },
-      };
-    });
-
-    // Spezza in chunk da BATCH_SIZE e invia con pausa tra i batch
-    for (let i = 0; i < emails.length; i += BATCH_SIZE) {
-      const chunk = emails.slice(i, i + BATCH_SIZE);
-      try {
-        console.log(`[Newsletter][${jobId}] Batch ${Math.floor(i / BATCH_SIZE) + 1}: sending ${chunk.length} emails...`);
-        const result = await resend.batch.send(chunk);
-        if (result.error) {
-          const errMsg = result.error.message || JSON.stringify(result.error);
-          console.error(`[Newsletter][${jobId}] Batch error:`, errMsg);
-          chunk.forEach((e) => job.failedList.push({ email: e.to, reason: errMsg }));
-          job.failed += chunk.length;
-        } else {
-          job.sent += chunk.length;
-          console.log(`[Newsletter][${jobId}] Batch OK — sent so far: ${job.sent}/${job.total}`);
-        }
-      } catch (err) {
-        console.error(`[Newsletter][${jobId}] Batch exception:`, err.message);
-        chunk.forEach((e) => job.failedList.push({ email: e.to, reason: err.message }));
-        job.failed += chunk.length;
-      }
-      // Pausa tra batch: 1.5 sec (rate limit Resend: 2 req/sec, abbondante margine)
-      if (i + BATCH_SIZE < emails.length) await delay(1500);
-    }
-
-    job.done = true;
-    console.log(`[Newsletter][${jobId}] DONE — sent: ${job.sent}, failed: ${job.failed}/${job.total}`);
+      },
+    };
   });
-});
+
+  for (let i = 0; i < emails.length; i += BATCH_SIZE) {
+    const chunk = emails.slice(i, i + BATCH_SIZE);
+    const queueIds = chunk.map(e => e.queueId);
+    try {
+      const result = await resend.batch.send(chunk.map(e => e.payload));
+      if (result.error) {
+        const errMsg = result.error.message || JSON.stringify(result.error);
+        console.error(`[Newsletter][${campaignId}] Batch error:`, errMsg);
+        await supabase.from('newsletter_queue').update({ error: errMsg }).in('id', queueIds);
+        if (job) job.failed += chunk.length;
+      } else {
+        await supabase.from('newsletter_queue').update({ sent: true, sent_at: new Date().toISOString() }).in('id', queueIds);
+        if (job) job.sent += chunk.length;
+        console.log(`[Newsletter][${campaignId}] Batch OK — sent: ${job?.sent}/${job?.total}`);
+      }
+    } catch (err) {
+      console.error(`[Newsletter][${campaignId}] Batch exception:`, err.message);
+      // Rate limit hit — ferma l'invio, il cron notturno continua
+      if (err.statusCode === 429 || err.message?.includes('rate') || err.message?.includes('limit')) {
+        console.warn(`[Newsletter][${campaignId}] Rate limit raggiunto — coda riprenderà dal cron notturno`);
+        break;
+      }
+      await supabase.from('newsletter_queue').update({ error: err.message }).in('id', queueIds);
+      if (job) job.failed += chunk.length;
+    }
+    if (i + BATCH_SIZE < emails.length) await delay(1500);
+  }
+
+  // Controlla se la coda è completamente svuotata
+  const { count } = await supabase
+    .from('newsletter_queue')
+    .select('id', { count: 'exact', head: true })
+    .eq('campaign_id', campaignId)
+    .eq('sent', false);
+
+  if (count === 0) {
+    await finalizeCampaign(campaignId, job);
+  } else {
+    console.log(`[Newsletter][${campaignId}] ${count} email rimanenti in coda — verranno inviate dal cron notturno`);
+    if (job) job.done = true; // Per il polling del pannello admin: consideriamo il job "done" lato UI
+  }
+}
+
+async function finalizeCampaign(campaignId, job) {
+  await supabase.from('newsletter_campaigns').update({ status: 'done', completed_at: new Date().toISOString() }).eq('id', campaignId);
+  if (job) job.done = true;
+  console.log(`[Newsletter][${campaignId}] Campagna completata`);
+}
 
 // GET /api/admin/newsletter-status/:jobId
 app.get('/api/admin/newsletter-status/:jobId', adminRateLimit, (req, res) => {
@@ -688,58 +751,151 @@ app.get('/api/admin/newsletter-status/:jobId', adminRateLimit, (req, res) => {
   res.json(job);
 });
 
-// CRON: Invio email di benvenuto ai pending (welcome_sent = false)
+// CRON: Processa tutta la coda email pendente (welcome + newsletter)
 // GET /api/cron/send-pending-welcomes
 // Chiamato ogni notte da cron-job.org — protetto da CRON_SECRET
+// Budget giornaliero: 90 email (conservativo su Resend free 100/giorno)
 app.get('/api/cron/send-pending-welcomes', async (req, res) => {
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret || req.headers['x-cron-secret'] !== cronSecret) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  // Prende tutti i confermati che non hanno ancora ricevuto il benvenuto
-  const { data: pending, error: fetchErr } = await supabase
+  const DAILY_BUDGET = 90;
+  const fromAddress = process.env.NEWSLETTER_FROM || 'Albasax <newsletter@albasax.com>';
+  const serverUrl = process.env.SERVER_URL || 'https://albasax-production.up.railway.app';
+  const delay = (ms) => new Promise(r => setTimeout(r, ms));
+  let totalSent = 0;
+  let totalFailed = 0;
+  const report = { welcome: { sent: 0, failed: 0 }, newsletter: {}, budget: DAILY_BUDGET };
+
+  // ── FASE 1: Welcome email pending ────────────────────────────────────────
+  const welcomeBudget = Math.floor(DAILY_BUDGET * 0.3); // max 30% del budget ai benvenuti
+  const { data: pendingWelcome } = await supabase
     .from('newsletter_subscribers')
     .select('id, email, name')
     .eq('confirmed', true)
     .eq('active', true)
     .eq('welcome_sent', false)
     .order('subscribed_at', { ascending: true })
-    .limit(90); // conservativo: lascia margine per altre email del giorno
+    .limit(welcomeBudget);
 
-  if (fetchErr) return res.status(500).json({ error: fetchErr.message });
-  if (!pending || pending.length === 0) return res.json({ sent: 0, message: 'Nessun pending' });
-
-  const fromAddress = process.env.NEWSLETTER_FROM || 'Albasax <newsletter@albasax.com>';
-  const serverUrl = process.env.SERVER_URL || 'https://albasax-production.up.railway.app';
-  let sent = 0;
-  let failed = 0;
-
-  for (const sub of pending) {
-    try {
-      const unsubToken = generateUnsubscribeToken(sub.id);
-      const unsubscribeUrl = `${serverUrl}/api/newsletter/unsubscribe?id=${sub.id}&token=${unsubToken}`;
-      await resend.emails.send({
-        from: fromAddress,
-        to: sub.email,
-        reply_to: 'info@albasax.com',
-        subject: 'Benvenuto nella newsletter di Albasax ✦',
-        html: buildWelcomeEmailTemplate({ name: sub.name || '', unsubscribeUrl }),
-      });
-      await supabase.from('newsletter_subscribers').update({ welcome_sent: true }).eq('id', sub.id);
-      sent++;
-    } catch (err) {
-      console.warn(`[Cron Welcome] Fallito per ${sub.email}:`, err.message);
-      failed++;
-      // Se è rate limit, non ha senso continuare oggi
-      if (err.statusCode === 429 || err.message?.includes('rate')) break;
+  if (pendingWelcome && pendingWelcome.length > 0) {
+    for (const sub of pendingWelcome) {
+      if (totalSent >= DAILY_BUDGET) break;
+      try {
+        const unsubToken = generateUnsubscribeToken(sub.id);
+        const unsubscribeUrl = `${serverUrl}/api/newsletter/unsubscribe?id=${sub.id}&token=${unsubToken}`;
+        await resend.emails.send({
+          from: fromAddress,
+          to: sub.email,
+          reply_to: 'info@albasax.com',
+          subject: 'Benvenuto nella newsletter di Albasax ✦',
+          html: buildWelcomeEmailTemplate({ name: sub.name || '', unsubscribeUrl }),
+        });
+        await supabase.from('newsletter_subscribers').update({ welcome_sent: true }).eq('id', sub.id);
+        totalSent++;
+        report.welcome.sent++;
+      } catch (err) {
+        console.warn(`[Cron Welcome] Fallito ${sub.email}:`, err.message);
+        report.welcome.failed++;
+        totalFailed++;
+        if (err.statusCode === 429 || err.message?.includes('rate')) { break; }
+      }
+      await delay(200);
     }
-    // Pausa 200ms tra ogni email per non stressare Resend
-    await new Promise(r => setTimeout(r, 200));
   }
 
-  console.log(`[Cron Welcome] Inviati: ${sent}, falliti: ${failed}, rimasti: ${pending.length - sent - failed}`);
-  res.json({ sent, failed, remaining: pending.length - sent - failed });
+  // ── FASE 2: Newsletter queue pendenti (più vecchie prima) ────────────────
+  // Cerca campagne con email non ancora inviate
+  const remainingBudget = DAILY_BUDGET - totalSent;
+  if (remainingBudget > 0) {
+    const { data: pendingQueue } = await supabase
+      .from('newsletter_queue')
+      .select('id, campaign_id, subscriber_id, email, name')
+      .eq('sent', false)
+      .is('error', null) // salta quelle con errore permanente
+      .order('created_at', { ascending: true })
+      .limit(remainingBudget);
+
+    if (pendingQueue && pendingQueue.length > 0) {
+      // Raggruppa per campagna per caricare subject/html una volta sola
+      const campaignIds = [...new Set(pendingQueue.map(r => r.campaign_id))];
+      const { data: campaigns } = await supabase
+        .from('newsletter_campaigns')
+        .select('id, subject, html_body, preview_text')
+        .in('id', campaignIds);
+      const campaignMap = Object.fromEntries((campaigns || []).map(c => [c.id, c]));
+
+      const BATCH_SIZE = 50;
+      const batched = [];
+      for (const item of pendingQueue) {
+        const camp = campaignMap[item.campaign_id];
+        if (!camp) continue;
+        const token = generateUnsubscribeToken(item.subscriber_id);
+        const unsubscribeUrl = `${serverUrl}/api/newsletter/unsubscribe?id=${item.subscriber_id}&token=${token}`;
+        batched.push({
+          queueId: item.id,
+          campaignId: item.campaign_id,
+          payload: {
+            from: fromAddress,
+            to: item.email,
+            reply_to: 'info@albasax.com',
+            subject: camp.subject,
+            text: buildPlainText({ subject: camp.subject, html: camp.html_body, name: item.name || 'Friend', unsubscribeUrl }),
+            html: buildEmailTemplate({ subject: camp.subject, html: camp.html_body, previewText: camp.preview_text, name: item.name || 'Friend', unsubscribeUrl }),
+            headers: {
+              'List-Unsubscribe': `<${unsubscribeUrl}>`,
+              'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+              'Precedence': 'bulk',
+            },
+          },
+        });
+      }
+
+      for (let i = 0; i < batched.length; i += BATCH_SIZE) {
+        if (totalSent >= DAILY_BUDGET) break;
+        const chunk = batched.slice(i, i + BATCH_SIZE);
+        const queueIds = chunk.map(e => e.queueId);
+        const campaignId = chunk[0].campaignId;
+        try {
+          const result = await resend.batch.send(chunk.map(e => e.payload));
+          if (result.error) {
+            await supabase.from('newsletter_queue').update({ error: result.error.message }).in('id', queueIds);
+            totalFailed += chunk.length;
+            report.newsletter[campaignId] = (report.newsletter[campaignId] || { sent: 0, failed: 0 });
+            report.newsletter[campaignId].failed += chunk.length;
+          } else {
+            await supabase.from('newsletter_queue').update({ sent: true, sent_at: new Date().toISOString() }).in('id', queueIds);
+            totalSent += chunk.length;
+            report.newsletter[campaignId] = (report.newsletter[campaignId] || { sent: 0, failed: 0 });
+            report.newsletter[campaignId].sent += chunk.length;
+          }
+        } catch (err) {
+          console.error(`[Cron Newsletter] Batch exception:`, err.message);
+          if (err.statusCode === 429 || err.message?.includes('rate')) break;
+          await supabase.from('newsletter_queue').update({ error: err.message }).in('id', queueIds);
+          totalFailed += chunk.length;
+        }
+        await delay(1500);
+      }
+
+      // Aggiorna status campagne completate
+      for (const campId of campaignIds) {
+        const { count } = await supabase
+          .from('newsletter_queue')
+          .select('id', { count: 'exact', head: true })
+          .eq('campaign_id', campId)
+          .eq('sent', false);
+        if (count === 0) {
+          await supabase.from('newsletter_campaigns').update({ status: 'done', completed_at: new Date().toISOString() }).eq('id', campId);
+        }
+      }
+    }
+  }
+
+  console.log(`[Cron] Fine — sent: ${totalSent}, failed: ${totalFailed}`);
+  res.json({ totalSent, totalFailed, report });
 });
 
 // ADMIN: Content table CRUD (usa service_role, bypassa RLS)

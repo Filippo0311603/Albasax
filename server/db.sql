@@ -187,6 +187,42 @@ ALTER TABLE newsletter_subscribers
 UPDATE newsletter_subscribers SET welcome_sent = TRUE WHERE confirmed = TRUE;
 
 -- ─────────────────────────────────────────────
+-- 8c. NEWSLETTER CAMPAIGNS + QUEUE
+--     Sistema di invio garantito con coda persistente.
+--     Ogni newsletter crea una campagna e una riga per iscritto.
+--     Il cron job svuota la coda a 90 email/giorno finché tutti ricevono.
+-- ─────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS newsletter_campaigns (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  subject      TEXT NOT NULL,
+  preview_text TEXT DEFAULT '',
+  html_body    TEXT NOT NULL,
+  total        INTEGER DEFAULT 0,
+  sent         INTEGER DEFAULT 0,
+  failed       INTEGER DEFAULT 0,
+  status       TEXT NOT NULL DEFAULT 'queued', -- queued | sending | done
+  created_at   TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  completed_at TIMESTAMP WITH TIME ZONE
+);
+ALTER TABLE newsletter_campaigns ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Admin read campaigns" ON newsletter_campaigns FOR SELECT USING (false); -- solo service_role
+
+CREATE TABLE IF NOT EXISTS newsletter_queue (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  campaign_id   UUID REFERENCES newsletter_campaigns(id) ON DELETE CASCADE,
+  subscriber_id UUID NOT NULL,
+  email         TEXT NOT NULL,
+  name          TEXT DEFAULT '',
+  sent          BOOLEAN DEFAULT FALSE,
+  error         TEXT,
+  created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  sent_at       TIMESTAMP WITH TIME ZONE
+);
+ALTER TABLE newsletter_queue ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Admin read queue" ON newsletter_queue FOR SELECT USING (false); -- solo service_role
+CREATE INDEX IF NOT EXISTS newsletter_queue_pending ON newsletter_queue (sent, campaign_id) WHERE sent = false;
+
+-- ─────────────────────────────────────────────
 -- 9. CONTENT TABLES (gestite dall'Admin panel via Railway service_role)
 --    Eseguire nel Supabase SQL Editor
 --    NOTA SICUREZZA: solo SELECT è permesso all'anon key.
