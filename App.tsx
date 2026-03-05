@@ -59,12 +59,14 @@ const App: React.FC = () => {
 
   const [revealed, setRevealed] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
-    if (Date.now() >= LAUNCH_DATE.getTime()) return true;       // già scaduto
-    return localStorage.getItem('albasax_sipario') === 'true';  // già aperto da questo browser
+    if (Date.now() >= LAUNCH_DATE.getTime()) return true;       // data di lancio superata
+    // Valido solo se il sipario è stato aperto DOPO la data di lancio reale
+    const stored = parseInt(localStorage.getItem('albasax_sipario') || '0', 10);
+    return stored >= LAUNCH_DATE.getTime();
   });
 
   const handleReveal = () => {
-    localStorage.setItem('albasax_sipario', 'true');
+    localStorage.setItem('albasax_sipario', String(Date.now()));
     setRevealed(true);
   };
 
