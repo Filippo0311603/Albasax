@@ -30,7 +30,13 @@ const Newsletter: React.FC = () => {
       if (!res.ok) throw new Error(data.error || t('newsletter.errorMsg'));
 
       setStatus('success');
-      setMessage(data.alreadyConfirmed ? t('newsletter.alreadyConfirmed') : t('newsletter.checkEmail'));
+      setMessage(
+        data.alreadyConfirmed
+          ? t('newsletter.alreadyConfirmed')
+          : data.queued
+          ? t('newsletter.queued')
+          : t('newsletter.checkEmail')
+      );
       setEmail('');
       setName('');
     } catch (err: any) {

@@ -46,6 +46,7 @@
     "successMsg": "You're in! Welcome to the inner circle.",
     "checkEmail": "Check your email and click the link to confirm your subscription.",
     "alreadyConfirmed": "You're already subscribed to the newsletter!",
+    "queued": "Registration received! There's high demand right now — you'll receive your confirmation email within a few hours.",
     "errorMsg": "Something went wrong. Try again."
   },
   "footer": {

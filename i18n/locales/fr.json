@@ -46,6 +46,7 @@
     "successMsg": "Bienvenue dans le cercle intérieur !",
     "checkEmail": "Consultez votre e-mail et cliquez sur le lien pour confirmer votre inscription.",
     "alreadyConfirmed": "Vous êtes déjà abonné à la newsletter !",
+    "queued": "Inscription reçue ! Il y a beaucoup de demandes en ce moment — vous recevrez votre e-mail de confirmation dans quelques heures.",
     "errorMsg": "Une erreur s'est produite. Veuillez réessayer."
   },
   "footer": {

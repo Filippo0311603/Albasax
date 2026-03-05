@@ -46,6 +46,7 @@
     "successMsg": "Bem-vindo ao círculo interno!",
     "checkEmail": "Verifique seu e-mail e clique no link para confirmar sua inscrição.",
     "alreadyConfirmed": "Você já está inscrito na newsletter!",
+    "queued": "Inscrição recebida! Há muita procura agora — você receberá o e-mail de confirmação em algumas horas.",
     "errorMsg": "Algo deu errado. Tente novamente."
   },
   "footer": {

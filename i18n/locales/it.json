@@ -46,6 +46,7 @@
     "successMsg": "Benvenuto nella cerchia ristretta!",
     "checkEmail": "Controlla la tua email e clicca il link per confermare l'iscrizione.",
     "alreadyConfirmed": "Sei già iscritto alla newsletter!",
+    "queued": "Iscrizione ricevuta! C'è molta richiesta in questo momento — riceverai l'email di conferma nelle prossime ore.",
     "errorMsg": "Qualcosa è andato storto. Riprova."
   },
   "footer": {

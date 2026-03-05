@@ -46,6 +46,7 @@
     "successMsg": "Willkommen im inneren Kreis!",
     "checkEmail": "Überprüfe deine E-Mail und klicke auf den Link, um dein Abonnement zu bestätigen.",
     "alreadyConfirmed": "Du bist bereits für den Newsletter angemeldet!",
+    "queued": "Anmeldung erhalten! Es gibt gerade sehr viel Nachfrage — du erhältst deine Bestätigungs-E-Mail in wenigen Stunden.",
     "errorMsg": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
   },
   "footer": {

@@ -46,6 +46,7 @@
     "successMsg": "¡Bienvenido al círculo íntimo!",
     "checkEmail": "Revisa tu email y haz clic en el enlace para confirmar tu suscripción.",
     "alreadyConfirmed": "¡Ya estás suscrito a la newsletter!",
+    "queued": "¡Registro recibido! Hay mucha demanda ahora mismo — recibirás el correo de confirmación en unas horas.",
     "errorMsg": "Algo salió mal. Inténtalo de nuevo."
   },
   "footer": {

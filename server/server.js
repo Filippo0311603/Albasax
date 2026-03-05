@@ -524,6 +524,7 @@ app.post('/api/newsletter/subscribe', newsletterRateLimit, async (req, res) => {
     // Se rate limit Resend, metti in coda: il cron la invierà entro 24h con priorità massima
     if (emailErr.statusCode === 429 || emailErr.message?.includes('rate')) {
       await supabase.from('newsletter_subscribers').update({ confirmation_queued: true }).eq('id', sub.id);
+      return res.json({ pending: true, queued: true });
     }
   }
 
