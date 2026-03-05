@@ -176,6 +176,17 @@ ALTER TABLE newsletter_subscribers
 UPDATE newsletter_subscribers SET confirmed = TRUE WHERE active = TRUE;
 
 -- ─────────────────────────────────────────────
+-- 8b. MIGRATION: Welcome email queue
+-- Aggiunge welcome_sent per gestire il limite giornaliero di Resend (100/giorno)
+-- Gli iscritti confermati senza welcome ricevono l'email dal cron job notturno
+-- ─────────────────────────────────────────────
+ALTER TABLE newsletter_subscribers
+  ADD COLUMN IF NOT EXISTS welcome_sent BOOLEAN DEFAULT FALSE;
+
+-- Chi è già confermato e attivo da prima viene considerato già benvenuto
+UPDATE newsletter_subscribers SET welcome_sent = TRUE WHERE confirmed = TRUE;
+
+-- ─────────────────────────────────────────────
 -- 9. CONTENT TABLES (gestite dall'Admin panel via Railway service_role)
 --    Eseguire nel Supabase SQL Editor
 --    NOTA SICUREZZA: solo SELECT è permesso all'anon key.

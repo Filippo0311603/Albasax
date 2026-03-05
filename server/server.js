@@ -116,6 +116,48 @@ function buildConfirmEmailTemplate({ name, confirmUrl }) {
 </html>`;
 }
 
+// Template HTML email di benvenuto (inviata dopo conferma)
+function buildWelcomeEmailTemplate({ name, unsubscribeUrl }) {
+  const greeting = name ? `Ciao ${name},` : 'Ciao,';
+  return `<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Benvenuto nella newsletter di Albasax</title>
+</head>
+<body style="margin:0;padding:0;background:#080808;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#080808;padding:0;margin:0;">
+    <tr><td align="center" style="padding:48px 16px;">
+      <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;width:100%;">
+        <tr><td style="background:linear-gradient(90deg,#6b4e0a,#c5a643,#f0d07a,#c5a643,#6b4e0a);height:2px;font-size:0;line-height:0;">&nbsp;</td></tr>
+        <tr><td align="center" style="background:#0f0f0f;padding:40px 40px 32px;">
+          <p style="margin:0 0 6px;font-size:10px;letter-spacing:0.5em;text-transform:uppercase;color:#c5a643;font-weight:700;">— ALBASAX —</p>
+          <p style="margin:0;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:#4b4b4b;">Official Newsletter</p>
+        </td></tr>
+        <tr><td style="background:#1a1a1a;height:1px;font-size:0;line-height:0;">&nbsp;</td></tr>
+        <tr><td style="background:#0f0f0f;padding:40px 48px;">
+          <p style="margin:0 0 20px;font-size:14px;color:#8a8a8a;">${greeting}</p>
+          <h2 style="margin:0 0 20px;font-family:Georgia,'Times New Roman',serif;font-size:28px;font-weight:400;color:#ffffff;line-height:1.25;letter-spacing:-0.01em;">Benvenuto nella famiglia Albasax.</h2>
+          <p style="margin:0 0 16px;font-size:15px;color:#9ca3af;line-height:1.85;font-weight:300;">Sei ufficialmente parte della mia newsletter. Riceverai in anteprima tutto quello che accade: nuova musica, date dei concerti, contenuti esclusivi e molto altro.</p>
+          <p style="margin:0 0 36px;font-size:15px;color:#9ca3af;line-height:1.85;font-weight:300;">Grazie per esserci.</p>
+          <table cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 40px;">
+            <tr><td align="center" style="padding:16px 40px;border:1px solid #c5a643;">
+              <a href="https://albasax.com" style="font-size:10px;letter-spacing:0.35em;text-transform:uppercase;color:#c5a643;text-decoration:none;font-weight:700;">Visita il sito</a>
+            </td></tr>
+          </table>
+          <div style="background:linear-gradient(90deg,transparent,#2a2a2a,transparent);height:1px;margin:0 0 32px;"></div>
+          <p style="margin:0;font-size:9px;color:#2a2a2a;line-height:1.8;">Stai ricevendo questa email perché ti sei iscritto alla newsletter di Albasax.<br>
+          <a href="${unsubscribeUrl}" style="color:#3a3a3a;text-decoration:underline;">Disiscriviti</a> &nbsp;&bull;&nbsp; <a href="https://albasax.com/legal/privacy" style="color:#3a3a3a;text-decoration:underline;">Privacy Policy</a></p>
+        </td></tr>
+        <tr><td style="background:linear-gradient(90deg,#6b4e0a,#c5a643,#f0d07a,#c5a643,#6b4e0a);height:2px;font-size:0;line-height:0;">&nbsp;</td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
 // Template HTML email newsletter
 function buildEmailTemplate({ subject, html, previewText, name, unsubscribeUrl }) {
   return `<!DOCTYPE html>
@@ -515,12 +557,37 @@ app.get('/api/newsletter/confirm', async (req, res) => {
 
   if (!valid) return res.redirect(`${clientUrl}/newsletter/confirm?status=error`);
 
-  const { error: updateErr } = await supabase
+  const { data: confirmedSub, error: updateErr } = await supabase
     .from('newsletter_subscribers')
     .update({ confirmed: true, active: true, confirm_token: null })
-    .eq('id', id);
+    .eq('id', id)
+    .select('id, email, name')
+    .single();
 
   if (updateErr) return res.redirect(`${clientUrl}/newsletter/confirm?status=error`);
+
+  // Tenta invio email di benvenuto
+  // Se Resend ha raggiunto il limite giornaliero, welcome_sent rimane false
+  // e il cron job notturno completerà l'invio
+  try {
+    const unsubToken = generateUnsubscribeToken(confirmedSub.id);
+    const serverUrl = process.env.SERVER_URL || 'https://albasax-production.up.railway.app';
+    const unsubscribeUrl = `${serverUrl}/api/newsletter/unsubscribe?id=${confirmedSub.id}&token=${unsubToken}`;
+    const fromAddress = process.env.NEWSLETTER_FROM || 'Albasax <newsletter@albasax.com>';
+    await resend.emails.send({
+      from: fromAddress,
+      to: confirmedSub.email,
+      reply_to: 'info@albasax.com',
+      subject: 'Benvenuto nella newsletter di Albasax ✦',
+      html: buildWelcomeEmailTemplate({ name: confirmedSub.name || '', unsubscribeUrl }),
+    });
+    // Email inviata con successo: marca welcome_sent = true
+    await supabase.from('newsletter_subscribers').update({ welcome_sent: true }).eq('id', confirmedSub.id);
+  } catch (welcomeErr) {
+    // Resend ha risposto con errore (rate limit o altro) — welcome_sent resta false
+    // Il cron job si occuperà di inviare il benvenuto più tardi
+    console.warn('[Welcome] Email non inviata, verrà riprovata dal cron job:', welcomeErr.message);
+  }
 
   res.redirect(`${clientUrl}/newsletter/confirm?status=success`);
 });
@@ -619,6 +686,60 @@ app.get('/api/admin/newsletter-status/:jobId', adminRateLimit, (req, res) => {
   const job = newsletterJobs[req.params.jobId];
   if (!job) return res.status(404).json({ error: 'Job non trovato' });
   res.json(job);
+});
+
+// CRON: Invio email di benvenuto ai pending (welcome_sent = false)
+// GET /api/cron/send-pending-welcomes
+// Chiamato ogni notte da cron-job.org — protetto da CRON_SECRET
+app.get('/api/cron/send-pending-welcomes', async (req, res) => {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret || req.headers['x-cron-secret'] !== cronSecret) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  // Prende tutti i confermati che non hanno ancora ricevuto il benvenuto
+  const { data: pending, error: fetchErr } = await supabase
+    .from('newsletter_subscribers')
+    .select('id, email, name')
+    .eq('confirmed', true)
+    .eq('active', true)
+    .eq('welcome_sent', false)
+    .order('subscribed_at', { ascending: true })
+    .limit(90); // conservativo: lascia margine per altre email del giorno
+
+  if (fetchErr) return res.status(500).json({ error: fetchErr.message });
+  if (!pending || pending.length === 0) return res.json({ sent: 0, message: 'Nessun pending' });
+
+  const fromAddress = process.env.NEWSLETTER_FROM || 'Albasax <newsletter@albasax.com>';
+  const serverUrl = process.env.SERVER_URL || 'https://albasax-production.up.railway.app';
+  let sent = 0;
+  let failed = 0;
+
+  for (const sub of pending) {
+    try {
+      const unsubToken = generateUnsubscribeToken(sub.id);
+      const unsubscribeUrl = `${serverUrl}/api/newsletter/unsubscribe?id=${sub.id}&token=${unsubToken}`;
+      await resend.emails.send({
+        from: fromAddress,
+        to: sub.email,
+        reply_to: 'info@albasax.com',
+        subject: 'Benvenuto nella newsletter di Albasax ✦',
+        html: buildWelcomeEmailTemplate({ name: sub.name || '', unsubscribeUrl }),
+      });
+      await supabase.from('newsletter_subscribers').update({ welcome_sent: true }).eq('id', sub.id);
+      sent++;
+    } catch (err) {
+      console.warn(`[Cron Welcome] Fallito per ${sub.email}:`, err.message);
+      failed++;
+      // Se è rate limit, non ha senso continuare oggi
+      if (err.statusCode === 429 || err.message?.includes('rate')) break;
+    }
+    // Pausa 200ms tra ogni email per non stressare Resend
+    await new Promise(r => setTimeout(r, 200));
+  }
+
+  console.log(`[Cron Welcome] Inviati: ${sent}, falliti: ${failed}, rimasti: ${pending.length - sent - failed}`);
+  res.json({ sent, failed, remaining: pending.length - sent - failed });
 });
 
 // ADMIN: Content table CRUD (usa service_role, bypassa RLS)
