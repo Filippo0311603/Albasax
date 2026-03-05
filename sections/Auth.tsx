@@ -19,7 +19,7 @@ function mapAuthError(msg: string): string {
   if (m.includes('invalid login credentials') || m.includes('invalid email or password'))
     return 'Email o password non corretti. Riprova.';
   if (m.includes('email not confirmed'))
-    return 'Devi confermare la tua email prima di accedere. Controlla la casella di posta (anche spam).';
+    return 'Email non ancora confermata — ma puoi esplorare il sito liberamente senza fare login. Quando vuoi accedere al tuo account, clicca il link che ti abbiamo inviato. Lo trovi anche nello spam.';
   if (m.includes('user already registered') || m.includes('already been registered'))
     return 'Questa email è già registrata. Prova ad accedere oppure usa "Password dimenticata?".';
   if (m.includes('password should be at least'))
@@ -568,22 +568,32 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout, isRecoveryMode = f
             <Mail size={36} className="text-gold" />
           </div>
           <div className="space-y-3">
-            <h2 className="text-3xl font-serif">Check Your Email</h2>
+            <h2 className="text-3xl font-serif">Benvenuto!</h2>
             <p className="text-gray-400 text-sm leading-relaxed">
-              We sent a confirmation link to<br />
+              Abbiamo inviato un link di conferma a<br />
               <span className="text-white font-semibold">{sentEmail}</span>
             </p>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              Puoi già <span className="text-gold">esplorare il sito liberamente</span> —
+              la conferma email non è necessaria per navigare.
+              Sarà richiesta solo per gli acquisti nello shop.
+            </p>
             <p className="text-gray-500 text-xs">
-              Click the link in the email to activate your account.
-              The link expires in <span className="text-gold">24 hours</span>.
+              Il link scade tra <span className="text-gold">24 ore</span>. Non lo vedi? Controlla lo spam.
             </p>
           </div>
           <div className="space-y-3">
             <button
-              onClick={() => { setEmailSent(false); setIsLogin(true); }}
+              onClick={() => navigate('/')}
               className="w-full py-4 bg-gold text-black font-bold uppercase tracking-widest text-xs hover:bg-gold/90 transition-all flex items-center justify-center gap-2"
             >
-              <ArrowRight size={14} /> Ho già verificato → Accedi
+              <ArrowRight size={14} /> Esplora il sito
+            </button>
+            <button
+              onClick={() => { setEmailSent(false); setIsLogin(true); }}
+              className="w-full py-4 border border-gray-700 text-gray-300 hover:border-gold hover:text-gold font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2"
+            >
+              <ArrowRight size={14} /> Ho già confermato → Accedi
             </button>
             <button
               onClick={handleResend}
@@ -591,7 +601,7 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout, isRecoveryMode = f
               className="w-full py-4 border border-gray-700 text-gray-300 hover:border-gold hover:text-gold font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-              {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend email'}
+              {resendCooldown > 0 ? `Rinvia tra ${resendCooldown}s` : 'Rinvia email'}
             </button>
             <button
               onClick={() => { setEmailSent(false); setIsLogin(false); }}
@@ -599,12 +609,6 @@ const Auth: React.FC<AuthProps> = ({ user, onLogin, onLogout, isRecoveryMode = f
             >
               ← Torna alla registrazione
             </button>
-          </div>
-          <div className="flex items-start gap-2 text-left bg-yellow-900/10 border border-yellow-800/30 p-4 rounded">
-            <AlertCircle size={16} className="text-yellow-600 mt-0.5 shrink-0" />
-            <p className="text-yellow-700 text-xs leading-relaxed">
-              Non la vedi? Controlla la cartella spam.
-            </p>
           </div>
         </div>
 
