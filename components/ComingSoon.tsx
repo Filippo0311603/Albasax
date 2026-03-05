@@ -114,7 +114,7 @@ const ComingSoon: React.FC<Props> = ({ onReveal }) => {
             — ALBASAX —
           </p>
           <p style={{ margin: '0 0 40px', fontSize: 9, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#4b4b4b', pointerEvents: 'none' }}>
-            Dramatic Pop
+            Dramatic World
           </p>
 
           {/* Headline */}
@@ -191,7 +191,7 @@ const ComingSoon: React.FC<Props> = ({ onReveal }) => {
               (e.currentTarget as HTMLButtonElement).style.color = '#c5a643';
             }}
           >
-            Alza il Sipario
+            Apri il Sipario
           </button>
 
           {/* Gold line bottom */}
