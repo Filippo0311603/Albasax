@@ -12,7 +12,8 @@ import { supabase } from './supabaseClient';
 import i18n from './i18n/index';
 
 // TEST: 2 minuti da quando il bundle viene caricato
-const LAUNCH_DATE = new Date(Date.now() + 2 * 60 * 1000);
+// Sabato 7 marzo 2026 ore 14:00 CET (UTC+1)
+const LAUNCH_DATE = new Date('2026-03-07T13:00:00Z');
 
 const Hero        = lazy(() => import('./sections/Hero'));
 const Biography   = lazy(() => import('./sections/Biography'));

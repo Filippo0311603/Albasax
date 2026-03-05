@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 // TEST: 2 minuti da quando il bundle viene caricato
-const LAUNCH_DATE = new Date(Date.now() + 2 * 60 * 1000);
+// Sabato 7 marzo 2026 ore 14:00 CET (UTC+1)
+const LAUNCH_DATE = new Date('2026-03-07T13:00:00Z');
 
 function calcTimeLeft() {
   const diff = LAUNCH_DATE.getTime() - Date.now();
