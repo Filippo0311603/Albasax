@@ -119,7 +119,7 @@ const ComingSoon: React.FC<Props> = ({ onReveal }) => {
 
           {/* Headline */}
           <p style={{ margin: '0 0 8px', fontFamily: "Georgia,'Times New Roman',serif", fontSize: 'clamp(22px,4vw,38px)', fontWeight: 400, color: '#ffffff', letterSpacing: '0.02em', textAlign: 'center', padding: '0 24px', lineHeight: 1.3, pointerEvents: 'none' }}>
-            Il sipario sta per alzarsi.
+            Il sipario sta per aprirsi.
           </p>
           <p style={{ margin: '0 0 48px', fontSize: 13, color: '#6b6b6b', letterSpacing: '0.1em', textAlign: 'center', padding: '0 32px', lineHeight: 1.7, pointerEvents: 'none' }}>
             Sabato 7 Marzo 2026 · ore 14:00
