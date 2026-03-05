@@ -651,7 +651,7 @@ app.post('/api/admin/send-newsletter', adminRateLimit, async (req, res) => {
 });
 
 // ── Processa coda newsletter: invia fino a maxEmails per sessione ────────────
-async function processNewsletterQueue(campaignId, subject, html, previewText, job, maxEmails = 90) {
+async function processNewsletterQueue(campaignId, subject, html, previewText, job, maxEmails = 50) {
   const { data: pending } = await supabase
     .from('newsletter_queue')
     .select('id, email, name, subscriber_id')
@@ -761,7 +761,7 @@ app.get('/api/cron/send-pending-welcomes', async (req, res) => {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const DAILY_BUDGET = 90;
+  const DAILY_BUDGET = 50; // 50 newsletter + 50 riservati alle email transazionali (conferme, welcome real-time)
   const fromAddress = process.env.NEWSLETTER_FROM || 'Albasax <newsletter@albasax.com>';
   const serverUrl = process.env.SERVER_URL || 'https://albasax-production.up.railway.app';
   const delay = (ms) => new Promise(r => setTimeout(r, ms));
@@ -770,7 +770,7 @@ app.get('/api/cron/send-pending-welcomes', async (req, res) => {
   const report = { welcome: { sent: 0, failed: 0 }, newsletter: {}, budget: DAILY_BUDGET };
 
   // ── FASE 1: Welcome email pending ────────────────────────────────────────
-  const welcomeBudget = Math.floor(DAILY_BUDGET * 0.3); // max 30% del budget ai benvenuti
+  const welcomeBudget = Math.floor(DAILY_BUDGET * 0.2); // max 20% del budget ai benvenuti (10 email)
   const { data: pendingWelcome } = await supabase
     .from('newsletter_subscribers')
     .select('id, email, name')
