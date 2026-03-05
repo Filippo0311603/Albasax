@@ -521,6 +521,10 @@ app.post('/api/newsletter/subscribe', newsletterRateLimit, async (req, res) => {
     });
   } catch (emailErr) {
     console.error('[Subscribe] Email send error:', emailErr.message);
+    // Se rate limit Resend, metti in coda: il cron la invierà entro 24h con priorità massima
+    if (emailErr.statusCode === 429 || emailErr.message?.includes('rate')) {
+      await supabase.from('newsletter_subscribers').update({ confirmation_queued: true }).eq('id', sub.id);
+    }
   }
 
   res.json({ pending: true });
@@ -767,7 +771,42 @@ app.get('/api/cron/send-pending-welcomes', async (req, res) => {
   const delay = (ms) => new Promise(r => setTimeout(r, ms));
   let totalSent = 0;
   let totalFailed = 0;
-  const report = { welcome: { sent: 0, failed: 0 }, newsletter: {}, budget: DAILY_BUDGET };
+  const report = { confirmation: { sent: 0, failed: 0 }, welcome: { sent: 0, failed: 0 }, newsletter: {}, budget: DAILY_BUDGET };
+
+  // ── FASE 0: Email di conferma in coda (PRIORITÀ MASSIMA) ─────────────────
+  // Iscritti che non hanno ricevuto l'email di conferma per rate limit
+  const { data: pendingConfirm } = await supabase
+    .from('newsletter_subscribers')
+    .select('id, email, name, confirm_token')
+    .eq('confirmed', false)
+    .eq('confirmation_queued', true)
+    .order('subscribed_at', { ascending: true })
+    .limit(10); // max 10: sono email critiche, ma non devono prosciugare il budget
+
+  if (pendingConfirm && pendingConfirm.length > 0) {
+    for (const sub of pendingConfirm) {
+      if (totalSent >= DAILY_BUDGET) break;
+      const confirmUrl = `${serverUrl}/api/newsletter/confirm?id=${sub.id}&token=${sub.confirm_token}`;
+      try {
+        await resend.emails.send({
+          from: fromAddress,
+          to: sub.email,
+          reply_to: 'info@albasax.com',
+          subject: 'Conferma la tua iscrizione alla newsletter di Albasax',
+          html: buildConfirmEmailTemplate({ name: sub.name || '', confirmUrl }),
+        });
+        await supabase.from('newsletter_subscribers').update({ confirmation_queued: false }).eq('id', sub.id);
+        totalSent++;
+        report.confirmation.sent++;
+      } catch (err) {
+        console.warn(`[Cron Confirm] Fallito ${sub.email}:`, err.message);
+        report.confirmation.failed++;
+        totalFailed++;
+        if (err.statusCode === 429 || err.message?.includes('rate')) break;
+      }
+      await delay(200);
+    }
+  }
 
   // ── FASE 1: Welcome email pending ────────────────────────────────────────
   const welcomeBudget = Math.floor(DAILY_BUDGET * 0.2); // max 20% del budget ai benvenuti (10 email)

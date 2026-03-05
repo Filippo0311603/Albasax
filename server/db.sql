@@ -187,6 +187,14 @@ ALTER TABLE newsletter_subscribers
 UPDATE newsletter_subscribers SET welcome_sent = TRUE WHERE confirmed = TRUE;
 
 -- ─────────────────────────────────────────────
+-- 8b2. CONFIRMATION_QUEUED
+--      Se l'email di conferma fallisce per rate limit Resend,
+--      il cron la invia il giorno dopo con priorità massima (Fase 0).
+-- ─────────────────────────────────────────────
+ALTER TABLE newsletter_subscribers
+  ADD COLUMN IF NOT EXISTS confirmation_queued BOOLEAN DEFAULT FALSE;
+
+-- ─────────────────────────────────────────────
 -- 8c. NEWSLETTER CAMPAIGNS + QUEUE
 --     Sistema di invio garantito con coda persistente.
 --     Ogni newsletter crea una campagna e una riga per iscritto.
