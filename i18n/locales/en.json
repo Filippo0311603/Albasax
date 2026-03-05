@@ -10,13 +10,13 @@
     "press": "Press"
   },
   "hero": {
-    "tagline": "GLAMOUR POP ARTIST",
+    "tagline": "DRAMATIC GLAMOUR POP ARTIST",
     "listenNow": "Listen Now",
     "viewTourDates": "View Tour Dates"
   },
   "bio": {
     "sectionLabel": "The Artist",
-    "p1": "ALBASAX is an international Pop Artist, Performer, Singer and Saxophonist, blending what he loves to define as his \"Cinematic Glamour Pop\" with live instruments and dramatic performance into a single artistic universe. Graduated from the prestigious Santa Cecilia Conservatory of Rome, he combines a solid musical foundation with contemporary pop, electronic soundscapes and theatrical storytelling.",
+    "p1": "ALBASAX is an international Pop Artist, Performer, Singer and Saxophonist, blending what he loves to define as his \"Dramatic Glamour Pop\" with live instruments and dramatic performance into a single artistic universe. Graduated from the prestigious Santa Cecilia Conservatory of Rome, he combines a solid musical foundation with contemporary pop, electronic soundscapes and theatrical storytelling.",
     "p2": "His artistic world is inspired by Hollywood cinema, theatrical aesthetics and pop spectacle, shaping a distinctive identity where elegance, glamour, vulnerability and power coexist.",
     "p3": "Driven by the belief that music is not only meant to be heard, but also seen, felt and lived, ALBASAX transforms each performance into a cinematic experience where music becomes a film and the stage becomes a scene.",
     "p4": "He is currently working on his international debut album, written in English and Spanish, conceived as a cinematic journey designed for a global audience, where sound, image and performance merge into one immersive vision."
@@ -40,7 +40,7 @@
   },
   "newsletter": {
     "title": "Join the Newsletter",
-    "subtitle": "Be the first to know about new album drops and secret pop-up shows.",
+    "subtitle": "Be the first to know about new album drops and secret pop-up shows. Be a part of the Dramatic community.",
     "namePlaceholder": "YOUR NAME (OPTIONAL)",
     "emailPlaceholder": "ENTER YOUR EMAIL",
     "successMsg": "You're in! Welcome to the inner circle.",

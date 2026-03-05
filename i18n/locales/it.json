@@ -10,13 +10,13 @@
     "press": "Press"
   },
   "hero": {
-    "tagline": "ARTISTA POP GLAMOUR",
+    "tagline": "DRAMATIC ARTISTA POP GLAMOUR",
     "listenNow": "Ascolta Ora",
     "viewTourDates": "Date del Tour"
   },
   "bio": {
     "sectionLabel": "L'Artista",
-    "p1": "ALBASAX è un Artista Pop, Performer, Cantante e Sassofonista internazionale, che fonde ciò che ama definire il suo \"Cinematic Glamour Pop\" con strumenti dal vivo e performance drammatiche in un unico universo artistico. Diplomato al prestigioso Conservatorio Santa Cecilia di Roma, coniuga una solida formazione musicale con il pop contemporaneo, paesaggi sonori elettronici e storytelling teatrale.",
+    "p1": "ALBASAX è un Artista Pop, Performer, Cantante e Sassofonista internazionale, che fonde ciò che ama definire il suo \"Dramatic Glamour Pop\" con strumenti dal vivo e performance drammatiche in un unico universo artistico. Diplomato al prestigioso Conservatorio Santa Cecilia di Roma, coniuga una solida formazione musicale con il pop contemporaneo, paesaggi sonori elettronici e storytelling teatrale.",
     "p2": "Il suo mondo artistico è ispirato al cinema hollywoodiano, all'estetica teatrale e allo spettacolo pop, plasmando un'identità distintiva in cui eleganza, glamour, vulnerabilità e potere coesistono.",
     "p3": "Convinto che la musica non sia fatta solo per essere ascoltata, ma anche vista, sentita e vissuta, ALBASAX trasforma ogni esibizione in un'esperienza cinematografica in cui la musica diventa un film e il palco diventa una scena.",
     "p4": "Attualmente sta lavorando al suo album di debutto internazionale, scritto in inglese e spagnolo, concepito come un viaggio cinematografico pensato per un pubblico globale, in cui suono, immagine e performance si fondono in un'unica visione immersiva."
@@ -40,7 +40,7 @@
   },
   "newsletter": {
     "title": "Iscriviti alla Newsletter",
-    "subtitle": "Sii il primo a sapere dei nuovi album e degli show segreti.",
+    "subtitle": "Sii il primo a sapere dei nuovi album e degli show segreti. Entra a far parte della Dramatic community.",
     "namePlaceholder": "IL TUO NOME (OPZIONALE)",
     "emailPlaceholder": "INSERISCI LA TUA EMAIL",
     "successMsg": "Benvenuto nella cerchia ristretta!",

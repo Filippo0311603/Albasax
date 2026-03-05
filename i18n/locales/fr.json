@@ -10,13 +10,13 @@
     "press": "Presse"
   },
   "hero": {
-    "tagline": "ARTISTE POP GLAMOUR",
+    "tagline": "DRAMATIC ARTISTE POP GLAMOUR",
     "listenNow": "Écouter Maintenant",
     "viewTourDates": "Dates de Tournée"
   },
   "bio": {
     "sectionLabel": "L'Artiste",
-    "p1": "ALBASAX est un Artiste Pop, Performeur, Chanteur et Saxophoniste international, mêlant ce qu'il aime définir comme son « Cinematic Glamour Pop » à des instruments live et des performances dramatiques dans un univers artistique unique. Diplômé du prestigieux Conservatoire Santa Cecilia de Rome, il allie une solide formation musicale au pop contemporain, aux paysages sonores électroniques et à la narration théâtrale.",
+    "p1": "ALBASAX est un Artiste Pop, Performeur, Chanteur et Saxophoniste international, mêlant ce qu'il aime définir comme son « Dramatic Glamour Pop » à des instruments live et des performances dramatiques dans un univers artistique unique. Diplômé du prestigieux Conservatoire Santa Cecilia de Rome, il allie une solide formation musicale au pop contemporain, aux paysages sonores électroniques et à la narration théâtrale.",
     "p2": "Son univers artistique s'inspire du cinéma hollywoodien, de l'esthétique théâtrale et du spectacle pop, forgeant une identité distinctive où élégance, glamour, vulnérabilité et puissance coexistent.",
     "p3": "Convaincu que la musique n'est pas seulement faite pour être entendue, mais aussi vue, ressentie et vécue, ALBASAX transforme chaque performance en une expérience cinématographique où la musique devient un film et la scène devient une image.",
     "p4": "Il travaille actuellement sur son premier album international, écrit en anglais et en espagnol, conçu comme un voyage cinématographique destiné à un public mondial, où son, image et performance fusionnent en une vision immersive unique."
@@ -40,7 +40,7 @@
   },
   "newsletter": {
     "title": "Rejoindre la Newsletter",
-    "subtitle": "Soyez le premier informé des nouvelles sorties d'albums et des shows secrets.",
+    "subtitle": "Soyez le premier informé des nouvelles sorties d'albums et des shows secrets. Rejoignez la Dramatic community.",
     "namePlaceholder": "VOTRE NOM (FACULTATIF)",
     "emailPlaceholder": "ENTREZ VOTRE E-MAIL",
     "successMsg": "Bienvenue dans le cercle intérieur !",
