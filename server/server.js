@@ -118,38 +118,111 @@ function buildConfirmEmailTemplate({ name, confirmUrl }) {
 
 // Template HTML email di benvenuto (inviata dopo conferma)
 function buildWelcomeEmailTemplate({ name, unsubscribeUrl }) {
-  const greeting = name ? `Ciao ${name},` : 'Ciao,';
+  const greeting = name ? `Caro/a ${name},` : 'Ospite d\'Onore,';
+  const preHeader = 'Mettiti comodo: le luci in sala si stanno abbassando. Lo show sta per iniziare.';
   return `<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Benvenuto nella newsletter di Albasax</title>
+  <title>🎬 Il proiettore è acceso. Il tuo pass esclusivo per il mondo di Albasax.</title>
 </head>
 <body style="margin:0;padding:0;background:#080808;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#080808;padding:0;margin:0;">
+  <!-- Pre-header invisibile -->
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;color:#080808;line-height:1px;">${preHeader}&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;</div>
+
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#080808;">
     <tr><td align="center" style="padding:48px 16px;">
       <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;width:100%;">
+
+        <!-- GOLD LINE TOP -->
         <tr><td style="background:linear-gradient(90deg,#6b4e0a,#c5a643,#f0d07a,#c5a643,#6b4e0a);height:2px;font-size:0;line-height:0;">&nbsp;</td></tr>
-        <tr><td align="center" style="background:#0f0f0f;padding:40px 40px 32px;">
-          <p style="margin:0 0 6px;font-size:10px;letter-spacing:0.5em;text-transform:uppercase;color:#c5a643;font-weight:700;">— ALBASAX —</p>
-          <p style="margin:0;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:#4b4b4b;">Official Newsletter</p>
+
+        <!-- HEADER -->
+        <tr><td align="center" style="background:#0f0f0f;padding:40px 40px 28px;">
+          <p style="margin:0 0 6px;font-size:10px;letter-spacing:0.6em;text-transform:uppercase;color:#c5a643;font-weight:700;">— ALBASAX —</p>
+          <p style="margin:0;font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:#4b4b4b;">Official Newsletter</p>
         </td></tr>
         <tr><td style="background:#1a1a1a;height:1px;font-size:0;line-height:0;">&nbsp;</td></tr>
-        <tr><td style="background:#0f0f0f;padding:40px 48px;">
-          <p style="margin:0 0 20px;font-size:14px;color:#8a8a8a;">${greeting}</p>
-          <h2 style="margin:0 0 20px;font-family:Georgia,'Times New Roman',serif;font-size:28px;font-weight:400;color:#ffffff;line-height:1.25;letter-spacing:-0.01em;">Benvenuto nella famiglia Albasax.</h2>
-          <p style="margin:0 0 16px;font-size:15px;color:#9ca3af;line-height:1.85;font-weight:300;">Sei ufficialmente parte della mia newsletter. Riceverai in anteprima tutto quello che accade: nuova musica, date dei concerti, contenuti esclusivi e molto altro.</p>
-          <p style="margin:0 0 36px;font-size:15px;color:#9ca3af;line-height:1.85;font-weight:300;">Grazie per esserci.</p>
-          <table cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 40px;">
-            <tr><td align="center" style="padding:16px 40px;border:1px solid #c5a643;">
-              <a href="https://albasax.com" style="font-size:10px;letter-spacing:0.35em;text-transform:uppercase;color:#c5a643;text-decoration:none;font-weight:700;">Visita il sito</a>
+
+        <!-- BODY -->
+        <tr><td style="background:#0f0f0f;padding:44px 48px 40px;">
+
+          <!-- Greeting -->
+          <p style="margin:0 0 28px;font-size:15px;color:#8a8a8a;line-height:1.6;">${greeting}</p>
+
+          <!-- Titolo benvenuto -->
+          <h2 style="margin:0 0 8px;font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:400;color:#ffffff;line-height:1.3;letter-spacing:0.01em;">Benvenuto/a nell’universo di Albasax.</h2>
+          <div style="background:linear-gradient(90deg,#c5a643,transparent);height:1px;margin:0 0 28px;"></div>
+
+          <!-- Intro -->
+          <p style="margin:0 0 12px;font-size:15px;color:#9ca3af;line-height:1.85;font-weight:300;">Non sei entrato/a in una semplice mailing list.</p>
+          <p style="margin:0 0 28px;font-size:15px;color:#d1d5db;line-height:1.85;font-weight:400;">Ora fai parte dei <span style="color:#c5a643;font-weight:700;letter-spacing:0.05em;">THE DRAMATICS</span>, la community ufficiale di chi ama vivere la musica come uno spettacolo, una storia, un film.</p>
+
+          <!-- Dramatic Pop -->
+          <p style="margin:0 0 6px;font-size:13px;color:#6b6b6b;letter-spacing:0.15em;text-transform:uppercase;">Il genere di Albasax è il:</p>
+          <p style="margin:0 0 20px;font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#c5a643;letter-spacing:0.05em;font-weight:400;">Dramatic Pop</p>
+          <p style="margin:0 0 32px;font-size:15px;color:#9ca3af;line-height:1.85;font-weight:300;">Un mondo dove la teatralità del palco si fonde con l’eleganza del grande cinema hollywoodiano e l’energia del pop elettronico moderno.</p>
+
+          <p style="margin:0 0 20px;font-size:15px;color:#d1d5db;line-height:1.6;font-style:italic;">Non si tratta solo di canzoni.</p>
+
+          <p style="margin:0 0 10px;font-size:15px;color:#9ca3af;line-height:1.85;">&#127917; Albasax dà voce ai drammi, alle passioni e alle luci accecanti che tutti portiamo dentro.</p>
+          <p style="margin:0 0 40px;font-size:15px;color:#9ca3af;line-height:1.85;">&#127927; Porta in scena musica, danza e visione artistica come un’unica esperienza nel suo grande show.</p>
+
+          <!-- Divider -->
+          <div style="background:linear-gradient(90deg,transparent,#2a2a2a,transparent);height:1px;margin:0 0 36px;"></div>
+
+          <!-- Cosa significa -->
+          <p style="margin:0 0 20px;font-size:11px;letter-spacing:0.35em;text-transform:uppercase;color:#c5a643;font-weight:700;">&#127903;&#65039; Cosa significa essere un Dramatics?</p>
+          <p style="margin:0 0 24px;font-size:15px;color:#9ca3af;line-height:1.7;">Come membro della sua platea esclusiva, avrai accesso a:</p>
+
+          <table cellpadding="0" cellspacing="0" role="presentation" style="width:100%;margin:0 0 36px;">
+            <tr><td style="padding:14px 20px;border-left:2px solid #c5a643;margin-bottom:12px;background:#141414;">
+              <p style="margin:0 0 4px;font-size:13px;color:#c5a643;font-weight:600;">&#127916; Ciak in anteprima</p>
+              <p style="margin:0;font-size:14px;color:#9ca3af;line-height:1.6;">Ascolterai i nuovi brani prima dell’uscita ufficiale.</p>
+            </td></tr>
+            <tr><td style="height:8px;"></td></tr>
+            <tr><td style="padding:14px 20px;border-left:2px solid #c5a643;background:#141414;">
+              <p style="margin:0 0 4px;font-size:13px;color:#c5a643;font-weight:600;">&#127917; Dietro le quinte</p>
+              <p style="margin:0;font-size:14px;color:#9ca3af;line-height:1.6;">Scoprirai la nascita dei pezzi, le idee, i concept e le storie che non si vedono sul palco.</p>
+            </td></tr>
+            <tr><td style="height:8px;"></td></tr>
+            <tr><td style="padding:14px 20px;border-left:2px solid #c5a643;background:#141414;">
+              <p style="margin:0 0 4px;font-size:13px;color:#c5a643;font-weight:600;">&#127903;&#65039; Inviti riservati</p>
+              <p style="margin:0;font-size:14px;color:#9ca3af;line-height:1.6;">Accesso prioritario a eventi, live, videoclip e contenuti speciali.</p>
             </td></tr>
           </table>
-          <div style="background:linear-gradient(90deg,transparent,#2a2a2a,transparent);height:1px;margin:0 0 32px;"></div>
+
+          <!-- Divider -->
+          <div style="background:linear-gradient(90deg,transparent,#2a2a2a,transparent);height:1px;margin:0 0 36px;"></div>
+
+          <!-- Sito -->
+          <p style="margin:0 0 12px;font-size:15px;color:#9ca3af;line-height:1.85;">Il nuovo palcoscenico digitale ha appena aperto le porte.<br>E tu sei tra i primi a metterci piede.</p>
+          <p style="margin:0 0 12px;font-size:15px;color:#d1d5db;line-height:1.85;font-style:italic;">Le luci in sala si stanno abbassando.<br>Il primo atto sta per cominciare.</p>
+          <p style="margin:0 0 32px;font-size:15px;color:#9ca3af;line-height:1.85;">Se vuoi iniziare subito a entrare nell’atmosfera, seguici sul red carpet digitale:</p>
+
+          <!-- Social buttons -->
+          <table cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 40px;">
+            <tr>
+              <td style="padding:0 8px 0 0;"><a href="https://www.instagram.com/albasax_official/" style="display:inline-block;padding:12px 20px;border:1px solid #c5a643;font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:#c5a643;text-decoration:none;font-weight:700;">Instagram</a></td>
+              <td style="padding:0 8px;"><a href="https://www.youtube.com/@albasaxofficial" style="display:inline-block;padding:12px 20px;border:1px solid #3a3a3a;font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:#6b6b6b;text-decoration:none;font-weight:700;">YouTube</a></td>
+            </tr>
+          </table>
+
+          <!-- Sign off -->
+          <p style="margin:0 0 8px;font-size:15px;color:#9ca3af;line-height:1.85;">A presto, e buona visione.</p>
+          <p style="margin:0 0 4px;font-size:15px;color:#c5a643;font-weight:600;letter-spacing:0.05em;">✨🖤 Albasax Crew 🖤✨</p>
+          <p style="margin:0 0 36px;font-size:12px;color:#4b4b4b;font-style:italic;">*Creator of Dramatic Pop*</p>
+
+          <!-- Divider -->
+          <div style="background:linear-gradient(90deg,transparent,#1f1f1f,transparent);height:1px;margin:0 0 28px;"></div>
+
+          <!-- Footer legale -->
           <p style="margin:0;font-size:9px;color:#2a2a2a;line-height:1.8;">Stai ricevendo questa email perché ti sei iscritto alla newsletter di Albasax.<br>
           <a href="${unsubscribeUrl}" style="color:#3a3a3a;text-decoration:underline;">Disiscriviti</a> &nbsp;&bull;&nbsp; <a href="https://albasax.com/legal/privacy" style="color:#3a3a3a;text-decoration:underline;">Privacy Policy</a></p>
         </td></tr>
+
+        <!-- GOLD LINE BOTTOM -->
         <tr><td style="background:linear-gradient(90deg,#6b4e0a,#c5a643,#f0d07a,#c5a643,#6b4e0a);height:2px;font-size:0;line-height:0;">&nbsp;</td></tr>
       </table>
     </td></tr>
@@ -583,7 +656,7 @@ app.get('/api/newsletter/confirm', async (req, res) => {
       from: fromAddress,
       to: confirmedSub.email,
       reply_to: 'info@albasax.com',
-      subject: 'Benvenuto nella newsletter di Albasax ✦',
+      subject: '🎬 Il proiettore è acceso. Il tuo pass esclusivo per il mondo di Albasax.',
       html: buildWelcomeEmailTemplate({ name: confirmedSub.name || '', unsubscribeUrl }),
     });
     // Email inviata con successo: marca welcome_sent = true
@@ -830,7 +903,7 @@ app.get('/api/cron/send-pending-welcomes', async (req, res) => {
           from: fromAddress,
           to: sub.email,
           reply_to: 'info@albasax.com',
-          subject: 'Benvenuto nella newsletter di Albasax ✦',
+          subject: '🎬 Il proiettore è acceso. Il tuo pass esclusivo per il mondo di Albasax.',
           html: buildWelcomeEmailTemplate({ name: sub.name || '', unsubscribeUrl }),
         });
         await supabase.from('newsletter_subscribers').update({ welcome_sent: true }).eq('id', sub.id);
