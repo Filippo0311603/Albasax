@@ -4,6 +4,14 @@
   "installCommand": "npm install",
   "framework": "vite",
   "outputDirectory": "./dist",
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "www.albasax.com" }],
+      "destination": "https://albasax.com/$1",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
